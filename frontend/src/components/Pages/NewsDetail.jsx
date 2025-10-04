@@ -7,7 +7,7 @@ function NewsDetail() {
   const { id } = useParams(); // id from URL
   const navigate = useNavigate();
   const [selectedArticle, setSelectedArticle] = useState(null);
-  const [relatedArticles, setRelatedArticles] = useState([]);
+  const [relatedArticles, setRelatedArticles] = useState([]); 
   const [articlesByCategory, setArticlesByCategory] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -92,7 +92,7 @@ function NewsDetail() {
         {/* Back Button */}
         <button
           onClick={handleBack}
-          className="flex items-center gap-2 mb-8 text-blue-600 hover:text-gray-900 transition-colors"
+          className="flex items-center gap-2 mb-8 text-gray-600 hover:text-gray-900 transition-colors"
         >
           <ChevronRight className="rotate-180 h-5 w-5" />
           <span>Back to all articles</span>
@@ -135,12 +135,10 @@ function NewsDetail() {
           {selectedArticle.title}
         </h1>
 
-     
-        {/* Content dangerouslySetInnerHTML*/}
-        <div
-          className="text-gray-700 text-lg leading-relaxed mb-6 prose"
-          dangerouslySetInnerHTML={{ __html: selectedArticle.content }}
-        />
+        {/* Content */}
+        <p className="text-gray-700 text-lg leading-relaxed mb-6">
+          {selectedArticle.content}
+        </p>
       </div>
 
       {/* SIDEBAR */}
@@ -187,7 +185,7 @@ function NewsDetail() {
                   {articles.map((a) => (
                     <li
                       key={a._id}
-                      className="cursor-pointer text-sm text-gray-800 font-semibold hover:text-indigo-600"
+                      className="cursor-pointer text-sm text-gray-600 hover:text-indigo-600"
                       onClick={() => navigate(`/news/${a._id}`)}
                     >
                       {a.title}
