@@ -4,7 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { Search, Calendar, Clock, ChevronRight } from "lucide-react";
 import axios from "axios";
 
-const categories = ["All", "Announcements", "Exam Updates", "Results", "Events"];
+const categories = [
+  "All",
+  "Announcements",
+  "Exam Updates",
+  "Results",
+  "Events",
+];
 
 function News() {
   const navigate = useNavigate();
@@ -14,7 +20,6 @@ function News() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
   const [visibleCount, setVisibleCount] = useState(6); // show 6 initially
-
 
   useEffect(() => {
     axios
@@ -57,9 +62,9 @@ function News() {
       day: "numeric",
     });
   };
-const handleLoadMore = () => {
-  setVisibleCount((prev) => prev + 6); // load 6 more articles each time
-};
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + 6); // load 6 more articles each time
+  };
 
   if (loading) return <div className="p-8 text-center">Loading news...</div>;
   if (error) return <div className="p-8 text-center text-red-600">{error}</div>;
@@ -77,18 +82,19 @@ const handleLoadMore = () => {
           </p>
         </div>
       </header>*/}
-       {/* Header */}
-        {/* Header section */}
-            <header className="pt-8">
-              <div className="text-center mb-4 md:mb-6">
-                <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-2">
+      {/* Header */}
+      {/* Header section */}
+      <header className="pt-8">
+        <div className="text-center mb-4 md:mb-6">
+          <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-2">
             News & Updates
-              </h2>
-            <p className="text-gray-600 text-lg md:text-xl">
-                 Stay updated with the latest announcements, exam updates, and success stories from our coaching institute
-              </p>
-            </div>
-            </header>
+          </h2>
+          <p className="text-gray-600 text-lg md:text-xl">
+            Stay updated with the latest announcements, exam updates, and
+            success stories from our coaching institute
+          </p>
+        </div>
+      </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Search and Filters */}
@@ -144,7 +150,13 @@ const handleLoadMore = () => {
                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 leading-tight">
                   {featuredNews.title}
                 </h2>
-                <p className="text-gray-600 mb-6 text-lg leading-relaxed">{featuredNews.excerpt}</p>
+                {/*<p className="text-gray-600 mb-6 text-lg leading-relaxed">{featuredNews.excerpt}</p>*/}
+                {/* Sidebar Excerpt */}
+                <div
+                  className="text-gray-700 text-sm leading-relaxed mb-4 prose"
+                  dangerouslySetInnerHTML={{ __html: featuredNews.excerpt }}
+                />
+
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4 text-sm text-gray-500">
                     <div className="flex items-center gap-1">
@@ -172,7 +184,7 @@ const handleLoadMore = () => {
         {/* News Grid */}
         <section>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-{regularNews.slice(0, visibleCount).map((item) => (
+            {regularNews.slice(0, visibleCount).map((item) => (
               <article
                 key={item._id}
                 className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
@@ -234,8 +246,12 @@ const handleLoadMore = () => {
               <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                 <Search className="h-8 w-8 text-gray-400" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No results found</h3>
-              <p className="text-gray-600">Try adjusting your search terms or selected category.</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No results found
+              </h3>
+              <p className="text-gray-600">
+                Try adjusting your search terms or selected category.
+              </p>
             </div>
           )}
         </section>
@@ -243,10 +259,9 @@ const handleLoadMore = () => {
         {/* Load More */}
         {regularNews.length > 0 && (
           <div className="text-center mt-12">
-            <button 
-                  onClick={handleLoadMore}
-
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
+            <button
+              onClick={handleLoadMore}
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
             >
               Load More Articles
             </button>
