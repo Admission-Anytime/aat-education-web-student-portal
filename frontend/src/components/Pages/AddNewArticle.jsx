@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+
 //to edit or add news and updates page entries
 function AddNewArticle({ editingEntry, onSubmit, onBack }) {
   const [title, setTitle] = useState("");
@@ -80,7 +83,7 @@ console.log(editingEntry.readTime);
         </div>
 
         {/* Excerpt */}
-        <div>
+        {/*<div>
           <label className="block text-sm font-medium text-gray-700">Excerpt</label>
           <textarea
             value={excerpt}
@@ -89,10 +92,30 @@ console.log(editingEntry.readTime);
             rows={3}
             required
           />
-        </div>
+        </div>*/}
+        <div>
+  <label className="block text-sm font-medium text-gray-700">Excerpt</label>
+  <CKEditor
+    editor={ClassicEditor}
+    config={{
+    toolbar: [
+      'heading', '|',
+      'bold', 'italic', 'underline', 'link', '|',
+      'alignment', 'outdent', 'indent', '|',
+      'fontColor', 'fontBackgroundColor', '|',
+      'insertTable', 'undo', 'redo'
+    ],
+  }}
+    data={excerpt}
+    onChange={(event, editor) => {
+      const data = editor.getData();
+      setExcerpt(data);
+    }}
+  />
+</div>
 
         {/* Content */}
-        <div>
+       {/*} <div>
           <label className="block text-sm font-medium text-gray-700">Content</label>
           <textarea
             value={content}
@@ -101,7 +124,20 @@ console.log(editingEntry.readTime);
             rows={6}
             required
           />
-        </div>
+        </div>*/}
+
+        <div>
+  <label className="block text-sm font-medium text-gray-700">Content</label>
+  <CKEditor
+    editor={ClassicEditor}
+    data={content}
+    onChange={(event, editor) => {
+      const data = editor.getData();
+      setContent(data);
+    }}
+  />
+</div>
+
 
         {/* Category */}
         <div>
@@ -126,6 +162,7 @@ console.log(editingEntry.readTime);
         </div>
 
         {/* Image */}
+       {/* Image */}
         <div>
           <label className="block text-sm font-medium text-gray-700">Image</label>
           <input
@@ -141,7 +178,6 @@ console.log(editingEntry.readTime);
             />
           )}
         </div>
-
         {/* Featured */}
         <div className="flex items-center space-x-2">
           <input
