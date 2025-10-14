@@ -39,6 +39,7 @@ import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import Testimonial from "../Pages/Testimonial";
 import FooterAdmin from "../Pages/FooterAdmin";
+import CorporateTrainingProgramTable from "../Pages/CoorporateAdmin";
 
 const AdminPanel = () => {
   const navigate = useNavigate();
@@ -977,7 +978,6 @@ const AdminPanel = () => {
   const tabs = [
     { id: "institute", label: "Institute Info", icon: Building2 },
     { id: "home", label: "Home Page Slider", icon: Home },
-    { id: "stats", label: "Statistics", icon: Trophy },
     { id: "courses", label: "Courses", icon: GraduationCap },
     { id: "news", label: "News & Updates", icon: Calendar },
     { id: "corporate", label: "Corporate Training", icon: Users },
@@ -1604,186 +1604,8 @@ if (activeTab !== "institute") return null;*/
 
                 {/* Corporate Training Tab */}
                 {activeTab === "corporate" && (
-                  <div className="min-h-screen  ">
-                    <div className="max-w-6xl mx-auto">
-                      {/* Header Section */}
-                      <div className="  ">
-                        <h1 className="text-2xl font-bold text-gray-900 mb-6">
-                          Corporate Training Programs
-                        </h1>
-                      </div>
+                 <CorporateTrainingProgramTable />
 
-                      {/* Training Programs Grid */}
-                      <div className="grid gap-8 md:grid-cols-1 mb-12 ">
-                        {corporateTraining.map((category, categoryIndex) => (
-                          <div
-                            key={category.id}
-                            className="group bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden"
-                          >
-                            {/* Card Header */}
-                            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6">
-                              <div className="flex items-center space-x-4">
-                                <span className=" text-white text-2xl opacity-90">
-                                  {" "}
-                                  {categoryIndex + 1}
-                                </span>
-                                <input
-                                  type="text"
-                                  value={category.title}
-                                  onChange={(e) => {
-                                    const updated = corporateTraining.map(
-                                      (cat) =>
-                                        cat.id === category.id
-                                          ? { ...cat, title: e.target.value }
-                                          : cat
-                                    );
-                                    setCorporateTraining(updated);
-                                  }}
-                                  // className="relative w-full text-2xl font-bold bg-transparent border-none outline-none placeholder-white placeholder-opacity-70 text-white"
-                                  className="flex-1 bg-white/20 text-white placeholder-indigo-200 border border-white/30 rounded-lg px-4 py-2 text-xl font-semibold focus:outline-none focus:bg-white/30 focus:border-white transition-all"
-                                  placeholder="Program Title"
-                                />
-                                <button
-                                  onClick={() => removeProgram(category.id)}
-                                  className="p-2 text-red-300 hover:text-red-100 hover:bg-red-500/20 rounded-lg transition-all duration-200"
-                                  title="Remove Category"
-                                >
-                                  <Trash2 className="w-5 h-5" />
-                                </button>
-                              </div>
-                            </div>
-
-                            {/* Card Content */}
-                            <div className="p-6 space-y-6">
-                              {/* Description */}
-                              <div>
-                                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
-                                  Program Description
-                                </label>
-                                <textarea
-                                  value={category.description}
-                                  onChange={(e) => {
-                                    const updated = corporateTraining.map(
-                                      (cat) =>
-                                        cat.id === category.id
-                                          ? {
-                                              ...cat,
-                                              description: e.target.value,
-                                            }
-                                          : cat
-                                    );
-                                    setCorporateTraining(updated);
-                                  }}
-                                  rows={3}
-                                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-100 focus:border-blue-400 transition-all duration-200 resize-none bg-gray-50 hover:bg-white"
-                                  placeholder="Describe the program objectives and outcomes..."
-                                />
-                              </div>
-
-                              {/* Courses Section */}
-                              <div>
-                                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-4">
-                                  <GraduationCap className="w-4 h-4" />
-                                  Modules ({category.courses.length})
-                                </label>
-
-                                <div className="space-y-3">
-                                  {category.courses.map((course, index) => (
-                                    <div
-                                      key={index}
-                                      className="group/course flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-blue-50 transition-all duration-200"
-                                    >
-                                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover/course:bg-blue-200 transition-colors duration-200">
-                                        <span className="text-sm font-semibold text-blue-700">
-                                          {index + 1}
-                                        </span>
-                                      </div>
-                                      <input
-                                        type="text"
-                                        value={course}
-                                        onChange={(e) =>
-                                          updateCourse(
-                                            category.id,
-                                            index,
-                                            e.target.value
-                                          )
-                                        }
-                                        className="flex-1 px-4 py-2 border border-transparent rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all duration-200 bg-transparent hover:bg-white focus:bg-white"
-                                        placeholder="Course title..."
-                                      />
-                                      <button
-                                        onClick={() =>
-                                          removeCourse(category.id, index)
-                                        }
-                                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200 opacity-0 group-hover/course:opacity-100"
-                                      >
-                                        <Trash2 className="w-4 h-4" />
-                                      </button>
-                                    </div>
-                                  ))}
-                                </div>
-
-                                <button
-                                  onClick={() => addCourse(category.id)}
-                                  className="mt-4 w-full py-3 px-4 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 font-medium flex items-center justify-center gap-2 group/add"
-                                >
-                                  <Plus className="w-4 h-4 group-hover/add:rotate-180 transition-transform duration-300" />
-                                  Add Module
-                                </button>
-                              </div>
-
-                              {/* Remove Program Button */}
-                              {/* <div className="pt-4 border-t border-gray-100">
-                                                                <button
-                                                                    onClick={() => removeProgram(category.id)}
-                                                                    className="w-full py-3 px-4 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all duration-200 font-medium flex items-center justify-center gap-2 group/delete"
-                                                                >
-                                                                    <Trash2 className="w-4 h-4 group-hover/delete:animate-pulse" />
-                                                                    Remove Training Program
-                                                                </button>
-                                                            </div> */}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Empty State */}
-                      {corporateTraining.length === 0 && (
-                        <div className="text-center py-16">
-                          <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-2xl flex items-center justify-center">
-                            <Building2 className="w-12 h-12 text-gray-400" />
-                          </div>
-                          <h3 className="text-xl font-semibold text-gray-600 mb-2">
-                            No Training Programs Yet
-                          </h3>
-                          <p className="text-gray-500 mb-6">
-                            Get started by creating your first corporate
-                            training program.
-                          </p>
-                          <button
-                            onClick={addProgram}
-                            className="px-8 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors duration-200 font-semibold"
-                          >
-                            Create First Program
-                          </button>
-                        </div>
-                      )}
-
-                      {/* Add Program Button */}
-                      <div className="flex justify-center mb-10 ">
-                        <button
-                          onClick={addProgram}
-                          className="w-full border-2 border-dashed border-blue-300 rounded-xl p-6 text-blue-600 hover:text-blue-700 hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 flex items-center justify-center space-x-3 group/add"
-                        >
-                          <Plus className="w-8 h-8 font-bold  group-hover/add:rotate-180 transition-transform duration-300" />
-                          <span className="font-bold text-xl">
-                            {" "}
-                            Add Training Program
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
                 )}
 
                 {/* Courses Tab */}
@@ -1822,6 +1644,8 @@ if (activeTab !== "institute") return null;*/
                         placeholder="Enter description"
                       />
                     </div>
+
+                  
 
                     {/* Statistics Section */}
 

@@ -2,7 +2,7 @@ import express from "express";
 import multer from "multer";
 import Blog from "../models/addnewblogSchema.js";
 const router = express.Router();
-
+const BASE_URL = process.env.BASE_URL ;
 // Configure Multer for image uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

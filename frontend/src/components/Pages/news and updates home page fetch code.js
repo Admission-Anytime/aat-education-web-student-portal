@@ -1,7 +1,7 @@
 //temporry
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
+const BASE_URL = process.env.REACT_APP_BASE_URL ;
 const NewsSection = () => {
   const [news, setNews] = useState([]);
   const [featuredPost, setFeaturedPost] = useState(null);
@@ -10,7 +10,7 @@ const NewsSection = () => {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const res = await axios.get("http://localhost:4001/api/news"); // your backend route
+        const res = await axios.get($`{BASE_URL}/api/news`); // your backend route
         const sortedNews = res.data.sort(
           (a, b) => new Date(b.date) - new Date(a.date)
         );
@@ -49,7 +49,7 @@ const NewsSection = () => {
               <div className="rounded-lg overflow-hidden h-full flex flex-col shadow-lg">
                 <a href="#" className="block overflow-hidden rounded-t-lg">
                   <img
-                    src={`http://localhost:4001/Uploads/${featuredPost.image}`}
+                    src={`${BASE_URL}/Uploads/${featuredPost.image}`}
                     alt={featuredPost.title}
                     className="w-full h-auto object-cover hover:scale-105 transition-transform duration-300"
                   />
@@ -82,7 +82,7 @@ const NewsSection = () => {
                 >
                   <div className="flex-shrink-0 w-20 h-20 rounded-md overflow-hidden">
                     <img
-                      src={`http://localhost:4001/Uploads/${post.image}`}
+                      src={`${BASE_URL}/Uploads/${post.image}`}
                       alt={post.title}
                       className="w-full h-full object-cover"
                     />

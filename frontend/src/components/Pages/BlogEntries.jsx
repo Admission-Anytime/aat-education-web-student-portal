@@ -9,7 +9,7 @@ const BlogEntriesPage = () => {
   const [blogEntries, setBlogEntries] = useState([]); // initially empty
   const [loading, setLoading] = useState(true);
   const [showAddBlog, setShowAddBlog] = useState(false);
-
+const BASE_URL = process.env.REACT_APP_BASE_URL ;
   const fallbackImage =
     "https://media.istockphoto.com/id/1453843862/photo/business-meeting.jpg?s=612x612&w=0&k=20&c=4k9H7agmpn92B7bkUywvkK5Ckwm9Y8f8QrGs4DRDWpE=";
 
@@ -17,7 +17,7 @@ const BlogEntriesPage = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const response = await axios.get("http://localhost:4001/api/blogs");
+        const response = await axios.get(`${BASE_URL}/api/blogs`);
         setBlogEntries(response.data); // backend should return array of blogs
       } catch (error) {
         console.error("Error fetching blogs:", error);
@@ -53,7 +53,7 @@ const BlogEntriesPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:4001/api/blogs/${id}`);
+      await axios.delete(`${BASE_URL}/api/blogs/${id}`);
       setBlogEntries((prev) => prev.filter((entry) => entry._id !== id)); // backend uses _id
     } catch (error) {
       console.error("Error deleting blog:", error);
@@ -145,7 +145,7 @@ const BlogEntriesPage = () => {
                     </td>
                     <td className="px-6 py-4">
                       <img
-                        src={`http://localhost:4001/uploads/${entry.sliderImage}` || fallbackImage}
+                        src={`${BASE_URL}/uploads/${entry.sliderImage}` || fallbackImage}
                         alt={entry.title + " Slider"}
                         className="h-16 w-24 object-cover rounded-md border"
                       />

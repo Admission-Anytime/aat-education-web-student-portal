@@ -172,48 +172,55 @@ const getIcon = (title) => {
             {/* Footer */}
      
   {/* Footer */}
-   <footer className="bg-gray-900 text-gray-400 py-12">
-      {/* Main Links */}
-      <div className=" mx-auto  flex flex-wrap justify-center space-x-10 mb-8">
-        {footerData.mainLinks.map((link, index) => (
-          <a
-            key={index}
-            href={link.href}
-            className="hover:text-orange-400 transition-transform transform hover:translate-x-1"
-          >
-            {link.text}
-          </a>
-        ))}
-      </div>
+  <footer className="bg-gradient-to-b from-gray-900 via-gray-950 to-black text-gray-300 pt-14 pb-8">
+  {/* Top: Logo and Description */}
+  <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 border-b border-gray-800 pb-10">
+  
 
-      {/* Sections */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 px-6">
-        {footerData.sections.map((section, index) => (
-          <div key={index} className="flex flex-col">
-            <div className="flex items-center mb-4 space-x-2">
-              {getIcon(section.title)}
-              <h3 className="font-bold text-white">{section.title}</h3>
-            </div>
-            <nav className="flex flex-col space-y-2">
-              {section.links.map((link, i) => (
+    {/* Main Links */}
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-10 text-sm w-full md:w-auto">
+      {footerData.sections.map((section, index) => (
+        <div key={index}>
+          <div className="flex items-center mb-3 space-x-2">
+            {getIcon(section.title)}
+            <h3 className="text-lg font-semibold text-white">{section.title}</h3>
+          </div>
+          <ul className="space-y-2">
+            {section.links.map((link, i) => (
+              <li key={i}>
                 <a
-                  key={i}
                   href={link.href}
-                  className="hover:text-orange-400 transition-transform transform hover:translate-x-1"
+                  className="hover:text-orange-400 transition-all duration-300 hover:translate-x-1 inline-block"
                 >
                   {link.text}
                 </a>
-              ))}
-            </nav>
-          </div>
-        ))}
-      </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
 
-      {/* Copyright */}
-      <div className="mt-12 text-center text-sm text-gray-500">
-        {footerData.copyrightText}
-      </div>
-    </footer>
+  {/* Middle: Quick Links */}
+  <div className="flex flex-wrap justify-center gap-6 mt-10 text-sm border-b border-gray-800 pb-6">
+    {footerData.mainLinks.map((link, index) => (
+      <a
+        key={index}
+        href={link.href}
+        className="hover:text-orange-400 transition-all duration-300 hover:translate-y-0.5"
+      >
+        {link.text}
+      </a>
+    ))}
+  </div>
+
+  {/* Bottom: Copyright */}
+  <div className="mt-6 text-center text-xs text-gray-500">
+    <p>{footerData.copyrightText}</p>
+  </div>
+</footer>
+
 
    
 

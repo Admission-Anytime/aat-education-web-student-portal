@@ -24,6 +24,9 @@ import {
 import axios from "axios";
 import { createPortal } from "react-dom";
 
+//const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+console.log("Base URL:", BASE_URL);
 export default function MainPage() {
   //courses or progtrams section
   // BookOpen icon component
@@ -49,11 +52,13 @@ export default function MainPage() {
 
   useEffect(() => {
     // Replace with actual API call or keep mock data
-    axios
-      .get("/api/courses")
+      console.log("useEffect triggered");
+
+   axios.get("/api/courses")
       .then((res) => {
         const visibleCourses = res.data.filter((course) => course.visible);
-
+        console.log("Courses API Response:", res.data);
+        // Map to desired format
         const formatted = visibleCourses.map((program) => ({
           title: program.title,
           description: program.description,
@@ -70,12 +75,13 @@ export default function MainPage() {
               : []),
           ],
         }));
-
+console.log(formatted, "from mainpage.jsx line 81 courses axios.get");
         setPrograms(formatted);
         setIsLoading(false);
       })
       .catch((err) => {
         console.error("Error fetching courses:", err);
+ 
         setIsLoading(false);
       });
   }, []);
@@ -86,13 +92,14 @@ export default function MainPage() {
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
-        const res = await axios.get("http://localhost:4001/api/testimonials");
+        const res = await axios.get(`${BASE_URL}/api/testimonials`);
+        console.log("Testimonials API Response:", res.data);
 
         // Normalize: always include full URL
         const dataWithUrl = res.data.map((t) => ({
           ...t,
           profileImageUrl: t.profileImage
-            ? `http://localhost:4001${t.profileImage}` // ✅ add backend host
+            ? `${BASE_URL}${t.profileImage}` // ✅ add backend host
             : "/default-profile.jpg", // fallback
         }));
         console.log(dataWithUrl);
@@ -114,7 +121,8 @@ export default function MainPage() {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const res = await axios.get("http://localhost:4001/api/news"); // your backend route
+        const res = await axios.get(`${BASE_URL}/api/news`); // your backend route
+        console.log("News API Response:", res.data);
         const sortedNews = res.data.sort(
           (a, b) => new Date(b.date) - new Date(a.date)
         );
@@ -220,8 +228,8 @@ export default function MainPage() {
       setError("");
       setSuccess("");
 
-      // ✅ Send to backend
-      const res = await axios.post("/api/subscribers", { whatsapp, email });
+      // ✅ Send to backend ${BASE_URL}
+      const res = await axios.post(`${BASE_URL}/api/subscribers`, { whatsapp, email });
       console.log("email subscription", res.data.message);
       if (res.status === 200) {
         setSuccess(res.data.message || "You have successfully subscribed!");
@@ -243,19 +251,11 @@ export default function MainPage() {
   const visibleSlides = carouselData.filter((item) => item.visible);
 
   // Fetch carousel data from backend
-  /*useEffect(() => {
-    axios
-      .get("http://localhost:4001/api/carousel")
-      .then((res) => 
-        { console.log("Slider's fetched Data:", res.data);
-          setCarouselData(res.data)
-        })
-      .catch((err) => console.error(err));
-  }, []);*/
+ 
   useEffect(() => {
     const fetchCarousel = () => {
       axios
-        .get("http://localhost:4001/api/carousel")
+        .get(`${BASE_URL}/api/carousel`)
         .then((res) => setCarouselData(res.data))
         .catch((err) => console.error(err));
     };
@@ -274,6 +274,7 @@ export default function MainPage() {
   }, [visibleSlides]);
 
   // Auto-slide every 4 seconds
+ 
   useEffect(() => {
     if (carouselData.length > 0) {
       const timer = setInterval(() => {
@@ -540,7 +541,7 @@ export default function MainPage() {
     // Function to fetch the data
     const fetchAbout = async () => {
       try {
-        const response = await axios.get("/api/about");
+        const response = await axios.get(`${BASE_URL}/api/about`);
         // Update state, which triggers a re-render
         setAbout(response.data);
       } catch (error) {
@@ -693,7 +694,7 @@ export default function MainPage() {
               >
                 {/* To Fix: show image from uploads folder */}
                 <img
-                  src={`http://localhost:4001/Uploads/${item.imagename}`} // ✅ make sure folder name is Uploads with capital U as per Backend/Uploads
+                  src={`${BASE_URL}/Uploads/${item.imagename}`} // ✅ make sure folder name is Uploads with capital U as per Backend/Uploads
                   alt={"No image available"}
                   className="w-full h-full object-cover"
                 />
@@ -786,13 +787,13 @@ export default function MainPage() {
             </section> */}
 
       {/** dynamic about section fetching values from mongodb*/}
-      <section id="about" className="py-12 ">
+      <section id="about" className="py-14 ">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">
+            <h2 className="text-4xl font-bold text-black mb-4">
               {about.heading}
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-700 max-w-3xl mx-auto">
               {about.description}
             </p>
           </div>
@@ -828,7 +829,7 @@ export default function MainPage() {
                 <h3 className="text-2xl font-bold text-gray-800 mb-2">
                   {stat.number}
                 </h3>
-                <p className="text-gray-600">{stat.label}</p>
+                <p className="text-gray-700">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -839,15 +840,15 @@ export default function MainPage() {
       <section id="programs" className=" bg-gray-50 font-sans">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4 pt-6">
+            <h2 className="text-4xl font-bold text-black mb-4 pt-6">
               <a
-                href="http://localhost:5173/CorporateTraining"
+                href=""
                 className="hover:text-blue-600"
               >
                 Academic Programs
               </a>
             </h2>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto">
               Comprehensive educational programs designed to foster intellectual
               growth and personal development at every stage.
             </p>
@@ -916,7 +917,7 @@ export default function MainPage() {
         <div className="max-w-7xl mx-auto px-1 py-8  style={{ marginLeft: '-0.5cm' }">
           {/* Header */}
           <div className="text-center mb-8">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">
+            <h2 className="text-4xl font-bold text-black mb-4">
               <a
                 href="http://localhost:5173/News&Updates"
                 className="hover:text-blue-600"
@@ -924,7 +925,7 @@ export default function MainPage() {
                 News and Updates
               </a>
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-700">
               We'd love to hear from you. Contact us for admissions or any
               queries.
             </p>
@@ -941,16 +942,16 @@ export default function MainPage() {
                 <div className=" overflow-hidden  flex flex-col ">
                   <a href="#" className="block overflow-hidden ">
                     <img
-                      src={`http://localhost:4001/Uploads/${featuredPost.image}`}
+                      src={`${BASE_URL}/Uploads/${featuredPost.image}`}
                       alt={featuredPost.title}
                       className="w-full h-auto object-cover hover:scale-105 transition-transform duration-300"
                     />
                   </a>
                   <div className="p-4 bg-white flex flex-col justify-between flex-grow ">
-                    <span className="text-xs text-orange-400 font-bold mb-2">
-                      {new Date(featuredPost.date).toLocaleDateString()}
+                    <span className="text-sm text-blue-600 font-medium mb-2">
+                       {new Date(featuredPost.date).toLocaleDateString()}
                     </span>
-                    <h4 className=" font-xs font-bold mb-2">
+                    <h4 className=" font-xs font-semibold mb-2">
                       {featuredPost.title}
                     </h4>
                     {/*<p className="text-gray-700 text-sm line-clamp-3">
@@ -972,16 +973,16 @@ export default function MainPage() {
                   >
                     <div className="flex-shrink-0 w-20 h-20 overflow-hidden rounded">
                       <img
-                        src={`http://localhost:4001/Uploads/${post.image}`}
+                        src={`${BASE_URL}/Uploads/${post.image}`}
                         alt={post.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                       />
                     </div>
                     <div className="flex-grow">
-                      <span className="text-xs text-orange-400 font-bold mb-1 block">
+                      <span className="text-xs text-blue-700 font-medium mb-1">
                         {new Date(post.date).toLocaleDateString()}
                       </span>
-                      <h4 className="font-xs font-bold mb-2 group-hover:text-blue-600 transition-colors">
+                      <h4 className="font-xs font-semibold mb-2 group-hover:text-blue-600 transition-colors">
                         {post.title}
                       </h4>
                     </div>
@@ -992,7 +993,7 @@ export default function MainPage() {
               <div className="mt-8">
                 <a
                   href="http://localhost:5173/News&Updates"
-                  className="block text-right text-lg font-bold text-red-600 hover:text-red-800 transition-colors hover:underline"
+                  className="block text-right text-lg font-bold text-red-700 hover:text-red-800 transition-colors hover:underline"
                 >
                   Read All News &rarr;
                 </a>
@@ -1154,10 +1155,10 @@ export default function MainPage() {
         <section id="testimonial" className="py-12 ">
           <div className="max-w-7xl mx-auto text-center px-4 sm:px-6 lg:px-4">
             {/* Section Heading */}
-            <h2 className="text-4xl font-bold text-gray-800">Testimonials</h2>
-            <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-gray-600 rounded-xl">
-              Hear directly from the people who have experienced our exceptional
-              service.
+            <h2 className="text-4xl font-bold text-black">Testimonials</h2>
+            <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-gray-700 rounded-xl">
+                            Hear directly from the people whose futures we've helped shape.
+
             </p>
 
             {/* Testimonial Slider */}
@@ -1216,26 +1217,27 @@ export default function MainPage() {
                       <div className="flex flex-col items-center">
                         {/* Profile Image */}
                         <img
-                          className="h-30 w-30 rounded-full object-cover border-4 border-indigo-500 shadow-sm"
+                          className="h-30 w-30 rounded-full object-cover border-1 shadow-sm"
                           src={testimonial.profileImageUrl}
                           alt={`Profile of ${testimonial.name}`}
                         />
 
                         {/* Testimonial Quote */}
                         {/* Testimonial Quote */}
-                        <blockquote className="mt-6 text-center text-lg font-medium text-gray-700 leading-snug italic">
+                        <blockquote className="mt-6 text-center flex-grow text-base text-gray-700  italic">
+                          
                           "{testimonial.message}"
                         </blockquote>
 
                         {/* Author Info */}
                         <div className="mt-4 text-center">
-                          <p className="text-xl font-semibold text-gray-900">
+                          <p className="font-semibold text-gray-900">
                             {testimonial.name}
                           </p>
                           <p className="text-base text-gray-500">
                             {testimonial.title}
                           </p>
-                          <p className="text-base text-gray-500">
+                          <p className="text-sm text-gray-500">
                             {testimonial.designation}
                           </p>
                         </div>
@@ -1251,11 +1253,15 @@ export default function MainPage() {
       {/* Subscribe Section */}
       <div className="">
         {/* Subscribe Section */}
-        <div className="text-center bg-gray-800 py-12 p-8 shadow-2xl">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
+        <div className="text-center  bg-gradient-to-r from-blue-900 to-indigo-900  py-10 p-8 shadow-2xl">
+          {/*<h2 className="text-2xl md:text-3xl font-semibold text-white mb-2">*/}
+                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+
             Subscribe to Our Newsletter
           </h2>
-          <p className="text-white mb-6 max-w-xl mx-auto">
+          {/*<p className="text-white mb-6 max-w-xl mx-auto">*/}
+                    <p className="text-lg text-blue-100 mb-8">
+
             Stay updated with the latest news, admission alerts, and career
             guidance directly to your inbox and WhatsApp.
           </p>
@@ -1307,7 +1313,7 @@ export default function MainPage() {
 
             <button
               onClick={handleSubscribe}
-              className="w-full sm:w-auto px-6 py-3 bg-orange-500 hover:bg-orange-600 transition-colors duration-300 text-white font-semibold rounded-lg shadow-md"
+              className="w-full  sm:w-auto px-6 py-3 bg-white text-blue-600 font-bold px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors shadow-lg"
             >
               Subscribe
             </button>

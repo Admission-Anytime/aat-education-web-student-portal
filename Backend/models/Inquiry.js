@@ -1,13 +1,14 @@
-import { Schema, model } from "mongoose";
+import mongoose from "mongoose";
 
-const inquirySchema = new Schema({
-    name: { type: String, required: true },
-    email: { type: String, required: true },
-    phone: { type: String, required: true },
-    program: { type: String, required: true },
-    state: { type: String, required: true },
-    city: { type: String, required: true },
-    consent: { type: Boolean, required: true },
+const inquirySchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  phone: { type: String, required: true, unique: true },
+  program: { type: String, required: true },
+  state: { type: String },
+  city: { type: String },
+  consent: { type: Boolean, default: false },
 }, { timestamps: true });
 
-export default model("Inquiry", inquirySchema);
+const Inquiry = mongoose.model("InquirySaved", inquirySchema);
+export default Inquiry;

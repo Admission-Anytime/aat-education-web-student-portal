@@ -16,7 +16,6 @@ import Layout from "./components/Layout";
 //import SignUpandLogin from "./components/Pages/SignUpandLogin";
 import AddNewBlog from "./components/Pages/AddNewBlog";
 import BlogEntries from "./components/Pages/BlogEntries";
-import Addnewblogwithckeditor from "./components/Pages/addnewblogwithckeditor";
 //import Homepagesaboutsection from './components/Pages/Homepagesaboutsection'
 //import Slidertest from "./components/Pages/Slidertest";
 import Test from "./components/Pages/Test";
@@ -29,8 +28,8 @@ import Newssectionnewlook from "./components/Pages/Newssectionnewlook";
 import FooterAdmin from "./components/Pages/FooterAdmin";
 import AdminLogin from "./components/Pages/AdminLogin";
 import ProtectedRoute from "./components/Panel/ProtectedRoute";
-//import inquiryformforrightcorner from "./components/inquiryformforrightcorner.jsx"
-const App = () => {
+ //import inquiryformforrightcorner from "./components/inquiryformforrightcorner.jsx"
+ const App = () => {
   return (
     <div>
       <Routes>
@@ -38,18 +37,16 @@ const App = () => {
           <Route path="" element={<SchoolWebsite />}>
             <Route path="" element={<MainPage />}></Route>
             <Route path="Aboutus" element={<AboutUs />} />
-            <Route path="Courses" element={<Courses />} />
-            {/*<Route
+            <Route path="Courses" element={<Test />} />
+            <Route
               path="CorporateTraining"
               element={<CooperateTrainingProgram />}
-            />*/}
-            <Route path="CorporateTraining" element={<Test />} />
-           {/* <Route path="test" element={<Newssectionnewlook />} />*/}
-
-            <Route path="News&Updates" element={<News />} />
-            <Route path="apply-now" element={<ApplyNow />}>
-              <Route path="registration-form" element={<RegistrationForm />} />
-            </Route>
+            />
+            {/* <Route path="test" element={<Newssectionnewlook />} />*/}
+             <Route path="News&Updates" element={<News />} />
+            <Route path="apply-now" element={<RegistrationForm/>}/>
+             
+            
           </Route>
         </Route>
         {/* CONDITIONAL RENDERING after login by admin*/}

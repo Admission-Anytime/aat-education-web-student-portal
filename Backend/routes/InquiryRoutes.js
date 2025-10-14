@@ -1,6 +1,7 @@
 // routes/formRoutes.js
 import express from "express";
 import { Router } from "express";
+import Inquiry from "../models/Inquiry.js";
  const router = express.Router()
 // const router =express.Router();
 // Send OTP
@@ -22,15 +23,40 @@ router.post("/verify-otp", (req, res) => {
 });
 
 // Submit form
-router.post("/submit-form", (req, res) => {
-  const { phone, name, email, program, state, city } = req.body;
+router.post("/submit-form", async (req, res) => {
+  const { phone, name, email, program, state, city, consent } = req.body;
+
+  console.log("POST /submit-form body:", req.body);
+
   if (!verifiedPhones.has(phone)) {
     return res.status(403).json({ message: "Phone not verified" });
   }
-  console.log("Form submitted:", { phone, name, email, program, state, city });
-  verifiedPhones.delete(phone);
-  res.json({ message: "Form submitted successfully" });
+
+  try {
+    const inquiry = new Inquiry({
+      name,
+      email,
+      phone,
+      program,
+      state,
+      city,
+      consent,
+      otpVerified: true, // mark OTP as verified in DB
+    });
+
+    await inquiry.save();
+    console.log("Saved inquiry:", inquiry);
+
+    // Remove phone from verified set
+    verifiedPhones.delete(phone);
+
+    res.json({ message: "Form submitted successfully", inquiry });
+  } catch (err) {
+    console.error("Error saving inquiry:", err);
+    res.status(500).json({ message: "Failed to save form" });
+  }
 });
+
 // Check if a phone is verified
 router.get("/is-verified/:phone", (req, res) => {
   const { phone } = req.params;
@@ -85,7 +111,7 @@ router.post("/verify-otp", (req, res) => {
 // ----------------------
 router.post("/submit-form", async (req, res) => {
   const { phone, name, email, program, state, city, consent } = req.body;
-
+console.log("post inquiry",req.body);
   if (!verifiedPhones.has(phone)) {
     return res.status(403).json({ message: "Phone not verified" });
   }

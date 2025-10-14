@@ -1,3 +1,4 @@
+//Academic Courses file
 import React, { useState } from "react";
 import {
   ArrowLeft,
@@ -35,6 +36,8 @@ const CourseCatalog = () => {
 
   
 const [courses, setCourses] = useState([]);
+const BASE_URL = import.meta.env.VITE_BASE_URL ;
+console.log("BASE_URL:", BASE_URL);
 
 useEffect(() => {
   console.log("useEffect fired");  // ✅ Debug
@@ -47,32 +50,33 @@ useEffect(() => {
 }, []);
 
   // Map categories to color schemes for the course cards
-  const categoryColors = {
-    Undergraduate: {
-      bg: "bg-white",
-      text: "text-blue-800",
-      tagBg: "bg-blue-200",
-      tagText: "text-blue-800",
-    },
-    Postgraduate: {
-      bg: "bg-white",
-      text: "text-purple-800",
-      tagBg: "bg-purple-200",
-      tagText: "text-purple-800",
-    },
-    Diploma: {
-      bg: "bg-white",
-      text: "text-green-800",
-      tagBg: "bg-green-200",
-      tagText: "text-green-800",
-    },
-    Doctoral: {
-      bg: "bg-white",
-      text: "text-yellow-800",
-      tagBg: "bg-yellow-200",
-      tagText: "text-yellow-800",
-    },
-  };
+ const categoryColors = {
+  Postgraduate: {
+    bg: "bg-fuchsia-100",       // softer background
+    text: "text-fuchsia-900",  // dark blue for readability
+    tagBg: "bg-blue-200",   // slightly brighter for tags
+    tagText: "text-blue-800",
+  },
+  Undergraduate: {
+    bg: "bg-yellow-50",     // soft yellow background
+    text: "text-yellow-900", 
+    tagBg: "bg-yellow-300", // brighter for tag
+    tagText: "text-yellow-800",
+  },
+  Diploma: {
+    bg: "bg-green-50",      // light green background
+    text: "text-green-900",
+    tagBg: "bg-green-200",
+    tagText: "text-green-800",
+  },
+  Doctoral: {
+    bg: "bg-purple-50",     // light purple background
+    text: "text-purple-900",
+    tagBg: "bg-purple-300", // brighter purple for tag
+    tagText: "text-purple-800",
+  },
+};
+
 
 
   // Hardcoded data for the professional courses
@@ -506,6 +510,7 @@ useEffect(() => {
       </button>
     </div>
   );
+  
 
   // Component for displaying the detailed view of a single course
   const CourseDetails = ({ course, onBackClick }) => {
@@ -558,7 +563,7 @@ useEffect(() => {
     };
 
     return (
-      <div className="p-6 md:p-10 max-w-5xl mx-auto my-8">
+<div className="px-4 sm:px-6 md:px-10 max-w-5xl mx-auto my-6 sm:my-8">
   {/* <div className="bg-white rounded-2xl shadow-xl p-6 md:p-10 max-w-5xl mx-auto my-8"> */}
         {/* Header with back button and title */}
         <div className="flex justify-between items-center mb-6">
@@ -805,8 +810,8 @@ useEffect(() => {
             {/* Header section */}
             <header>
               <div className="text-center mb-4 md:mb-6 py-1">
-                <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-2">
-                  Academic Programs
+                <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-2">
+                  Academic Program
                 </h1>
                 <p className="text-gray-600 text-lg md:text-xl">
                   Choose from a wide range of undergraduate and postgraduate

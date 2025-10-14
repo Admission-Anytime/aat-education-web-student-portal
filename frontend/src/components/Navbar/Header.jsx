@@ -3,9 +3,9 @@ import logo_image from "../../assets/img/Logo.jpg";
 import { NavLink } from "react-router-dom";
 import { Menu } from "lucide-react";
 import axios from "axios";
-
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+const BASE_URL = import.meta.env.VITE_BASE_URL ;
 
   //dynamic institute info fetching
 
@@ -14,7 +14,7 @@ const Header = () => {
   useEffect(() => {
     const fetchInstitute = async () => {
       try {
-        const res = await axios.get("http://localhost:4001/api/institute");
+        const res = await axios.get(`${BASE_URL}/api/institute`);
         //setInstitute(res.data);
         setInstitute(Array.isArray(res.data) ? res.data[0] : res.data);
         console.log("Fetched institute data in header.jsx:", res.data);
@@ -38,7 +38,7 @@ const Header = () => {
                 {institute.logo && (
                   <img
                     className="h-20"
-                    src={`http://localhost:4001/Uploads/${institute.logo}`}
+                    src={`${BASE_URL}/Uploads/${institute.logo}`}
                     alt="Institute Logo"
                   />
                 )}
@@ -61,29 +61,30 @@ const Header = () => {
               >
                 Home
               </NavLink>
+              
+             
               <NavLink
+                to="Courses"
+                className="text-blue-900 font-semibold hover:text-blue-600  transition-colors"
+              >
+                Courses
+                </NavLink>
+                <NavLink
                 to="CorporateTraining"
                 className="text-blue-900 font-semibold hover:text-blue-600  transition-colors"
               >
-                Academic Programs
+                Coorporate Trainings
               </NavLink>
-              <NavLink
+ <NavLink
                 to="News&Updates"
                 className="text-blue-900 font-semibold hover:text-blue-600  transition-colors"
               >
                 News & Updates
               </NavLink>
-              <NavLink
-                to="Courses"
-                className="text-blue-900 font-semibold hover:text-blue-600  transition-colors"
-              >
-                Testimonials
-              </NavLink>
-
-              {/* <a href="#contact" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">Career Guidance</a> */}
+               <a href="apply-now" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors font-medium">
                 Apply Now
-              </button>
+              </button></a> 
             </nav>
 
             {/* Mobile Menu Button */}

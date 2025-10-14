@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ChevronRight, Calendar } from "lucide-react";
 import axios from "axios";
-
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 function NewsDetail() {
   const { id } = useParams(); // id from URL
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ function NewsDetail() {
     if (id) {
       setLoading(true);
       axios
-        .get(`http://localhost:4001/api/news/${id}`)
+        .get(`${BASE_URL}/api/news/${id}`)
         .then((res) => {
           setSelectedArticle(res.data);
           setLoading(false);
@@ -33,7 +33,7 @@ function NewsDetail() {
   // Fetch all articles for sidebar
   useEffect(() => {
     axios
-      .get("http://localhost:4001/api/news")
+      .get(`${BASE_URL}/api/news`)
       .then((res) => {
         if (res.data) {
           // filter out current article
@@ -102,7 +102,7 @@ function NewsDetail() {
         {selectedArticle.image && (
           <div className="rounded-xl overflow-hidden mb-8">
             <img
-              src={`http://localhost:4001/Uploads/${selectedArticle.image}`}
+              src={`${BASE_URL}/Uploads/${selectedArticle.image}`}
               alt={selectedArticle.title}
               className="w-full h-80 object-cover rounded-xl shadow-lg"
             />

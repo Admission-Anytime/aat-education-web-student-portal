@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Edit2 as PencilSquareIcon, Trash2 as TrashIcon } from "lucide-react";
-
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL;
 const Testimonial = () => {
   const [testimonials, setTestimonials] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -24,12 +24,12 @@ const Testimonial = () => {
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
-        const res = await axios.get("http://localhost:4001/api/testimonials");
+        const res = await axios.get(`${BASE_URL}/api/testimonials`);
         // Add profileImageUrl for each testimonial
         const dataWithUrl = res.data.map((t) => ({
           ...t,
           profileImageUrl: t.profileImage
-            ? `http://localhost:4001${t.profileImage}`
+            ? `${BASE_URL}${t.profileImage}`
             : fallbackImage,
         }));
         console.log("testimonials.jsx 35",dataWithUrl);
@@ -43,14 +43,14 @@ const Testimonial = () => {
 
   // Add testimonial
   const handleAddSubmit = async (data) => {
-    const res = await axios.post("/api/testimonials", data, {
+    const res = await axios.post(`${BASE_URL}/api/testimonials`, data, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
     const newTestimonial = {
       ...res.data,
       profileImageUrl: res.data.profileImage
-        ? `http://localhost:4001/Uploads/${res.data.profileImage}`
+        ? `${BASE_URL}/Uploads/${res.data.profileImage}`
         : fallbackImage,
     };
     setTestimonials([newTestimonial, ...testimonials]);
@@ -60,7 +60,7 @@ const Testimonial = () => {
   // Edit testimonial
   const handleEditSubmit = async (data) => {
     const res = await axios.put(
-      `/api/testimonials/${editingTestimonial._id}`,
+      `${BASE_URL}/api/testimonials/${editingTestimonial._id}`,
       data,
       { headers: { "Content-Type": "multipart/form-data" } }
     );
@@ -68,7 +68,7 @@ const Testimonial = () => {
    const updatedTestimonial = {
   ...res.data,
   profileImageUrl: res.data.profileImage
-    ? `http://localhost:4001${res.data.profileImage}?t=${Date.now()}`
+    ? `${BASE_URL}${res.data.profileImage}?t=${Date.now()}`
     : fallbackImage,
 };
 
@@ -88,7 +88,7 @@ console.log("Updated Testimonial:", updatedTestimonial);
     if (!window.confirm("Are you sure you want to delete this testimonial?"))
       return;
     try {
-      await axios.delete(`http://localhost:4001/api/testimonials/${id}`);
+      await axios.delete(`${BASE_URL}/api/testimonials/${id}`);
       setTestimonials(testimonials.filter((t) => t._id !== id));
     } catch (err) {
       console.error(err);
@@ -105,7 +105,7 @@ console.log("Updated Testimonial:", updatedTestimonial);
     const tWithUrl = {
       ...testimonial,
       profileImageUrl: testimonial.profileImage
-        ? `http://localhost:4001/Uploads/${testimonial.profileImage}`
+        ? `${BASE_URL}/Uploads/${testimonial.profileImage}`
         : fallbackImage,
     };
     setEditingTestimonial(tWithUrl);
@@ -132,7 +132,7 @@ console.log("Updated Testimonial:", updatedTestimonial);
       if (testimonial.profileImageUrl) {
         setPreview(testimonial.profileImageUrl);
       } else if (testimonial.profileImage) {
-        setPreview(`http://localhost:4001/Uploads/${testimonial.profileImage}`);
+        setPreview(`${BASE_URL}/Uploads/${testimonial.profileImage}`);
       } else {
         setPreview(fallbackImage);
       }

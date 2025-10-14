@@ -3,6 +3,9 @@ import axios from "axios";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
+
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 const AddNewBlog = () => {
   const [title, setTitle] = useState("");
   const [shortDescription, setShortDescription] = useState("");
@@ -31,7 +34,7 @@ const AddNewBlog = () => {
       if (coverImage) formData.append("coverImage", coverImage);
 
       const response = await axios.post(
-        "http://localhost:4001/api/blogs",
+        `${BASE_URL}/api/blogs`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

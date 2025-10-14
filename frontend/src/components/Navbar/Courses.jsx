@@ -1,8 +1,8 @@
-//testimonial navbar
+//Courses
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const TestimonialPage = () => {
+const Courses = () => {
   const [testimonials, setTestimonials] = useState([]);
   const [visibleCount, setVisibleCount] = useState(6); // initial number to show
   const fallbackImage = "/fallback.png";
@@ -30,14 +30,16 @@ const TestimonialPage = () => {
   };
 
   return (
-    <div className="bg-gray-50 container mx-auto p-6">
-      <h2 className="text-3xl md:text-5xl  text-center font-extrabold text-gray-900 mb-2">
+        <div className="min-h-screen font-sans bg-gradient-to-br from-slate-50 to-blue-50">
+
+<div className="bg-gray-50 container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-blue-800 leading-tight">
         Testimonials
-      </h2>
-      <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-gray-600 rounded-xl">
+      </h1>
+<p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-gray-600 rounded-xl">
         Hear directly from people who have experienced our exceptional service.
       </p>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 py-4">
+<div className="grid gap-6 py-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {testimonials.slice(0, visibleCount).map((t) => (
           <div
             key={t._id}
@@ -72,7 +74,8 @@ const TestimonialPage = () => {
         </div>
       )}
     </div>
+    </div>
   );
 };
 
-export default TestimonialPage;
+export default Courses;

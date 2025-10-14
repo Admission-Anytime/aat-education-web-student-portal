@@ -12,7 +12,7 @@ import { signup, login, logout } from "./Controller/SignUpController.js";
 import dotenv from "dotenv";
 import addnewblog from "./routes/addnewblog.js";
 import multer from "multer";
- import carouselRoutes from "./routes/carouselRoutes.js";
+import carouselRoutes from "./routes/carouselRoutes.js";
 import aboutsectionRoutes from "./routes/aboutsectionRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -30,6 +30,9 @@ import inquiryRoutes from "./routes/InquiryRoutes.js";
 import Admin from "./models/AdminLogin.js"; // <-- important!3
 import bcrypt from "bcryptjs"; // <-- important!3
 import AdminLogin from "./routes/AdminLogin.js"; // <-- important!3
+import CoorporateTraining from "./models/CoorporateTraining.js";
+import CoorporateTrainingRoutes from "./routes/coorporatetrainRoutes.js";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -133,6 +136,8 @@ mongoose.connect(MONGO_URL)
     process.exit(1); // stop the server if MongoDB connection fails
   });
 
+
+
  
 /*const seedAdmin = async () => {
   try {
@@ -167,8 +172,10 @@ seedAdmin(); */
 
 // inquiry Routes
 app.use("/api/inquiry", inquiryRoutes);
+//admin login routes
 app.use("/api/auth", AdminLogin); // all /signup, /login, /logout routes go here
-
+//Coorporate Training Routes
+app.use("/api/corporatetraining", CoorporateTrainingRoutes);
 
 
   //Cloudinary connection

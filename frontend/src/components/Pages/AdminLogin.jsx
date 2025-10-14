@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { LogIn, Mail, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 // --- Custom Components ---
 const PrimaryButton = ({ children, icon: Icon, onClick, className = '', disabled = false }) => (
   <button
@@ -51,7 +51,7 @@ useEffect(() => {
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:4001/api/auth/login", {
+      const res = await fetch(  `${BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -82,7 +82,7 @@ console.log("Token saved in localStorage:", localStorage.getItem("adminToken"));
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:4001/api/auth/forgot-password", {
+      const res = await fetch(`${BASE_URL}/api/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

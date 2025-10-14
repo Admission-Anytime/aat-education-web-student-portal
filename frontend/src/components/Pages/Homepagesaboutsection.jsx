@@ -22,7 +22,7 @@ export default function AboutAdmin() {
 
   const SendandSave = async () => {
     try {
-      const response = await axios.post("http://localhost:4001/api/about", {
+      const response = await axios.post(`${BASE_URL}/api/about`, {
         title,
         description,
         statistics, // backend still expects stats

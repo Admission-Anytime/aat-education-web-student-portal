@@ -4,7 +4,7 @@ import path from "path";
 import Testimonial from "../models/testimonial.js";
 
 const router = express.Router();
-
+const BASE_URL = process.env.BASE_URL ; 
  
 // 📂 Multer Storage
 const storage = multer.diskStorage({
@@ -73,7 +73,7 @@ router.get("/", async (req, res) => {
     const testimonialsWithUrl = testimonials.map((t) => ({
       ...t.toObject(),
       profileImageUrl: t.profileImage
-        ? `http://localhost:4001/Uploads/${t.profileImage}`
+        ? `${BASE_URL}/Uploads/${t.profileImage}`
         : null,
     }));
 
