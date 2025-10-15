@@ -32,6 +32,7 @@ import bcrypt from "bcryptjs"; // <-- important!3
 import AdminLogin from "./routes/AdminLogin.js"; // <-- important!3
 import CoorporateTraining from "./models/CoorporateTraining.js";
 import CoorporateTrainingRoutes from "./routes/coorporatetrainRoutes.js";
+import registrationRoutes from "./routes/registrationRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -176,6 +177,8 @@ app.use("/api/inquiry", inquiryRoutes);
 app.use("/api/auth", AdminLogin); // all /signup, /login, /logout routes go here
 //Coorporate Training Routes
 app.use("/api/corporatetraining", CoorporateTrainingRoutes);
+// Registration Routes
+app.use("/api/registrations", registrationRoutes);
 
 
   //Cloudinary connection

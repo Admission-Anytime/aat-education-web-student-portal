@@ -40,6 +40,8 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import Testimonial from "../Pages/Testimonial";
 import FooterAdmin from "../Pages/FooterAdmin";
 import CorporateTrainingProgramTable from "../Pages/CoorporateAdmin";
+//import XLSX from "xlsx";
+import RegistrationsAdminPanel from "../Pages/RegistrationAdmin";
 
 const AdminPanel = () => {
   const navigate = useNavigate();
@@ -981,6 +983,7 @@ const AdminPanel = () => {
     { id: "courses", label: "Courses", icon: GraduationCap },
     { id: "news", label: "News & Updates", icon: Calendar },
     { id: "corporate", label: "Corporate Training", icon: Users },
+    { id: "registernow", label: "Registerations", icon: Users },
     { id: "contact", label: "Contact Info", icon: Phone },
     { id: "about", label: "about section", icon: Info },
     { id: "testimonial", label: "Testimonial", icon: Info },
@@ -1610,6 +1613,12 @@ if (activeTab !== "institute") return null;*/
 
                 {/* Courses Tab */}
                 {activeTab === "courses" && <NewsAdminPage />}
+
+{/* Corporate Training Tab */}
+                {activeTab === "registernow" && (
+                 < RegistrationsAdminPanel/>
+
+                )}
 
                 {/* About Section Tab */}
                 {activeTab === "about" && (

@@ -34,50 +34,48 @@ const CourseCatalog = () => {
   // State for a simple copy message
   const [isCopied, setIsCopied] = useState(false);
 
-  
-const [courses, setCourses] = useState([]);
-const BASE_URL = import.meta.env.VITE_BASE_URL ;
-console.log("BASE_URL:", BASE_URL);
+  const [courses, setCourses] = useState([]);
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
+  console.log("BASE_URL:", BASE_URL);
 
-useEffect(() => {
-  console.log("useEffect fired");  // ✅ Debug
-  axios.get("/api/courses")
-    .then((res) => {
-      console.log("Courses data:", res.data);
-      setCourses(res.data);
-    })
-    .catch((err) => console.error("API error:", err));
-}, []);
+  useEffect(() => {
+    console.log("useEffect fired"); // ✅ Debug
+    axios
+      .get("/api/courses")
+      .then((res) => {
+        console.log("Courses data:", res.data);
+        setCourses(res.data);
+      })
+      .catch((err) => console.error("API error:", err));
+  }, []);
 
   // Map categories to color schemes for the course cards
- const categoryColors = {
-  Postgraduate: {
-    bg: "bg-fuchsia-100",       // softer background
-    text: "text-fuchsia-900",  // dark blue for readability
-    tagBg: "bg-blue-200",   // slightly brighter for tags
-    tagText: "text-blue-800",
-  },
-  Undergraduate: {
-    bg: "bg-yellow-50",     // soft yellow background
-    text: "text-yellow-900", 
-    tagBg: "bg-yellow-300", // brighter for tag
-    tagText: "text-yellow-800",
-  },
-  Diploma: {
-    bg: "bg-green-50",      // light green background
-    text: "text-green-900",
-    tagBg: "bg-green-200",
-    tagText: "text-green-800",
-  },
-  Doctoral: {
-    bg: "bg-purple-50",     // light purple background
-    text: "text-purple-900",
-    tagBg: "bg-purple-300", // brighter purple for tag
-    tagText: "text-purple-800",
-  },
-};
-
-
+  const categoryColors = {
+    Postgraduate: {
+      bg: "bg-fuchsia-100", // softer background
+      text: "text-fuchsia-900", // dark blue for readability
+      tagBg: "bg-blue-200", // slightly brighter for tags
+      tagText: "text-blue-800",
+    },
+    Undergraduate: {
+      bg: "bg-yellow-50", // soft yellow background
+      text: "text-yellow-900",
+      tagBg: "bg-yellow-300", // brighter for tag
+      tagText: "text-yellow-800",
+    },
+    Diploma: {
+      bg: "bg-green-50", // light green background
+      text: "text-green-900",
+      tagBg: "bg-green-200",
+      tagText: "text-green-800",
+    },
+    Doctoral: {
+      bg: "bg-purple-50", // light purple background
+      text: "text-purple-900",
+      tagBg: "bg-purple-300", // brighter purple for tag
+      tagText: "text-purple-800",
+    },
+  };
 
   // Hardcoded data for the professional courses
   /*
@@ -510,7 +508,6 @@ useEffect(() => {
       </button>
     </div>
   );
-  
 
   // Component for displaying the detailed view of a single course
   const CourseDetails = ({ course, onBackClick }) => {
@@ -563,13 +560,13 @@ useEffect(() => {
     };
 
     return (
-<div className="px-4 sm:px-6 md:px-10 max-w-5xl mx-auto my-6 sm:my-8">
-  {/* <div className="bg-white rounded-2xl shadow-xl p-6 md:p-10 max-w-5xl mx-auto my-8"> */}
+      <div className="px-4 sm:px-6 md:px-10 max-w-5xl mx-auto my-6 sm:my-8">
+        {/* <div className="bg-white rounded-2xl shadow-xl p-6 md:p-10 max-w-5xl mx-auto my-8"> */}
         {/* Header with back button and title */}
         <div className="flex justify-between items-center mb-6">
-           <button
+          <button
             onClick={onBackClick}
-            className="flex items-center justify-center w-8 h-8 text-blue-600 hover:text-white hover:bg-red-600 transition-colors rounded-full shadow-md focus:outline-none ml-1"
+            className="w-10 h-10 bg-gray-200 text-blue-600 hover:bg-blue-600 hover:text-white hover:scale-105 transform transition-all"
             aria-label="Go back to course list"
           >
             <ArrowLeft className="w-6 h-6" />
@@ -577,7 +574,6 @@ useEffect(() => {
           <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 text-center flex-grow">
             {course.title}
           </h2>
-
 
           {/* <span className="text-xl font-bold text-gray-700 flex items-center gap-1">
             <svg
@@ -696,13 +692,11 @@ useEffect(() => {
               </h3>
             </div>
             <div className="space-y-4">
-{course.structure.map((stage, i) => (
-  <div key={i} className="bg-white p-4 rounded-lg shadow-inner">
-    <span className="text-gray-900 font-medium">{stage}</span>
-  </div>
-))}
-
-
+              {course.structure.map((stage, i) => (
+                <div key={i} className="bg-white p-4 rounded-lg shadow-inner">
+                  <span className="text-gray-900 font-medium">{stage}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -810,13 +804,14 @@ useEffect(() => {
             {/* Header section */}
             <header>
               <div className="text-center mb-4 md:mb-6 py-1">
-                <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-2">
-                  Academic Program
-                </h1>
-                <p className="text-gray-600 text-lg md:text-xl">
-                  Choose from a wide range of undergraduate and postgraduate
-                  programs.
-                </p>
+                <header className="text-center mb-6 py-4 bg-gradient-to-r from-blue-100 to-gray-100 rounded-lg">
+                  <h1 className="text-4xl font-extrabold text-gray-900">
+                    Academic Programs
+                  </h1>
+                  <p className="text-gray-600 text-lg">
+                    Explore a wide range of courses.
+                  </p>
+                </header>
               </div>
             </header>
 
