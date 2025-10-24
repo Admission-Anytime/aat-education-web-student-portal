@@ -42,28 +42,78 @@ const upload = multer({
 // =====================
 router.post(
   "/",
-  upload.fields([
+upload.fields([
     { name: "photo", maxCount: 1 },
+    { name: "aadhaarCard", maxCount: 1 },
+    { name: "abcId", maxCount: 1 },
+    { name: "bedId", maxCount: 1 },
     { name: "tenthMarksheet", maxCount: 1 },
     { name: "twelfthMarksheet", maxCount: 1 },
+    { name: "quotaDocument", maxCount: 1 },
+    { name: "categoryCertificate", maxCount: 1 },
+    { name: "subCategoryDocument", maxCount: 1 },
+    { name: "ugDiplomaMarksheet", maxCount: 1 },
+    { name: "ugMarksheet", maxCount: 1 },
+    { name: "pgDiplomaMarksheet", maxCount: 1 },
+    { name: "pgMarksheet", maxCount: 1 },
   ]),
   async (req, res) => {
     try {
       // Extract file paths
       const photo = req.files?.photo ? req.files.photo[0].filename : null;
+      const aadhaarCard = req.files?.aadhaarCard
+        ? req.files.aadhaarCard[0].filename
+        : null;
+      const abcId = req.files?.abcId
+        ? req.files.abcId[0].filename
+        : null;
+      const bedId = req.files?.bedId
+        ? req.files.bedId[0].filename
+        : null;
       const tenthMarksheet = req.files?.tenthMarksheet
         ? req.files.tenthMarksheet[0].filename
         : null;
       const twelfthMarksheet = req.files?.twelfthMarksheet
         ? req.files.twelfthMarksheet[0].filename
         : null;
+      const quotaDocument = req.files?.quotaDocument
+        ? req.files.quotaDocument[0].filename
+        : null;
+      const categoryCertificate = req.files?.categoryCertificate
+        ? req.files.categoryCertificate[0].filename
+        : null;
+      const subCategoryDocument = req.files?.subCategoryDocument
+        ? req.files.subCategoryDocument[0].filename
+        : null;
+      const ugDiplomaMarksheet = req.files?.ugDiplomaMarksheet
+        ? req.files.ugDiplomaMarksheet[0].filename
+        : null;
+      const ugMarksheet = req.files?.ugMarksheet
+        ? req.files.ugMarksheet[0].filename
+        : null;
+      const pgDiplomaMarksheet = req.files?.pgDiplomaMarksheet
+        ? req.files.pgDiplomaMarksheet[0].filename
+        : null;
+      const pgMarksheet = req.files?.pgMarksheet
+        ? req.files.pgMarksheet[0].filename
+        : null;
 
       // Create registration data
       const registrationData = {
         ...req.body,
         photo: photo || 'default-photo.jpg', // Use default if no photo uploaded
+        aadhaarCard,
+        abcId,
+        bedId,
         tenthMarksheet,
         twelfthMarksheet,
+        quotaDocument,
+        categoryCertificate,
+        subCategoryDocument,
+        ugDiplomaMarksheet,
+        ugMarksheet,
+        pgDiplomaMarksheet,
+        pgMarksheet,
         agreeTerms: req.body.agreeTerms === "true" || req.body.agreeTerms === true,
       };
 
@@ -206,8 +256,18 @@ router.put(
   "/:id",
   upload.fields([
     { name: "photo", maxCount: 1 },
+    { name: "aadhaarCard", maxCount: 1 },
+    { name: "abcId", maxCount: 1 },
+    { name: "bedId", maxCount: 1 },
     { name: "tenthMarksheet", maxCount: 1 },
     { name: "twelfthMarksheet", maxCount: 1 },
+    { name: "quotaDocument", maxCount: 1 },
+    { name: "categoryCertificate", maxCount: 1 },
+    { name: "subCategoryDocument", maxCount: 1 },
+    { name: "ugDiplomaMarksheet", maxCount: 1 },
+    { name: "ugMarksheet", maxCount: 1 },
+    { name: "pgDiplomaMarksheet", maxCount: 1 },
+    { name: "pgMarksheet", maxCount: 1 },
   ]),
   async (req, res) => {
     try {
@@ -221,11 +281,41 @@ router.put(
       if (req.files?.photo) {
         req.body.photo = req.files.photo[0].filename;
       }
+      if (req.files?.aadhaarCard) {
+        req.body.aadhaarCard = req.files.aadhaarCard[0].filename;
+      }
+      if (req.files?.abcId) {
+        req.body.abcId = req.files.abcId[0].filename;
+      }
+      if (req.files?.bedId) {
+        req.body.bedId = req.files.bedId[0].filename;
+      }
       if (req.files?.tenthMarksheet) {
         req.body.tenthMarksheet = req.files.tenthMarksheet[0].filename;
       }
       if (req.files?.twelfthMarksheet) {
         req.body.twelfthMarksheet = req.files.twelfthMarksheet[0].filename;
+      }
+      if (req.files?.quotaDocument) {
+        req.body.quotaDocument = req.files.quotaDocument[0].filename;
+      }
+      if (req.files?.categoryCertificate) {
+        req.body.categoryCertificate = req.files.categoryCertificate[0].filename;
+      }
+      if (req.files?.subCategoryDocument) {
+        req.body.subCategoryDocument = req.files.subCategoryDocument[0].filename;
+      }
+      if (req.files?.ugDiplomaMarksheet) {
+        req.body.ugDiplomaMarksheet = req.files.ugDiplomaMarksheet[0].filename;
+      }
+      if (req.files?.ugMarksheet) {
+        req.body.ugMarksheet = req.files.ugMarksheet[0].filename;
+      }
+      if (req.files?.pgDiplomaMarksheet) {
+        req.body.pgDiplomaMarksheet = req.files.pgDiplomaMarksheet[0].filename;
+      }
+      if (req.files?.pgMarksheet) {
+        req.body.pgMarksheet = req.files.pgMarksheet[0].filename;
       }
 
       // Handle boolean conversion for agreeTerms
@@ -238,7 +328,7 @@ router.put(
       const updatedRegistration = await Registration.findByIdAndUpdate(
         req.params.id,
         req.body,
-        { new: true, runValidators: true }
+        { new: true, runValidators: true } 
       );
    
       res.json({

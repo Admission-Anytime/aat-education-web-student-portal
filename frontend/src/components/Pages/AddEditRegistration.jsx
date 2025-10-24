@@ -2,183 +2,176 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const AddEditRegistration = ({ editingRegistration, onSubmit, onBack }) => {
+  // Function to convert camelCase keys to PascalCase
+  const toPascalCase = (str) =>
+    str.charAt(0).toUpperCase() + str.slice(1);
+
+  const capitalizeKeys = (obj) => {
+    const newObj = {};
+    for (const key in obj) {
+      const capKey = toPascalCase(key);
+      newObj[capKey] = obj[key];
+    }
+    return newObj;
+  };
+
+  // Initialize form data with PascalCase keys
   const [formData, setFormData] = useState({
-    // Programme Info
-    programmeName: "",
-    specialisation: "",
-    registrationId: "",
-    program: "",
-    qualification: "",
-    quota: "",
-    category: "",
-    subCategory: "",
-
-    // Student Info
-    studentFirstName: "",
-    studentMiddleName: "",
-    studentLastName: "",
-    gender: "",
-    dateOfBirth: "",
-    studentEmail: "",
-    studentPhone: "",
-    whatsappNo: "",
-
-    // Current Address
-    currentAddress: "",
-    currentCity: "",
-    currentState: "",
-    currentZipCode: "",
-
-    // Permanent Address
-    permanentAddress: "",
-    permanentCity: "",
-    permanentState: "",
-    permanentZipCode: "",
-
-    // Father's Info
-    fatherFirstName: "",
-    fatherMiddleName: "",
-    fatherLastName: "",
-    fatherEmail: "",
-    fatherPhone: "",
-    fatherWhatsapp: "",
-
-    // Mother's Info
-    motherFirstName: "",
-    motherMiddleName: "",
-    motherLastName: "",
-    motherEmail: "",
-    motherPhone: "",
-    motherWhatsapp: "",
-
-    // Guardian Info
-    guardianFirstName: "",
-    guardianMiddleName: "",
-    guardianLastName: "",
-    parentEmail: "",
-    parentPhone: "",
-    relationship: "",
-
-    // Previous School
-    previousSchool: "",
-
-    // 10th Grade
-    tenthBoard: "",
-    tenthSchool: "",
-    tenthYear: "",
-    tenthPercentage: "",
-    tenthMarksheet: "",
-
-    // 12th Grade
-    twelfthBoard: "",
-    twelfthSchool: "",
-    twelfthStream: "",
-    twelfthYear: "",
-    twelfthPercentage: "",
-    twelfthMarksheet: "",
-
-    // UG Diploma
-    ugDiplomaInstitute: "",
-    ugDiplomaCourse: "",
-    ugDiplomaSpecialization: "",
-    ugDiplomaYear: "",
-    ugDiplomaPercentage: "",
-
-    // UG
-    ugCollege: "",
-    ugCourse: "",
-    ugSpecialization: "",
-    ugYear: "",
-    ugPercentage: "",
-
-    // PG Diploma
-    pgDiplomaInstitute: "",
-    pgDiplomaCourse: "",
-    pgDiplomaSpecialization: "",
-    pgDiplomaYear: "",
-    pgDiplomaPercentage: "",
-
-    // PG
-    pgUniversity: "",
-    pgCourse: "",
-    pgSpecialization: "",
-    pgYear: "",
-    pgPercentage: "",
-
-    // Additional Info
-    gpa: "",
-    interests: "",
-    whyApplying: "",
-    emergencyName: "",
-    emergencyPhone: "",
-    emergencyRelationship: "",
-    specialNeeds: "",
-    medications: "",
-
-    // Terms & Status
-    agreeTerms: false,
-    status: "Pending",
+    ProgrammeName: "",
+    Specialisation: "",
+    RegistrationId: "",
+    Photo: null,
+    AadhaarCard: null,
+    AbcId: null,
+    BedId: null,
+    StudentFirstName: "",
+    StudentMiddleName: "",
+    StudentLastName: "",
+    Gender: "",
+    DateOfBirth: "",
+    Quota: "",
+    QuotaDocument: null,
+    Category: "",
+    CategoryCertificate: null,
+    SubCategory: "",
+    Qualification: "",
+    StudentPhone: "",
+    WhatsappNo: "",
+    StudentEmail: "",
+    Program: "",
+    CurrentHouseNo: "",
+    CurrentStreet: "",
+    CurrentArea: "",
+    CurrentLandmark: "",
+    CurrentCity: "",
+    CurrentDistrict: "",
+    CurrentState: "",
+    CurrentPincode: "",
+    CurrentCountry: "",
+    PermanentHouseNo: "",
+    PermanentStreet: "",
+    PermanentArea: "",
+    PermanentLandmark: "",
+    PermanentCity: "",
+    PermanentDistrict: "",
+    PermanentState: "",
+    PermanentPincode: "",
+    PermanentCountry: "",
+    FatherFirstName: "",
+    FatherMiddleName: "",
+    FatherLastName: "",
+    FatherEmail: "",
+    FatherPhone: "",
+    FatherWhatsapp: "",
+    MotherFirstName: "",
+    MotherMiddleName: "",
+    MotherLastName: "",
+    MotherEmail: "",
+    MotherPhone: "",
+    MotherWhatsapp: "",
+    GuardianFirstName: "",
+    GuardianMiddleName: "",
+    GuardianLastName: "",
+    ParentEmail: "",
+    ParentPhone: "",
+    Relationship: "",
+    PreviousSchool: "",
+    TenthBoard: "",
+    TenthSchool: "",
+    TenthSchoolAddress: "",
+    TenthYear: "",
+    TenthPercentage: "",
+    TenthMarksheet: null,
+    TwelfthBoard: "",
+    TwelfthSchool: "",
+    TwelfthSchoolAddress: "",
+    TwelfthStream: "",
+    TwelfthYear: "",
+    TwelfthPercentage: "",
+    TwelfthMarksheet: null,
+    UgDiplomaInstitute: "",
+    UgDiplomaCourse: "",
+    UgDiplomaSpecialization: "",
+    UgDiplomaYear: "",
+    UgDiplomaPercentage: "",
+    UgDiplomaMarksheet: null,
+    UgCollege: "",
+    UgCourse: "",
+    UgSpecialization: "",
+    UgYear: "",
+    UgPercentage: "",
+    UgMarksheet: null,
+    PgDiplomaInstitute: "",
+    PgDiplomaCourse: "",
+    PgDiplomaSpecialization: "",
+    PgDiplomaYear: "",
+    PgDiplomaPercentage: "",
+    PgDiplomaMarksheet: null,
+    PgUniversity: "",
+    PgCourse: "",
+    PgSpecialization: "",
+    PgYear: "",
+    PgPercentage: "",
+    PgMarksheet: null,
+    Gpa: "",
+    Interests: "",
+    WhyApplying: "",
+    EmergencyName: "",
+    EmergencyPhone: "",
+    EmergencyRelationship: "",
+    SpecialNeeds: "",
+    Medications: "",
+    AgreeTerms: false,
+    Status: "Pending",
   });
 
   // Populate form if editing
   useEffect(() => {
     if (editingRegistration && editingRegistration._id) {
-      setFormData({ ...formData, ...editingRegistration });
+      const pascalCaseData = capitalizeKeys(editingRegistration);
+      setFormData({ ...formData, ...pascalCaseData });
     }
   }, [editingRegistration]);
 
-  // Handle form changes
+  // Handle input changes
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type, checked, files } = e.target;
     setFormData({
       ...formData,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox" ? checked : type === "file" ? files[0] : value,
     });
   };
 
   // Submit form
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const data = new FormData();
+      Object.keys(formData).forEach((key) => data.append(key, formData[key]));
 
-  try {
-    const data = new FormData();
+      let res;
+      if (editingRegistration && editingRegistration._id) {
+        res = await axios.put(
+          `http://localhost:4001/api/registrations/${editingRegistration._id}`,
+          data,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+      } else {
+        res = await axios.post(
+          "http://localhost:4001/api/registrations",
+          data,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+      }
 
-    // Append all form fields
-    Object.keys(formData).forEach((key) => {
-      data.append(key, formData[key]);
-    });
-
-    // If you have file inputs, append them manually, e.g.:
-    // data.append('photo', selectedPhotoFile);
-    // data.append('tenthMarksheet', selectedTenthFile);
-    // data.append('twelfthMarksheet', selectedTwelfthFile);
-
-    let res;
-    if (editingRegistration && editingRegistration._id) {
-      // Use PUT for full update
-      res = await axios.put(
-        `http://localhost:4001/api/registrations/${editingRegistration._id}`,
-        data,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-    } else {
-      // Use POST for new registration
-      res = await axios.post(
-        "http://localhost:4001/api/registrations",
-        data,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
+      console.log("Server response:", res.data);
+      onSubmit(res.data);
+      alert("Registration saved successfully!");
+    } catch (err) {
+      console.error("Error saving registration:", err.response?.data || err.message);
+      alert("Failed to save registration. Check console for details.");
     }
-
-    console.log("Server response:", res.data);
-    onSubmit(res.data);
-    alert("Registration saved successfully!");
-  } catch (err) {
-    console.error("Error saving registration:", err.response?.data || err.message);
-    alert("Failed to save registration. Check console for details.");
-  }
-};
-
+  };
 
   // Render input dynamically
   const renderInput = (name, type = "text") => (
@@ -193,9 +186,43 @@ const AddEditRegistration = ({ editingRegistration, onSubmit, onBack }) => {
           onChange={handleChange}
           className="mt-1 block w-full border border-gray-300 rounded-md p-2"
         >
-          {["Male","Female","Other"].map((opt) => (
-            <option key={opt} value={opt}>{opt}</option>
-          ))}
+          {name === "Quota" ? (
+            <>
+              <option value="">Select Quota</option>
+              {["Ex Army", "Teacher Staff", "Not Applicable"].map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </>
+          ) : name === "Category" ? (
+            <>
+              <option value="">Select Category</option>
+              {["Unreserved", "Reserved"].map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </>
+          ) : name === "SubCategory" ? (
+            <>
+              <option value="">Select SubCategory</option>
+              {["ST", "SC", "OBC"].map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </>
+          ) : (
+            <>
+              <option value="">Select Gender</option>
+              {["Male", "Female", "Other"].map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </>
+          )}
         </select>
       ) : type === "checkbox" ? (
         <input
@@ -204,6 +231,13 @@ const AddEditRegistration = ({ editingRegistration, onSubmit, onBack }) => {
           checked={formData[name]}
           onChange={handleChange}
           className="h-4 w-4"
+        />
+      ) : type === "file" ? (
+        <input
+          type="file"
+          name={name}
+          onChange={handleChange}
+          className="mt-1 block w-full border border-gray-300 rounded-md p-2"
         />
       ) : (
         <input
@@ -217,28 +251,49 @@ const AddEditRegistration = ({ editingRegistration, onSubmit, onBack }) => {
     </div>
   );
 
-  // All sections and fields
+  // Sections configuration
   const sections = [
-    { title: "Programme Information", fields: ["programmeName","specialisation","registrationId","program","qualification","quota","category","subCategory"] },
-    { title: "Student Info", fields: ["studentFirstName","studentMiddleName","studentLastName","gender","dateOfBirth","studentEmail","studentPhone","whatsappNo"] },
-    { title: "Current Address", fields: ["currentAddress","currentCity","currentState","currentZipCode"] },
-    { title: "Permanent Address", fields: ["permanentAddress","permanentCity","permanentState","permanentZipCode"] },
-    { title: "Father's Info", fields: ["fatherFirstName","fatherMiddleName","fatherLastName","fatherEmail","fatherPhone","fatherWhatsapp"] },
-    { title: "Mother's Info", fields: ["motherFirstName","motherMiddleName","motherLastName","motherEmail","motherPhone","motherWhatsapp"] },
-    { title: "Guardian Info", fields: ["guardianFirstName","guardianMiddleName","guardianLastName","parentEmail","parentPhone","relationship"] },
-     { title: "10th Grade", fields: ["tenthBoard","tenthSchool","tenthYear","tenthPercentage","tenthMarksheet"] },
-    { title: "12th Grade", fields: ["twelfthBoard","twelfthSchool","twelfthStream","twelfthYear","twelfthPercentage","twelfthMarksheet"] },
-    { title: "UG Diploma", fields: ["ugDiplomaInstitute","ugDiplomaCourse","ugDiplomaSpecialization","ugDiplomaYear","ugDiplomaPercentage"] },
-    { title: "UG", fields: ["ugCollege","ugCourse","ugSpecialization","ugYear","ugPercentage"] },
-    { title: "PG Diploma", fields: ["pgDiplomaInstitute","pgDiplomaCourse","pgDiplomaSpecialization","pgDiplomaYear","pgDiplomaPercentage"] },
-    { title: "PG", fields: ["pgUniversity","pgCourse","pgSpecialization","pgYear","pgPercentage"] },
-     { title: "Consent & Status", fields: ["agreeTerms","status"] },
+     {
+      title: "Student Info",
+      fields: ["StudentFirstName", "StudentMiddleName", "StudentLastName", "Gender", "DateOfBirth", "StudentEmail", "StudentPhone", "WhatsappNo"],
+    },
+    {
+      title: "Programme Information",
+      fields: ["RegistrationId", "ProgrammeName", "Specialisation", "Qualification", "Quota", "Category", "SubCategory"],
+    },
+    {
+      title: "Documents",
+      fields: ["Photo", "AadhaarCard", "AbcId", "BedId", "QuotaDocument", "CategoryCertificate"],
+    },
+   
+   
+    {
+      title: "Father's Info",
+      fields: ["FatherFirstName", "FatherMiddleName", "FatherLastName", "FatherEmail", "FatherPhone", "FatherWhatsapp"],
+    },
+    {
+      title: "Mother's Info",
+      fields: ["MotherFirstName", "MotherMiddleName", "MotherLastName", "MotherEmail", "MotherPhone", "MotherWhatsapp"],
+    },
+    {
+      title: "Guardian Info",
+      fields: ["GuardianFirstName", "GuardianMiddleName", "GuardianLastName", "ParentEmail", "ParentPhone", "Relationship"],
+    },
+    { title: "Qualification Details", fields: [] },
+    { title: "10th Grade", fields: ["TenthBoard", "TenthSchool", "TenthSchoolAddress", "TenthYear", "TenthPercentage", "TenthMarksheet"] },
+    { title: "12th Grade", fields: ["TwelfthBoard", "TwelfthSchool", "TwelfthSchoolAddress", "TwelfthStream", "TwelfthYear", "TwelfthPercentage", "TwelfthMarksheet"] },
+    { title: "UG Diploma", fields: ["UgDiplomaInstitute", "UgDiplomaCourse", "UgDiplomaSpecialization", "UgDiplomaYear", "UgDiplomaPercentage", "UgDiplomaMarksheet"] },
+    { title: "UG", fields: ["UgCollege", "UgCourse", "UgSpecialization", "UgYear", "UgPercentage", "UgMarksheet"] },
+    { title: "PG Diploma", fields: ["PgDiplomaInstitute", "PgDiplomaCourse", "PgDiplomaSpecialization", "PgDiplomaYear", "PgDiplomaPercentage", "PgDiplomaMarksheet"] },
+    { title: "PG", fields: ["PgUniversity", "PgCourse", "PgSpecialization", "PgYear", "PgPercentage", "PgMarksheet"] },
+    
+     { title: "Consent & Status", fields: ["AgreeTerms", "Status"] },
   ];
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 max-w-6xl mx-auto overflow-auto">
       <h2 className="text-2xl font-bold mb-6 text-gray-900">
-        {editingRegistration ? "Edit Registration" : "Add New Registration"}
+        {editingRegistration ? "Edit Registration Form" : "Add New Registration"}
       </h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         {sections.map((section) => (
@@ -246,15 +301,15 @@ const AddEditRegistration = ({ editingRegistration, onSubmit, onBack }) => {
             <h3 className="text-xl font-semibold mb-4 text-gray-800">{section.title}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {section.fields.map((f) => {
-                if (f === "gender") return renderInput(f, "select");
-                if (f === "dateOfBirth") return renderInput(f, "date");
-                if (f.includes("Email") || f === "parentEmail") return renderInput(f, "email");
-                if (f.includes("Phone") || f.includes("whatsappNo") || f === "emergencyPhone") return renderInput(f, "tel");
-                if (f === "agreeTerms") return renderInput(f, "checkbox");
-                if (f === "status") return (
+                if (f === "Gender" || f === "Quota" || f === "Category" || f === "SubCategory") return renderInput(f, "select");
+                if (f === "DateOfBirth") return renderInput(f, "date");
+                if (f.includes("Email") || f === "ParentEmail") return renderInput(f, "email");
+                if (f.includes("Phone") || f.includes("WhatsappNo") || f === "EmergencyPhone") return renderInput(f, "tel");
+                if (f === "AgreeTerms") return renderInput(f, "checkbox");
+                if (f === "Status") return (
                   <select
-                    name="status"
-                    value={formData.status}
+                    name="Status"
+                    value={formData.Status}
                     onChange={handleChange}
                     className="border border-gray-300 rounded-md p-2"
                   >
@@ -263,12 +318,12 @@ const AddEditRegistration = ({ editingRegistration, onSubmit, onBack }) => {
                     ))}
                   </select>
                 );
+                if (f.includes("Marksheet") || f === "Photo" || f === "AadhaarCard" || f === "AbcId" || f === "BedId" || f === "QuotaDocument" || f === "CategoryCertificate") return renderInput(f, "file");
                 return renderInput(f);
               })}
             </div>
           </div>
         ))}
-
         <div className="flex justify-end space-x-4">
           <button
             type="button"

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+ import mongoose from "mongoose";
 
 const registrationSchema = new mongoose.Schema(
   {
@@ -25,6 +25,24 @@ const registrationSchema = new mongoose.Schema(
       type: String, // File path
       required: false, // Made optional for testing
       default: 'default-photo.jpg',
+    },
+
+    // Aadhaar Card
+    aadhaarCard: {
+      type: String, // File path
+      required: true,
+    },
+
+    // ABC ID (Optional)
+    abcId: {
+      type: String, // File path
+      required: false,
+    },
+
+    // BED ID (Optional)
+    bedId: {
+      type: String, // File path
+      required: false,
     },
 
     // Student Personal Information
@@ -55,17 +73,29 @@ const registrationSchema = new mongoose.Schema(
     quota: {
       type: String,
       required: true,
-      enum: ["Ex Army", "Teacher Staff"],
+      enum: ["Ex Army", "Teacher Staff", "Not Applicable"],
+    },
+    quotaDocument: {
+      type: String, // File path for quota-related document
+      required: false,
     },
     category: {
       type: String,
       required: true,
       enum: ["Unreserved", "Reserved"],
     },
+    categoryCertificate: {
+      type: String, // File path for category certificate
+      required: false,
+    },
     subCategory: {
       type: String,
       required: true,
       enum: ["ST", "SC", "OBC"],
+    },
+    subCategoryDocument: {
+      type: String, // File path for sub category document
+      required: false,
     },
     qualification: {
       type: String,
@@ -97,12 +127,31 @@ const registrationSchema = new mongoose.Schema(
     },
 
     // Current Address
-    currentAddress: {
+    currentHouseNo: {
       type: String,
       required: true,
       trim: true,
     },
+    currentStreet: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    currentArea: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    currentLandmark: {
+      type: String,
+      trim: true,
+    },
     currentCity: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    currentDistrict: {
       type: String,
       required: true,
       trim: true,
@@ -112,19 +161,43 @@ const registrationSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    currentZipCode: {
+    currentPincode: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    currentCountry: {
       type: String,
       required: true,
       trim: true,
     },
 
     // Permanent Address
-    permanentAddress: {
+    permanentHouseNo: {
       type: String,
       required: true,
       trim: true,
     },
+    permanentStreet: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    permanentArea: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    permanentLandmark: {
+      type: String,
+      trim: true,
+    },
     permanentCity: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    permanentDistrict: {
       type: String,
       required: true,
       trim: true,
@@ -134,7 +207,12 @@ const registrationSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    permanentZipCode: {
+    permanentPincode: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    permanentCountry: {
       type: String,
       required: true,
       trim: true,
@@ -256,6 +334,11 @@ const registrationSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    tenthSchoolAddress: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     tenthYear: {
       type: String,
       required: true,
@@ -277,6 +360,11 @@ const registrationSchema = new mongoose.Schema(
       trim: true,
     },
     twelfthSchool: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    twelfthSchoolAddress: {
       type: String,
       required: true,
       trim: true,
@@ -321,6 +409,9 @@ const registrationSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    ugDiplomaMarksheet: {
+      type: String, // File path
+    },
 
     // Under Graduate (Optional)
     ugCollege: {
@@ -338,10 +429,13 @@ const registrationSchema = new mongoose.Schema(
     ugYear: {
       type: String,
       trim: true,
-    },
+    },  
     ugPercentage: {
       type: String,
       trim: true,
+    },
+    ugMarksheet: {
+      type: String, // File path
     },
 
     // PG Diploma (Optional)
@@ -365,6 +459,9 @@ const registrationSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    pgDiplomaMarksheet: {
+      type: String, // File path
+    },
 
     // Post Graduate (Optional)
     pgUniversity: {
@@ -386,6 +483,9 @@ const registrationSchema = new mongoose.Schema(
     pgPercentage: {
       type: String,
       trim: true,
+    },
+    pgMarksheet: {
+      type: String, // File path
     },
 
     // Additional Information

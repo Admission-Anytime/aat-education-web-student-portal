@@ -3,9 +3,10 @@ import axios from "axios";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import AddEditRegistration from "./AddEditRegistration"; // Assume you have this component; adapt from AddEditCourse
 
-const RegistrationsAdminPanel = () => {
+const RegistrationsAdmin = () => {
   const [registrations, setRegistrations] = useState([]);
   const [editingRegistration, setEditingRegistration] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState('All');
 console.log(registrations);
   // Fetch registrations from backend
   /*useEffect(() => {
@@ -45,6 +46,12 @@ console.log(registrations);
     setEditingRegistration(null);
   };
 
+  // Filter and sort registrations
+  const statusOrder = ['Under Review', 'Pending', 'Approved', 'Rejected'];
+  const filteredAndSortedRegistrations = registrations
+    .filter(registration => selectedStatus === 'All' || registration.status === selectedStatus)
+    .sort((a, b) => statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status));
+
   if (editingRegistration) {
     return (
       <AddEditRegistration
@@ -61,6 +68,23 @@ console.log(registrations);
          <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-6">
         Manage Registrations
       </h2>
+      <div className="mb-4">
+        <label htmlFor="statusFilter" className="block text-sm font-medium text-gray-700 mb-2">
+          Filter by Status:
+        </label>
+        <select
+          id="statusFilter"
+          value={selectedStatus}
+          onChange={(e) => setSelectedStatus(e.target.value)}
+          className="block w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        >
+          <option value="All">All</option>
+          <option value="Under Review">Under Review</option>
+          <option value="Pending">Pending</option>
+          <option value="Approved">Approved</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+      </div>
       </div>
       <div className="overflow-x-auto bg-white rounded-lg shadow-md p-4">
        
@@ -97,7 +121,7 @@ console.log(registrations);
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {registrations.map((registration) => (
+            {filteredAndSortedRegistrations.map((registration) => (
               <tr key={registration._id} className="hover:bg-gray-50">
                 <td className="px-4 py-2 text-sm font-medium text-gray-900">
                   {registration.registrationId}
@@ -146,4 +170,4 @@ console.log(registrations);
   );
 };
 
-export default RegistrationsAdminPanel;
+export default RegistrationsAdmin;

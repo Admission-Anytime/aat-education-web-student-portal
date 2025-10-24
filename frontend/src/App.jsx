@@ -9,6 +9,7 @@ import Courses from "./components/Navbar/Courses";
 import CooperateTrainingProgram from "./components/Navbar/CooperateTrainingProgram";
 import News from "./components/Navbar/News";
 import RegistrationForm from "./components/Pages/RegistrationForm";
+import LoginWithOTP from "./components/Pages/LoginWithOTP";
 import ImsLoginPage from "./components/Pages/ImsLoginPage";
 import ApplyNow from "./components/Pages/ApplyNow";
 import AdminPanel from "./components/Panel/AdminPanel";
@@ -43,12 +44,14 @@ import ProtectedRoute from "./components/Panel/ProtectedRoute";
               element={<CooperateTrainingProgram />}
             />
             {/* <Route path="test" element={<Newssectionnewlook />} />*/}
-             <Route path="News&Updates" element={<News />} />
+            <Route path="News&Updates" element={<News />} />
             <Route path="apply-now" element={<RegistrationForm/>}/>
-             
-            
           </Route>
         </Route>
+
+        {/* Student Login Route */}
+        <Route path="student-login" element={<LoginWithOTP />} />
+
         {/* CONDITIONAL RENDERING after login by admin*/}
 
         <Route

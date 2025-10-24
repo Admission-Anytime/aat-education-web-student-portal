@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   User,
   MapPin,
@@ -11,6 +12,7 @@ import {
   AlertCircle,
   Upload,
   X,
+  LogOut,
 } from "lucide-react";
 
 // Reusable Input Field Component (with error handling)
@@ -22,6 +24,8 @@ const InputField = ({
   value,
   onChange,
   error,
+  whiteBg = false,
+  label,
 }) => (
   <div className="w-full">
     <input
@@ -31,6 +35,8 @@ const InputField = ({
       value={value}
       onChange={onChange}
       className={`border p-3 rounded-xl w-full transition-all focus:ring-2 focus:ring-opacity-50 ${
+        whiteBg ? "bg-white" : ""
+      } ${
         error
           ? "border-red-500 focus:border-red-500 focus:ring-red-100"
           : "border-gray-300 focus:border-blue-500 focus:ring-blue-100"
@@ -42,38 +48,64 @@ const InputField = ({
         <span className="ml-1">{error}</span>
       </p>
     )}
+    {label && (
+      <p className="text-gray-600 text-xs mt-1">{label}</p>
+    )}
   </div>
 );
 
 function RegistrationForm() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const preFilledData = location.state || {};
+
   const [formData, setFormData] = useState({
-    programmeName: "",
-    specialisation: "",
+    programmeName: preFilledData.programmeName || "",
+    specialisation: preFilledData.specialisation || "",
     registrationId: "",
     photo: null,
     photoPreview: null,
+    aadhaarCard: null,
+    abcId: null,
+    bedId: null,
     studentFirstName: "",
     studentMiddleName: "",
     studentLastName: "",
     gender: "",
     dateOfBirth: "",
     quota: "",
+    quotaDocument: null,
     category: "",
+    categoryCertificate: null,
     subCategory: "",
+    subCategoryDocument: null,
     qualification: "",
-    studentPhone: "",
-    whatsappNo: "",
+    studentPhone: preFilledData.phoneNumber || "",
+    whatsappNo: preFilledData.phoneNumber || "",
     studentEmail: "",
     grade: "",
     program: "", // Not used in current UI, but kept in state
-    currentAddress: "",
+    // Current Address
+    currentHouseNo: "",
+    currentStreet: "",
+    currentArea: "",
+    currentLandmark: "",
     currentCity: "",
+    currentDistrict: "",
     currentState: "",
-    currentZipCode: "",
-    permanentAddress: "",
+    currentPincode: "",
+    currentCountry: "",
+    // Permanent Address
+    permanentHouseNo: "",
+    permanentStreet: "",
+    permanentArea: "",
+    permanentLandmark: "",
     permanentCity: "",
+    permanentDistrict: "",
     permanentState: "",
-    permanentZipCode: "",
+    permanentPincode: "",
+    permanentCountry: "",
+    sameAsCurrent: false,
     fatherFirstName: "",
     fatherMiddleName: "",
     fatherLastName: "",
@@ -96,12 +128,14 @@ function RegistrationForm() {
     // 10th Grade
     tenthBoard: "",
     tenthSchool: "",
+    tenthSchoolAddress: "",
     tenthYear: "",
     tenthPercentage: "",
     tenthMarksheet: null,
     // 12th Grade
     twelfthBoard: "",
     twelfthSchool: "",
+    twelfthSchoolAddress: "",
     twelfthStream: "",
     twelfthYear: "",
     twelfthPercentage: "",
@@ -112,24 +146,28 @@ function RegistrationForm() {
     ugDiplomaSpecialization: "",
     ugDiplomaYear: "",
     ugDiplomaPercentage: "",
+    ugDiplomaMarksheet: null,
     // UG
     ugCollege: "",
     ugCourse: "",
     ugSpecialization: "",
     ugYear: "",
     ugPercentage: "",
+    ugMarksheet: null,
     // PG Diploma
     pgDiplomaInstitute: "",
     pgDiplomaCourse: "",
     pgDiplomaSpecialization: "",
     pgDiplomaYear: "",
     pgDiplomaPercentage: "",
+    pgDiplomaMarksheet: null,
     // PG
     pgUniversity: "",
     pgCourse: "",
     pgSpecialization: "",
     pgYear: "",
     pgPercentage: "",
+    pgMarksheet: null,
     gpa: "", // Not used in current UI, but kept in state
     interests: "",
     whyApplying: "", // Not used in current UI, but kept in state
@@ -145,6 +183,22 @@ function RegistrationForm() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [applicationId, setApplicationId] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Check if user came from login
+  useEffect(() => {
+    if (preFilledData.phoneNumber && preFilledData.programmeName && preFilledData.specialisation) {
+      setIsLoggedIn(true);
+    } else {
+      // If no pre-filled data, redirect to login
+      navigate("/student-login", { replace: true });
+    }
+  }, [preFilledData, navigate]);
+
+  // Handle logout
+  const handleLogout = () => {
+    navigate("/student-login");
+  };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -199,6 +253,157 @@ function RegistrationForm() {
     setErrors((prev) => ({ ...prev, photo: undefined }));
   };
 
+  const handleAadhaarUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/") && file.type !== "application/pdf") {
+        setErrors((prev) => ({
+          ...prev,
+          aadhaarCard: "Please upload an image or PDF file.",
+        }));
+        return;
+      }
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors((prev) => ({
+          ...prev,
+          aadhaarCard: "File size should be less than 5MB.",
+        }));
+        return;
+      }
+
+      // Set the file
+      setFormData((prev) => ({
+        ...prev,
+        aadhaarCard: file,
+      }));
+      setErrors((prev) => ({ ...prev, aadhaarCard: undefined }));
+    }
+  };
+
+  const handleAbcUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/") && file.type !== "application/pdf") {
+        setErrors((prev) => ({
+          ...prev,
+          abcId: "Please upload an image or PDF file.",
+        }));
+        return;
+      }
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors((prev) => ({
+          ...prev,
+          abcId: "File size should be less than 5MB.",
+        }));
+        return;
+      }
+
+      // Set the file
+      setFormData((prev) => ({
+        ...prev,
+        abcId: file,
+      }));
+      setErrors((prev) => ({ ...prev, abcId: undefined }));
+    }
+  };
+
+  const handleBedUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/") && file.type !== "application/pdf") {
+        setErrors((prev) => ({
+          ...prev,
+          bedId: "Please upload an image or PDF file.",
+        }));
+        return;
+      }
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors((prev) => ({
+          ...prev,
+          bedId: "File size should be less than 5MB.",
+        }));
+        return;
+      }
+
+      // Set the file
+      setFormData((prev) => ({
+        ...prev,
+        bedId: file,
+      }));
+      setErrors((prev) => ({ ...prev, bedId: undefined }));
+    }
+  };
+
+  const handleSubCategoryDocumentUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/") && file.type !== "application/pdf") {
+        setErrors((prev) => ({
+          ...prev,
+          subCategoryDocument: "Please upload an image or PDF file.",
+        }));
+        return;
+      }
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors((prev) => ({
+          ...prev,
+          subCategoryDocument: "File size should be less than 5MB.",
+        }));
+        return;
+      }
+
+      // Set the file
+      setFormData((prev) => ({
+        ...prev,
+        subCategoryDocument: file,
+      }));
+      setErrors((prev) => ({ ...prev, subCategoryDocument: undefined }));
+    }
+  };
+
+  // Handle "Same as Current Address" checkbox
+  const handleSameAsCurrentChange = (e) => {
+    const isChecked = e.target.checked;
+    setFormData((prev) => ({
+      ...prev,
+      sameAsCurrent: isChecked,
+      ...(isChecked && {
+        permanentHouseNo: prev.currentHouseNo,
+        permanentStreet: prev.currentStreet,
+        permanentArea: prev.currentArea,
+        permanentLandmark: prev.currentLandmark,
+        permanentCity: prev.currentCity,
+        permanentDistrict: prev.currentDistrict,
+        permanentState: prev.currentState,
+        permanentPincode: prev.currentPincode,
+        permanentCountry: prev.currentCountry,
+      }),
+    }));
+
+    // Clear permanent address errors if copying from current
+    if (isChecked) {
+      setErrors((prev) => ({
+        ...prev,
+        permanentHouseNo: undefined,
+        permanentStreet: undefined,
+        permanentArea: undefined,
+        permanentCity: undefined,
+        permanentDistrict: undefined,
+        permanentState: undefined,
+        permanentPincode: undefined,
+        permanentCountry: undefined,
+      }));
+    }
+  };
+
   const validateForm = () => {
     let newErrors = {};
     let isValid = true;
@@ -218,14 +423,23 @@ function RegistrationForm() {
       "studentPhone",
       "whatsappNo",
       "studentEmail",
-      "currentAddress",
+      "aadhaarCard",
+      "currentHouseNo",
+      "currentStreet",
+      "currentArea",
       "currentCity",
+      "currentDistrict",
       "currentState",
-      "currentZipCode",
-      "permanentAddress",
+      "currentPincode",
+      "currentCountry",
+      "permanentHouseNo",
+      "permanentStreet",
+      "permanentArea",
       "permanentCity",
+      "permanentDistrict",
       "permanentState",
-      "permanentZipCode",
+      "permanentPincode",
+      "permanentCountry",
       "fatherFirstName",
       "fatherMiddleName",
       "fatherLastName",
@@ -246,15 +460,22 @@ function RegistrationForm() {
       "relationship",
       "tenthBoard",
       "tenthSchool",
+      "tenthSchoolAddress",
       "tenthYear",
       "tenthPercentage",
       "twelfthBoard",
       "twelfthSchool",
+      "twelfthSchoolAddress",
       "twelfthStream",
       "twelfthYear",
       "twelfthPercentage",
       "agreeTerms",
     ];
+
+    // Add subCategoryDocument to required fields if subCategory is selected
+    if (formData.subCategory) {
+      requiredFields.push("subCategoryDocument");
+    }
 
     requiredFields.forEach((field) => {
       if (field === "agreeTerms") {
@@ -298,14 +519,14 @@ function RegistrationForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     console.log("Form submitted!");
     console.log("Form data:", formData);
-    
+
     const isValid = validateForm();
     console.log("Form validation result:", isValid);
     console.log("Validation errors:", errors);
-    
+
     if (!isValid) {
       console.log("Form validation failed. Errors:", errors);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -325,7 +546,13 @@ function RegistrationForm() {
           key !== "photo" &&
           key !== "photoPreview" &&
           key !== "tenthMarksheet" &&
-          key !== "twelfthMarksheet"
+          key !== "twelfthMarksheet" &&
+          key !== "quotaDocument" &&
+          key !== "categoryCertificate" &&
+          key !== "ugDiplomaMarksheet" &&
+          key !== "ugMarksheet" &&
+          key !== "pgDiplomaMarksheet" &&
+          key !== "pgMarksheet"
         ) {
           formDataToSend.append(key, formData[key]);
         }
@@ -335,11 +562,41 @@ function RegistrationForm() {
       if (formData.photo) {
         formDataToSend.append("photo", formData.photo);
       }
+      if (formData.aadhaarCard) {
+        formDataToSend.append("aadhaarCard", formData.aadhaarCard);
+      }
+      if (formData.abcId) {
+        formDataToSend.append("abcId", formData.abcId);
+      }
+      if (formData.bedId) {
+        formDataToSend.append("bedId", formData.bedId);
+      }
       if (formData.tenthMarksheet) {
         formDataToSend.append("tenthMarksheet", formData.tenthMarksheet);
       }
       if (formData.twelfthMarksheet) {
         formDataToSend.append("twelfthMarksheet", formData.twelfthMarksheet);
+      }
+      if (formData.quotaDocument) {
+        formDataToSend.append("quotaDocument", formData.quotaDocument);
+      }
+      if (formData.categoryCertificate) {
+        formDataToSend.append("categoryCertificate", formData.categoryCertificate);
+      }
+      if (formData.subCategoryDocument) {
+        formDataToSend.append("subCategoryDocument", formData.subCategoryDocument);
+      }
+      if (formData.ugDiplomaMarksheet) {
+        formDataToSend.append("ugDiplomaMarksheet", formData.ugDiplomaMarksheet);
+      }
+      if (formData.ugMarksheet) {
+        formDataToSend.append("ugMarksheet", formData.ugMarksheet);
+      }
+      if (formData.pgDiplomaMarksheet) {
+        formDataToSend.append("pgDiplomaMarksheet", formData.pgDiplomaMarksheet);
+      }
+      if (formData.pgMarksheet) {
+        formDataToSend.append("pgMarksheet", formData.pgMarksheet);
       }
 
       // Send to backend
@@ -354,7 +611,7 @@ function RegistrationForm() {
       );
 
       console.log("Registration successful:", response);
-      
+
       // Set application ID from response
       setApplicationId(response.data.registration._id);
       setSubmitted(true);
@@ -364,7 +621,7 @@ function RegistrationForm() {
       console.error("Error response:", error.response?.data);
       console.error("Error message:", error.response?.data?.error);
       setLoading(false);
-      
+
       // Handle error
       if (error.response?.data?.message) {
         alert(`Error: ${error.response.data.message}\n\nDetails: ${error.response.data.error || 'No additional details'}`);
@@ -374,6 +631,9 @@ function RegistrationForm() {
     }
   };
 
+  
+
+// removed duplicate early return; rendering logic continues below (if/submitted and main return)
   if (submitted) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-emerald-50 flex items-center justify-center p-4">
@@ -411,7 +671,9 @@ function RegistrationForm() {
                 gender: "",
                 dateOfBirth: "",
                 quota: "",
+                quotaDocument: null,
                 category: "",
+                categoryCertificate: null,
                 subCategory: "",
                 qualification: "",
                 studentPhone: "",
@@ -447,11 +709,13 @@ function RegistrationForm() {
                 previousSchool: "",
                 tenthBoard: "",
                 tenthSchool: "",
+                tenthSchoolAddress: "",
                 tenthYear: "",
                 tenthPercentage: "",
                 tenthMarksheet: null,
                 twelfthBoard: "",
                 twelfthSchool: "",
+                twelfthSchoolAddress: "",
                 twelfthStream: "",
                 twelfthYear: "",
                 twelfthPercentage: "",
@@ -461,21 +725,25 @@ function RegistrationForm() {
                 ugDiplomaSpecialization: "",
                 ugDiplomaYear: "",
                 ugDiplomaPercentage: "",
+                ugDiplomaMarksheet: null,
                 ugCollege: "",
                 ugCourse: "",
                 ugSpecialization: "",
                 ugYear: "",
                 ugPercentage: "",
+                ugMarksheet: null,
                 pgDiplomaInstitute: "",
                 pgDiplomaCourse: "",
                 pgDiplomaSpecialization: "",
                 pgDiplomaYear: "",
                 pgDiplomaPercentage: "",
+                pgDiplomaMarksheet: null,
                 pgUniversity: "",
                 pgCourse: "",
                 pgSpecialization: "",
                 pgYear: "",
                 pgPercentage: "",
+                pgMarksheet: null,
                 gpa: "",
                 interests: "",
                 whyApplying: "",
@@ -505,12 +773,35 @@ function RegistrationForm() {
             <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-32 -mt-32"></div>
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-white opacity-5 rounded-full -ml-24 -mb-24"></div>
             <div className="relative z-10">
-              <h2 className="text-4xl font-extrabold mb-3 tracking-tight">
-                Student Registration Form
-              </h2>
-              <p className="text-blue-100 text-lg">
-                Complete all sections to submit your application
-              </p>
+              <div className="flex justify-between items-start">
+                <div>
+                  <h2 className="text-4xl font-extrabold mb-3 tracking-tight">
+                    Student Registration Form
+                  </h2>
+                  <p className="text-blue-100 text-lg">
+                    Complete all sections to submit your application
+                  </p>
+                </div>
+                {isLoggedIn && (
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center space-x-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl transition-all"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span className="text-sm font-medium">Logout</span>
+                  </button>
+                )}
+              </div>
+              {isLoggedIn && (
+                <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                  <p className="text-sm text-blue-100 mb-1">Logged in as:</p>
+                  <p className="font-semibold text-lg">+91-{preFilledData.phoneNumber}</p>
+                  <p className="text-sm text-blue-100 mt-2">
+                    Program: <span className="font-medium text-white">{preFilledData.programmeName}</span> | 
+                    Specialisation: <span className="font-medium text-white">{preFilledData.specialisation}</span>
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -535,32 +826,69 @@ function RegistrationForm() {
               <div className="grid md:grid-cols-2 gap-8 mb-6">
                 {/* Left Column: Programme Name, Specialisation, Registration Id */}
                 <div className="space-y-6">
-                  <InputField
-                    name="programmeName"
-                    value={formData.programmeName}
-                    onChange={handleInputChange}
-                    placeholder="Programme Name *"
-                    error={errors.programmeName}
-                  />
-                  <InputField
-                    name="specialisation"
-                    value={formData.specialisation}
-                    onChange={handleInputChange}
-                    placeholder="Specialisation *"
-                    error={errors.specialisation}
-                  />
-                  <InputField
+                   <InputField
                     name="registrationId"
                     value={formData.registrationId}
                     onChange={handleInputChange}
                     placeholder="Registration ID *"
                     error={errors.registrationId}
+                    label="Registration ID"
                   />
+                  <div className="w-full">
+                    <input
+                      type="text"
+                      name="programmeName"
+                      placeholder="Programme Name *"
+                      value={formData.programmeName}
+                      onChange={handleInputChange}
+                      disabled={isLoggedIn}
+                      className={`border p-3 rounded-xl w-full transition-all focus:ring-2 focus:ring-opacity-50 ${
+                        isLoggedIn
+                          ? "bg-gray-100 cursor-not-allowed text-gray-700"
+                          : errors.programmeName
+                          ? "border-red-500 focus:border-red-500 focus:ring-red-100"
+                          : "border-gray-300 focus:border-blue-500 focus:ring-blue-100"
+                      }`}
+                    />
+                    {errors.programmeName && (
+                      <p className="text-red-500 text-sm mt-1 flex items-center">
+                        <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
+                        <span className="ml-1">{errors.programmeName}</span>
+                      </p>
+                    )}
+                    <p className="text-gray-600 text-xs mt-1">Programme Name</p>
+                  </div>
+                  <div className="w-full">
+                    <input
+                      type="text"
+                      name="specialisation"
+                      placeholder="Specialisation *"
+                      value={formData.specialisation}
+                      onChange={handleInputChange}
+                      disabled={isLoggedIn}
+                      className={`border p-3 rounded-xl w-full transition-all focus:ring-2 focus:ring-opacity-50 ${
+                        isLoggedIn
+                          ? "bg-gray-100 cursor-not-allowed text-gray-700"
+                          : errors.specialisation
+                          ? "border-red-500 focus:border-red-500 focus:ring-red-100"
+                          : "border-gray-300 focus:border-blue-500 focus:ring-blue-100"
+                      }`}
+                    />
+                    {errors.specialisation && (
+                      <p className="text-red-500 text-sm mt-1 flex items-center">
+                        <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
+                        <span className="ml-1">{errors.specialisation}</span>
+                      </p>
+                    )}
+                    <p className="text-gray-600 text-xs mt-1">Specialisation</p>
+                  </div>
+                 
                 </div>
 
-                {/* Right Column: Photo Upload & Preview */}
-                <div className="flex justify-center items-start">
-                  <div className="w-54">
+                {/* Right Column: Photo Upload */}
+                <div className="flex flex-col items-center space-y-4">
+                  {/* Photo Upload */}
+                  <div className="w-40">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Upload Photo *
                     </label>
@@ -575,29 +903,29 @@ function RegistrationForm() {
                         />
                         <label
                           htmlFor="photo-upload"
-                          className={`flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-xl cursor-pointer transition-all hover:bg-gray-50 ${
+                          className={`flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-xl cursor-pointer transition-all hover:bg-gray-50 ${
                             errors.photo
                               ? "border-red-500 bg-red-50"
                               : "border-gray-300 bg-gray-50"
                           }`}
                         >
                           <Upload
-                            className={`w-10 h-10 mb-2 ${
+                            className={`w-8 h-8 mb-2 ${
                               errors.photo ? "text-red-500" : "text-gray-400"
                             }`}
                           />
                           <p
-                            className={`text-sm ${
+                            className={`text-xs ${
                               errors.photo ? "text-red-500" : "text-gray-600"
                             }`}
                           >
                             Click to upload
                           </p>
-                          <p className="text-xs text-gray-500 mt-1">Max 5MB</p>
+                          <p className="text-[10px] text-gray-500 mt-1">Max 5MB</p>
                         </label>
                       </div>
                     ) : (
-                      <div className="relative w-full h-64 border-2 border-gray-300 rounded-xl overflow-hidden">
+                      <div className="relative w-full h-40 border-2 border-gray-300 rounded-xl overflow-hidden">
                         <img
                           src={formData.photoPreview}
                           alt="Preview"
@@ -606,9 +934,9 @@ function RegistrationForm() {
                         <button
                           type="button"
                           onClick={handleRemovePhoto}
-                          className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors shadow-lg"
+                          className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 transition-colors shadow-lg"
                         >
-                          <X className="w-4 h-4" />
+                          <X className="w-3 h-3" />
                         </button>
                       </div>
                     )}
@@ -630,6 +958,7 @@ function RegistrationForm() {
                   onChange={handleInputChange}
                   placeholder="First Name *"
                   error={errors.studentFirstName}
+                  label="First Name"
                 />
                 <InputField
                   name="studentMiddleName"
@@ -637,6 +966,7 @@ function RegistrationForm() {
                   onChange={handleInputChange}
                   placeholder="Middle Name *"
                   error={errors.studentMiddleName}
+                  label="Middle Name"
                 />
                 <InputField
                   name="studentLastName"
@@ -644,11 +974,12 @@ function RegistrationForm() {
                   onChange={handleInputChange}
                   placeholder="Last Name *"
                   error={errors.studentLastName}
+                  label="Last Name"
                 />
               </div>
 
-              {/* Row 2: Gender, DOB, Quota */}
-              <div className="grid md:grid-cols-3 gap-6 mt-6">
+              {/* Row 2: Gender, DOB, Quota, Quota Document */}
+              <div className="grid md:grid-cols-4 gap-6 mt-6">
                 <div className="w-full">
                   <select
                     name="gender"
@@ -671,16 +1002,59 @@ function RegistrationForm() {
                       <span className="ml-1">{errors.gender}</span>
                     </p>
                   )}
+                  <p className="text-gray-600 text-xs mt-1">Gender</p>
                 </div>
                 <div className="w-full">
-                  <InputField
-                    type="date"
-                    name="dateOfBirth"
-                    value={formData.dateOfBirth}
-                    onChange={handleInputChange}
-                    placeholder="Date of Birth *"
-                    error={errors.dateOfBirth}
-                  />
+                <div className="relative">
+  <input
+    type="date"
+    name="dateOfBirth"
+    value={formData.dateOfBirth}
+    onChange={handleInputChange}
+    className={`border p-3 rounded-xl w-full transition-all focus:ring-2 focus:ring-opacity-50 ${
+      errors.dateOfBirth
+        ? "border-red-500 focus:border-red-500 focus:ring-red-100"
+        : "border-gray-300 focus:border-blue-500 focus:ring-blue-100"
+    }`}
+    style={{
+      colorScheme: 'light',
+      color: formData.dateOfBirth ? 'inherit' : 'transparent',
+      position: 'relative',
+      zIndex: 1,
+      backgroundColor: 'transparent',
+    }}
+    onFocus={(e) => {
+      e.target.style.color = 'inherit';
+      const label = e.target.parentNode.querySelector('span');
+      if (label) label.style.display = 'none';
+    }}
+    onBlur={(e) => {
+      if (!e.target.value) {
+        const label = e.target.parentNode.querySelector('span');
+        if (label) label.style.display = 'block';
+      }
+    }}
+  />
+  {!formData.dateOfBirth && (
+    <span
+      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-base"
+      style={{
+        zIndex: 0,
+      }}
+    >
+      Date of Birth *
+    </span>
+  )}
+</div>
+
+{errors.dateOfBirth && (
+  <p className="text-red-500 text-sm mt-1 flex items-center">
+    <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
+    <span className="ml-1">{errors.dateOfBirth}</span>
+  </p>
+)}
+<p className="text-gray-600 text-xs mt-1">Date of Birth</p>
+
                 </div>
                 <div className="w-full">
                   <select
@@ -693,9 +1067,10 @@ function RegistrationForm() {
                         : "border-gray-300 focus:border-blue-500 focus:ring-blue-100"
                     }`}
                   >
-                    <option value="">Select Quota *</option>
+                    <option value="">Quota *</option>
                     <option value="Ex Army">Ex Army</option>
                     <option value="Teacher Staff">Teacher Staff</option>
+                    <option value="Not Applicable">Not Applicable</option>
                   </select>
                   {errors.quota && (
                     <p className="text-red-500 text-sm mt-1 flex items-center">
@@ -703,11 +1078,67 @@ function RegistrationForm() {
                       <span className="ml-1">{errors.quota}</span>
                     </p>
                   )}
+                  <p className="text-gray-600 text-xs mt-1">Quota</p>
+                </div>
+                <div className="w-full">
+                  <div className="relative">
+                    <input
+                      type="file"
+                      name="quotaDocument"
+                      id="quotaDocument"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          // Validate file size (max 5MB)
+                          if (file.size > 5 * 1024 * 1024) {
+                            setErrors((prev) => ({
+                              ...prev,
+                              quotaDocument: "File size should be less than 5MB.",
+                            }));
+                            e.target.value = null;
+                            return;
+                          }
+                          setFormData((prev) => ({
+                            ...prev,
+                            quotaDocument: file,
+                          }));
+                          setErrors((prev) => ({ ...prev, quotaDocument: undefined }));
+                        }
+                      }}
+                      className="hidden"
+                    />
+                    <label
+                      htmlFor="quotaDocument"
+                      className={`flex items-center border rounded-xl w-full text-sm transition-all cursor-pointer overflow-hidden ${
+                        errors.quotaDocument
+                          ? "border-red-500"
+                          : "border-gray-300 hover:border-blue-500"
+                      }`}
+                    >
+                      <span className="bg-blue-600 text-white px-4 py-2.5 text-sm font-medium whitespace-nowrap">
+                        Choose File
+                      </span>
+                      <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
+                        {formData.quotaDocument ? formData.quotaDocument.name : "No file chosen"}
+                      </span>
+                    </label>
+
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Quota Document (if applicable)
+                  </p>
+                  {errors.quotaDocument && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
+                      <span className="ml-1">{errors.quotaDocument}</span>
+                    </p>
+                  )}
                 </div>
               </div>
 
-              {/* Row 3: Category, Sub Category, Qualification */}
-              <div className="grid md:grid-cols-3 gap-6 mt-6">
+              {/* Row 3: Category, Category Certificate, Sub Category, Sub Category Certificate, Qualification */}
+              <div className="grid md:grid-cols-5 gap-6 mt-6">
                 <div className="w-full">
                   <select
                     name="category"
@@ -722,11 +1153,70 @@ function RegistrationForm() {
                     <option value="">Select Category *</option>
                     <option value="Unreserved">Unreserved</option>
                     <option value="Reserved">Reserved</option>
+                    <option value="Reserved">OBC</option>
+                    <option value="Reserved">ST</option>
+                    <option value="Reserved">SC</option>
+                    <option value="Reserved">EWS</option>
                   </select>
                   {errors.category && (
                     <p className="text-red-500 text-sm mt-1 flex items-center">
                       <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
                       <span className="ml-1">{errors.category}</span>
+                    </p>
+                  )}
+                  <p className="text-gray-600 text-xs mt-1">Category</p>
+                </div>
+                <div className="w-full">
+                  <div className="relative">
+                    <input
+                      type="file"
+                      name="categoryCertificate"
+                      id="categoryCertificate"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          // Validate file size (max 5MB)
+                          if (file.size > 5 * 1024 * 1024) {
+                            setErrors((prev) => ({
+                              ...prev,
+                              categoryCertificate: "File size should be less than 5MB.",
+                            }));
+                            e.target.value = null;
+                            return;
+                          }
+                          setFormData((prev) => ({
+                            ...prev,
+                            categoryCertificate: file,
+                          }));
+                          setErrors((prev) => ({ ...prev, categoryCertificate: undefined }));
+                        }
+                      }}
+                      className="hidden"
+                    />
+                    <label
+                      htmlFor="categoryCertificate"
+                      className={`flex items-center border rounded-xl w-full text-sm transition-all cursor-pointer overflow-hidden ${
+                        errors.categoryCertificate
+                          ? "border-red-500"
+                          : "border-gray-300 hover:border-blue-500"
+                      }`}
+                    >
+                      <span className="bg-blue-600 text-white px-4 py-2.5 text-sm font-medium whitespace-nowrap">
+                        Choose File
+                      </span>
+                      <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
+                        {formData.categoryCertificate ? formData.categoryCertificate.name : "No file chosen"}
+                      </span>
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Category Certificate (if applicable)
+                  </p>
+                  {errors.categoryCertificate && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
+                      <span className="ml-1">{errors.categoryCertificate}</span>
                     </p>
                   )}
                 </div>
@@ -752,34 +1242,104 @@ function RegistrationForm() {
                       <span className="ml-1">{errors.subCategory}</span>
                     </p>
                   )}
+                  <p className="text-gray-600 text-xs mt-1">Sub Category</p>
+                </div>
+                <div className="w-full">
+                  <div className="relative">
+                    <input
+                      type="file"
+                      name="subCategoryDocument"
+                      id="subCategoryDocument"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={handleSubCategoryDocumentUpload}
+                      className="hidden"
+                    />
+                    <label
+                      htmlFor="subCategoryDocument"
+                      className={`flex items-center border rounded-xl w-full text-sm transition-all cursor-pointer overflow-hidden ${
+                        errors.subCategoryDocument
+                          ? "border-red-500"
+                          : "border-gray-300 hover:border-blue-500"
+                      }`}
+                    >
+                      <span className="bg-blue-600 text-white px-4 py-2.5 text-sm font-medium whitespace-nowrap">
+                        Choose File
+                      </span>
+                      <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
+                        {formData.subCategoryDocument ? formData.subCategoryDocument.name : "No file chosen"}
+                      </span>
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Sub Category Certificate (if applicable)
+                  </p>
+                  {errors.subCategoryDocument && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
+                      <span className="ml-1">{errors.subCategoryDocument}</span>
+                    </p>
+                  )}
                 </div>
                 <InputField
                   name="qualification"
                   value={formData.qualification}
                   onChange={handleInputChange}
-                  placeholder="Qualification *"
+                  placeholder="Eligible Qualification*"
                   error={errors.qualification}
+                  label="Eligible Qualification"
                 />
               </div>
 
               {/* Row 4: Mobile No, Whatsapp No, Email ID */}
               <div className="grid md:grid-cols-3 gap-6 mt-6">
-                <InputField
-                  name="studentPhone"
-                  type="tel"
-                  value={formData.studentPhone}
-                  onChange={handleInputChange}
-                  placeholder="Mobile No *"
-                  error={errors.studentPhone}
-                />
-                <InputField
-                  name="whatsappNo"
-                  type="tel"
-                  value={formData.whatsappNo}
-                  onChange={handleInputChange}
-                  placeholder="Whatsapp No *"
-                  error={errors.whatsappNo}
-                />
+                <div className="w-full">
+                  <input
+                    type="tel"
+                    name="studentPhone"
+                    placeholder="Mobile No *"
+                    value={formData.studentPhone}
+                    onChange={handleInputChange}
+                    disabled={isLoggedIn}
+                    className={`border p-3 rounded-xl w-full transition-all focus:ring-2 focus:ring-opacity-50 ${
+                      isLoggedIn
+                        ? "bg-gray-100 cursor-not-allowed text-gray-700"
+                        : errors.studentPhone
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-100"
+                        : "border-gray-300 focus:border-blue-500 focus:ring-blue-100"
+                    }`}
+                  />
+                  {errors.studentPhone && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
+                      <span className="ml-1">{errors.studentPhone}</span>
+                    </p>
+                  )}
+                  <p className="text-gray-600 text-xs mt-1">Mobile No</p>
+                </div>
+                <div className="w-full">
+                  <input
+                    type="tel"
+                    name="whatsappNo"
+                    placeholder="Whatsapp No *"
+                    value={formData.whatsappNo}
+                    onChange={handleInputChange}
+                    disabled={isLoggedIn}
+                    className={`border p-3 rounded-xl w-full transition-all focus:ring-2 focus:ring-opacity-50 ${
+                      isLoggedIn
+                        ? "bg-gray-100 cursor-not-allowed text-gray-700"
+                        : errors.whatsappNo
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-100"
+                        : "border-gray-300 focus:border-blue-500 focus:ring-blue-100"
+                    }`}
+                  />
+                  {errors.whatsappNo && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
+                      <span className="ml-1">{errors.whatsappNo}</span>
+                    </p>
+                  )}
+                  <p className="text-gray-600 text-xs mt-1">WhatsApp No</p>
+                </div>
                 <InputField
                   name="studentEmail"
                   type="email"
@@ -787,10 +1347,127 @@ function RegistrationForm() {
                   onChange={handleInputChange}
                   placeholder="Email ID *"
                   error={errors.studentEmail}
+                  label="Email ID"
                 />
               </div>
-              
-              {/* Row 5: Grade */}
+
+              {/* Row 5: Aadhaar Card, ABC ID, and BED ID Upload */}
+              <div className="grid md:grid-cols-3 gap-6 mt-6">
+                <div className="w-full">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Upload Aadhaar Card *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*,.pdf"
+                      onChange={handleAadhaarUpload}
+                      className="hidden"
+                      id="aadhaar-upload"
+                    />
+                    <label
+                      htmlFor="aadhaar-upload"
+                      className={`flex items-center border rounded-xl w-full text-sm transition-all cursor-pointer overflow-hidden ${
+                        errors.aadhaarCard
+                          ? "border-red-500"
+                          : "border-gray-300 hover:border-blue-500"
+                      }`}
+                    >
+                      <span className="bg-blue-600 text-white px-4 py-2.5 text-sm font-medium whitespace-nowrap">
+                        Choose File
+                      </span>
+                      <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
+                        {formData.aadhaarCard ? formData.aadhaarCard.name : "No file chosen"}
+                      </span>
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Images or PDF, Max 5MB
+                  </p>
+                  {errors.aadhaarCard && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
+                      <span className="ml-1">{errors.aadhaarCard}</span>
+                    </p>
+                  )}
+                </div>
+                <div className="w-full">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Upload ABC ID
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*,.pdf"
+                      onChange={handleAbcUpload}
+                      className="hidden"
+                      id="abc-upload"
+                    />
+                    <label
+                      htmlFor="abc-upload"
+                      className={`flex items-center border rounded-xl w-full text-sm transition-all cursor-pointer overflow-hidden ${
+                        errors.abcId
+                          ? "border-red-500"
+                          : "border-gray-300 hover:border-blue-500"
+                      }`}
+                    >
+                      <span className="bg-blue-600 text-white px-4 py-2.5 text-sm font-medium whitespace-nowrap">
+                        Choose File
+                      </span>
+                      <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
+                        {formData.abcId ? formData.abcId.name : "No file chosen"}
+                      </span>
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Images or PDF, Max 5MB (Optional)
+                  </p>
+                  {errors.abcId && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
+                      <span className="ml-1">{errors.abcId}</span>
+                    </p>
+                  )}
+                </div>
+                <div className="w-full">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Upload BED ID
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*,.pdf"
+                      onChange={handleBedUpload}
+                      className="hidden"
+                      id="bed-upload"
+                    />
+                    <label
+                      htmlFor="bed-upload"
+                      className={`flex items-center border rounded-xl w-full text-sm transition-all cursor-pointer overflow-hidden ${
+                        errors.bedId
+                          ? "border-red-500"
+                          : "border-gray-300 hover:border-blue-500"
+                      }`}
+                    >
+                      <span className="bg-blue-600 text-white px-4 py-2.5 text-sm font-medium whitespace-nowrap">
+                        Choose File
+                      </span>
+                      <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
+                        {formData.bedId ? formData.bedId.name : "No file chosen"}
+                      </span>
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Images or PDF, Max 5MB (Optional)
+                  </p>
+                  {errors.bedId && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
+                      <span className="ml-1">{errors.bedId}</span>
+                    </p>
+                  )}
+                </div>
+              </div>
              
             </section>
 
@@ -825,6 +1502,8 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="First Name *"
                     error={errors.fatherFirstName}
+                    whiteBg={true}
+                    label="First Name"
                   />
                   <InputField
                     name="fatherMiddleName"
@@ -832,6 +1511,8 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Middle Name *"
                     error={errors.fatherMiddleName}
+                    whiteBg={true}
+                    label="Middle Name"
                   />
                   <InputField
                     name="fatherLastName"
@@ -839,6 +1520,8 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Last Name *"
                     error={errors.fatherLastName}
+                    whiteBg={true}
+                    label="Last Name"
                   />
                 </div>
                 <div className="grid md:grid-cols-3 gap-6 mt-4">
@@ -849,6 +1532,8 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Email *"
                     error={errors.fatherEmail}
+                    whiteBg={true}
+                    label="Email"
                   />
                   <InputField
                     name="fatherPhone"
@@ -857,6 +1542,8 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Phone Number *"
                     error={errors.fatherPhone}
+                    whiteBg={true}
+                    label="Phone Number"
                   />
                   <InputField
                     name="fatherWhatsapp"
@@ -865,6 +1552,8 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="WhatsApp Number *"
                     error={errors.fatherWhatsapp}
+                    whiteBg={true}
+                    label="WhatsApp Number"
                   />
                 </div>
               </div>
@@ -884,6 +1573,8 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="First Name *"
                     error={errors.motherFirstName}
+                    whiteBg={true}
+                    label="First Name"
                   />
                   <InputField
                     name="motherMiddleName"
@@ -891,6 +1582,8 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Middle Name *"
                     error={errors.motherMiddleName}
+                    whiteBg={true}
+                    label="Middle Name"
                   />
                   <InputField
                     name="motherLastName"
@@ -898,6 +1591,8 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Last Name *"
                     error={errors.motherLastName}
+                    whiteBg={true}
+                    label="Last Name"
                   />
                 </div>
                 <div className="grid md:grid-cols-3 gap-6 mt-4">
@@ -908,6 +1603,8 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Email *"
                     error={errors.motherEmail}
+                    whiteBg={true}
+                    label="Email"
                   />
                   <InputField
                     name="motherPhone"
@@ -916,6 +1613,8 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Phone Number *"
                     error={errors.motherPhone}
+                    whiteBg={true}
+                    label="Phone Number"
                   />
                   <InputField
                     name="motherWhatsapp"
@@ -924,6 +1623,8 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="WhatsApp Number *"
                     error={errors.motherWhatsapp}
+                    whiteBg={true}
+                    label="WhatsApp Number"
                   />
                 </div>
               </div>
@@ -936,13 +1637,15 @@ function RegistrationForm() {
                   </span>
                   Guardian's Information
                 </h4>
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className="grid md:grid-cols-3 gap-6 mb-4">
                   <InputField
                     name="guardianFirstName"
                     value={formData.guardianFirstName}
                     onChange={handleInputChange}
                     placeholder="First Name *"
                     error={errors.guardianFirstName}
+                    whiteBg={true}
+                    label="First Name"
                   />
                   <InputField
                     name="guardianMiddleName"
@@ -950,6 +1653,8 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Middle Name *"
                     error={errors.guardianMiddleName}
+                    whiteBg={true}
+                    label="Middle Name"
                   />
                   <InputField
                     name="guardianLastName"
@@ -957,35 +1662,41 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Last Name *"
                     error={errors.guardianLastName}
+                    whiteBg={true}
+                    label="Last Name"
                   />
                 </div>
-              </div>
-
-              {/* Contact Information */}
-              <div className="grid md:grid-cols-3 gap-6 mt-6">
-                <InputField
-                  name="parentEmail"
-                  type="email"
-                  value={formData.parentEmail}
-                  onChange={handleInputChange}
-                  placeholder="Parent Email *"
-                  error={errors.parentEmail}
-                />
-                <InputField
-                  name="parentPhone"
-                  type="tel"
-                  value={formData.parentPhone}
-                  onChange={handleInputChange}
-                  placeholder="Parent Phone *"
-                  error={errors.parentPhone}
-                />
-                <InputField
-                  name="relationship"
-                  value={formData.relationship}
-                  onChange={handleInputChange}
-                  placeholder="Relationship (e.g., Father) *"
-                  error={errors.relationship}
-                />
+                <div className="grid md:grid-cols-3 gap-6">
+                  <InputField
+                    name="parentEmail"
+                    type="email"
+                    value={formData.parentEmail}
+                    onChange={handleInputChange}
+                    placeholder="Guardian Email *"
+                    error={errors.parentEmail}
+                    whiteBg={true}
+                    label="Guardian Email"
+                  />
+                  <InputField
+                    name="parentPhone"
+                    type="tel"
+                    value={formData.parentPhone}
+                    onChange={handleInputChange}
+                    placeholder="Guardian Phone *"
+                    error={errors.parentPhone}
+                    whiteBg={true}
+                    label="Guardian Phone"
+                  />
+                  <InputField
+                    name="relationship"
+                    value={formData.relationship}
+                    onChange={handleInputChange}
+                    placeholder="Relationship (e.g., Father) *"
+                    error={errors.relationship}
+                    whiteBg={true}
+                    label="Relationship"
+                  />
+                </div>
               </div>
             </section>
 
@@ -1013,13 +1724,15 @@ function RegistrationForm() {
                   </span>
                   10th Grade / SSC (Required)
                 </h4>
-                <div className="grid md:grid-cols-2 gap-6 mb-4">
+                <div className="grid md:grid-cols-4 gap-6 mb-4">
                   <InputField
                     name="tenthBoard"
                     value={formData.tenthBoard}
                     onChange={handleInputChange}
                     placeholder="Board Name (e.g., CBSE, ICSE) *"
                     error={errors.tenthBoard}
+                    whiteBg={true}
+                    label="Board Name"
                   />
                   <InputField
                     name="tenthSchool"
@@ -1027,7 +1740,20 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="School Name *"
                     error={errors.tenthSchool}
+                    whiteBg={true}
+                    label="School Name"
                   />
+                  <div className="md:col-span-2">
+                    <InputField
+                      name="tenthSchoolAddress"
+                      value={formData.tenthSchoolAddress}
+                      onChange={handleInputChange}
+                      placeholder="School Address *"
+                      error={errors.tenthSchoolAddress}
+                      whiteBg={true}
+                      label="School Address"
+                    />
+                  </div>
                 </div>
                 <div className="grid md:grid-cols-3 gap-6">
                   <InputField
@@ -1036,6 +1762,8 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Year of Passing *"
                     error={errors.tenthYear}
+                    whiteBg={true}
+                    label="Year of Passing"
                   />
                   <InputField
                     name="tenthPercentage"
@@ -1043,21 +1771,37 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Percentage / CGPA *"
                     error={errors.tenthPercentage}
+                    whiteBg={true}
+                    label="Percentage / CGPA"
                   />
                   <div className="w-full">
-                    <input
-                      type="file"
-                      name="tenthMarksheet"
-                      accept=".pdf,.jpg,.jpeg,.png"
-                      onChange={(e) => {
-                        const file = e.target.files[0];
-                        setFormData((prev) => ({
-                          ...prev,
-                          tenthMarksheet: file,
-                        }));
-                      }}
-                      className="border border-gray-300 p-2.5 rounded-xl w-full text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all"
-                    />
+                    <div className="relative">
+                      <input
+                        type="file"
+                        name="tenthMarksheet"
+                        id="tenthMarksheet"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          setFormData((prev) => ({
+                            ...prev,
+                            tenthMarksheet: file,
+                          }));
+                        }}
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="tenthMarksheet"
+                        className="flex items-center border border-gray-300 rounded-xl w-full text-sm transition-all cursor-pointer hover:border-blue-500 overflow-hidden"
+                      >
+                        <span className="bg-blue-600 text-white px-4 py-2.5 text-sm font-medium whitespace-nowrap">
+                          Choose File
+                        </span>
+                        <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
+                          {formData.tenthMarksheet ? formData.tenthMarksheet.name : "No file chosen"}
+                        </span>
+                      </label>
+                    </div>
                     <p className="text-xs text-gray-500 mt-1">
                       Marksheet (Optional)
                     </p>
@@ -1073,13 +1817,15 @@ function RegistrationForm() {
                   </span>
                   12th Grade / HSC (Required)
                 </h4>
-                <div className="grid md:grid-cols-2 gap-6 mb-4">
+                <div className="grid md:grid-cols-4 gap-6 mb-4">
                   <InputField
                     name="twelfthBoard"
                     value={formData.twelfthBoard}
                     onChange={handleInputChange}
                     placeholder="Board Name *"
                     error={errors.twelfthBoard}
+                    whiteBg={true}
+                    label="Board Name"
                   />
                   <InputField
                     name="twelfthSchool"
@@ -1087,7 +1833,20 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="School / College Name *"
                     error={errors.twelfthSchool}
+                    whiteBg={true}
+                    label="School / College Name"
                   />
+                  <div className="md:col-span-2">
+                    <InputField
+                      name="twelfthSchoolAddress"
+                      value={formData.twelfthSchoolAddress}
+                      onChange={handleInputChange}
+                      placeholder="School / College Address *"
+                      error={errors.twelfthSchoolAddress}
+                      whiteBg={true}
+                      label="School / College Address"
+                    />
+                  </div>
                 </div>
                 <div className="grid md:grid-cols-2 gap-6 mb-4">
                   <InputField
@@ -1096,6 +1855,8 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Stream (Science, Commerce, Arts) *"
                     error={errors.twelfthStream}
+                    whiteBg={true}
+                    label="Stream"
                   />
                   <InputField
                     name="twelfthYear"
@@ -1103,6 +1864,8 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Year of Passing *"
                     error={errors.twelfthYear}
+                    whiteBg={true}
+                    label="Year of Passing"
                   />
                 </div>
                 <div className="grid md:grid-cols-2 gap-6">
@@ -1112,23 +1875,39 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Percentage / CGPA *"
                     error={errors.twelfthPercentage}
+                    whiteBg={true}
+                    label="Percentage / CGPA"
                   />
                   <div className="w-full">
-                    <input
-                      type="file"
-                      name="twelfthMarksheet"
-                      accept=".pdf,.jpg,.jpeg,.png"
-                      onChange={(e) => {
-                        const file = e.target.files[0];
-                        setFormData((prev) => ({
-                          ...prev,
-                          twelfthMarksheet: file,
-                        }));
-                      }}
-                      className="border border-gray-300 p-2.5 rounded-xl w-full text-sm focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all"
-                    />
+                    <div className="relative">
+                      <input
+                        type="file"
+                        name="twelfthMarksheet"
+                        id="twelfthMarksheet"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          setFormData((prev) => ({
+                            ...prev,
+                            twelfthMarksheet: file,
+                          }));
+                        }}
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="twelfthMarksheet"
+                        className="flex items-center border border-gray-300 rounded-xl w-full text-sm transition-all cursor-pointer hover:border-purple-500 overflow-hidden"
+                      >
+                        <span className="bg-blue-600 text-white px-4 py-2.5 text-sm font-medium whitespace-nowrap">
+                          Choose File
+                        </span>
+                        <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
+                          {formData.twelfthMarksheet ? formData.twelfthMarksheet.name : "No file chosen"}
+                        </span>
+                      </label>
+                    </div>
                     <p className="text-xs text-gray-500 mt-1">
-                      Marksheet (Optional)
+                      Upload Marksheet 
                     </p>
                   </div>
                 </div>
@@ -1140,7 +1919,7 @@ function RegistrationForm() {
                   <span className="bg-green-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm mr-3">
                     3
                   </span>
-                  UG Diploma (Optional)
+                  UG Diploma (If Applicable)
                 </h4>
                 <div className="grid md:grid-cols-2 gap-6 mb-4">
                   <InputField
@@ -1149,6 +1928,8 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Institute Name"
                     error={errors.ugDiplomaInstitute}
+                    whiteBg={true}
+                    label="Institute Name"
                   />
                   <InputField
                     name="ugDiplomaCourse"
@@ -1156,15 +1937,19 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Diploma Course Name"
                     error={errors.ugDiplomaCourse}
+                    whiteBg={true}
+                    label="Diploma Course Name"
                   />
                 </div>
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className="grid md:grid-cols-2 gap-6 mb-4">
                   <InputField
                     name="ugDiplomaSpecialization"
                     value={formData.ugDiplomaSpecialization}
                     onChange={handleInputChange}
                     placeholder="Specialization"
                     error={errors.ugDiplomaSpecialization}
+                    whiteBg={true}
+                    label="Specialization"
                   />
                   <InputField
                     name="ugDiplomaYear"
@@ -1172,14 +1957,52 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Year of Completion"
                     error={errors.ugDiplomaYear}
+                    whiteBg={true}
+                    label="Year of Completion"
                   />
+                </div>
+                <div className="grid md:grid-cols-2 gap-6">
                   <InputField
                     name="ugDiplomaPercentage"
                     value={formData.ugDiplomaPercentage}
                     onChange={handleInputChange}
                     placeholder="Percentage / CGPA"
                     error={errors.ugDiplomaPercentage}
+                    whiteBg={true}
+                    label="Percentage / CGPA"
                   />
+                  <div className="w-full">
+                    <div className="relative">
+                      <input
+                        type="file"
+                        name="ugDiplomaMarksheet"
+                        id="ugDiplomaMarksheet"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          setFormData((prev) => ({
+                            ...prev,
+                            ugDiplomaMarksheet: file,
+                          }));
+                        }}
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="ugDiplomaMarksheet"
+                        className="flex items-center border border-gray-300 rounded-xl w-full text-sm transition-all cursor-pointer hover:border-green-500 overflow-hidden"
+                      >
+                        <span className="bg-blue-600 text-white px-4 py-2.5 text-sm font-medium whitespace-nowrap">
+                          Choose File
+                        </span>
+                        <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
+                          {formData.ugDiplomaMarksheet ? formData.ugDiplomaMarksheet.name : "No file chosen"}
+                        </span>
+                      </label>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Upload Marksheet (Optional)
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -1189,7 +2012,7 @@ function RegistrationForm() {
                   <span className="bg-yellow-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm mr-3">
                     4
                   </span>
-                  Under Graduate (UG) (Optional)
+                  Under Graduate - UG (If Applicable)
                 </h4>
                 <div className="grid md:grid-cols-2 gap-6 mb-4">
                   <InputField
@@ -1198,6 +2021,8 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="College / University Name"
                     error={errors.ugCollege}
+                    whiteBg={true}
+                    label="College / University Name"
                   />
                   <InputField
                     name="ugCourse"
@@ -1205,15 +2030,19 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Course Name (B.Sc, B.Tech, B.Com)"
                     error={errors.ugCourse}
+                    whiteBg={true}
+                    label="Course Name"
                   />
                 </div>
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className="grid md:grid-cols-2 gap-6 mb-4">
                   <InputField
                     name="ugSpecialization"
                     value={formData.ugSpecialization}
                     onChange={handleInputChange}
                     placeholder="Specialization / Major"
                     error={errors.ugSpecialization}
+                    whiteBg={true}
+                    label="Specialization / Major"
                   />
                   <InputField
                     name="ugYear"
@@ -1221,14 +2050,52 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Year of Passing"
                     error={errors.ugYear}
+                    whiteBg={true}
+                    label="Year of Passing"
                   />
+                </div>
+                <div className="grid md:grid-cols-2 gap-6">
                   <InputField
                     name="ugPercentage"
                     value={formData.ugPercentage}
                     onChange={handleInputChange}
                     placeholder="Percentage / CGPA"
                     error={errors.ugPercentage}
+                    whiteBg={true}
+                    label="Percentage / CGPA"
                   />
+                  <div className="w-full">
+                    <div className="relative">
+                      <input
+                        type="file"
+                        name="ugMarksheet"
+                        id="ugMarksheet"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          setFormData((prev) => ({
+                            ...prev,
+                            ugMarksheet: file,
+                          }));
+                        }}
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="ugMarksheet"
+                        className="flex items-center border border-gray-300 rounded-xl w-full text-sm transition-all cursor-pointer hover:border-yellow-500 overflow-hidden"
+                      >
+                        <span className="bg-blue-600 text-white px-4 py-2.5 text-sm font-medium whitespace-nowrap">
+                          Choose File
+                        </span>
+                        <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
+                          {formData.ugMarksheet ? formData.ugMarksheet.name : "No file chosen"}
+                        </span>
+                      </label>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Upload Marksheet (Optional)
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -1238,7 +2105,7 @@ function RegistrationForm() {
                   <span className="bg-pink-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm mr-3">
                     5
                   </span>
-                  PG Diploma (Optional)
+                  PG Diploma (If Applicable)
                 </h4>
                 <div className="grid md:grid-cols-2 gap-6 mb-4">
                   <InputField
@@ -1247,6 +2114,8 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Institute Name"
                     error={errors.pgDiplomaInstitute}
+                    whiteBg={true}
+                    label="Institute Name"
                   />
                   <InputField
                     name="pgDiplomaCourse"
@@ -1254,15 +2123,19 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Course Title"
                     error={errors.pgDiplomaCourse}
+                    whiteBg={true}
+                    label="Course Title"
                   />
                 </div>
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className="grid md:grid-cols-2 gap-6 mb-4">
                   <InputField
                     name="pgDiplomaSpecialization"
                     value={formData.pgDiplomaSpecialization}
                     onChange={handleInputChange}
                     placeholder="Specialization"
                     error={errors.pgDiplomaSpecialization}
+                    whiteBg={true}
+                    label="Specialization"
                   />
                   <InputField
                     name="pgDiplomaYear"
@@ -1270,14 +2143,52 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Year of Completion"
                     error={errors.pgDiplomaYear}
+                    whiteBg={true}
+                    label="Year of Completion"
                   />
+                </div>
+                <div className="grid md:grid-cols-2 gap-6">
                   <InputField
                     name="pgDiplomaPercentage"
                     value={formData.pgDiplomaPercentage}
                     onChange={handleInputChange}
                     placeholder="Percentage / CGPA"
                     error={errors.pgDiplomaPercentage}
+                    whiteBg={true}
+                    label="Percentage / CGPA"
                   />
+                  <div className="w-full">
+                    <div className="relative">
+                      <input
+                        type="file"
+                        name="pgDiplomaMarksheet"
+                        id="pgDiplomaMarksheet"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          setFormData((prev) => ({
+                            ...prev,
+                            pgDiplomaMarksheet: file,
+                          }));
+                        }}
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="pgDiplomaMarksheet"
+                        className="flex items-center border border-gray-300 rounded-xl w-full text-sm transition-all cursor-pointer hover:border-pink-500 overflow-hidden"
+                      >
+                        <span className="bg-blue-600 text-white px-4 py-2.5 text-sm font-medium whitespace-nowrap">
+                          Choose File
+                        </span>
+                        <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
+                          {formData.pgDiplomaMarksheet ? formData.pgDiplomaMarksheet.name : "No file chosen"}
+                        </span>
+                      </label>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Upload Marksheet (Optional)
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -1287,7 +2198,7 @@ function RegistrationForm() {
                   <span className="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm mr-3">
                     6
                   </span>
-                  Post Graduate (PG) (Optional)
+                  Post Graduate - PG (If Applicable)
                 </h4>
                 <div className="grid md:grid-cols-2 gap-6 mb-4">
                   <InputField
@@ -1296,6 +2207,8 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="University Name"
                     error={errors.pgUniversity}
+                    whiteBg={true}
+                    label="University Name"
                   />
                   <InputField
                     name="pgCourse"
@@ -1303,15 +2216,19 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Course Name (M.Sc, M.Tech, MBA)"
                     error={errors.pgCourse}
+                    whiteBg={true}
+                    label="Course Name"
                   />
                 </div>
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className="grid md:grid-cols-2 gap-6 mb-4">
                   <InputField
                     name="pgSpecialization"
                     value={formData.pgSpecialization}
                     onChange={handleInputChange}
                     placeholder="Specialization"
                     error={errors.pgSpecialization}
+                    whiteBg={true}
+                    label="Specialization"
                   />
                   <InputField
                     name="pgYear"
@@ -1319,14 +2236,52 @@ function RegistrationForm() {
                     onChange={handleInputChange}
                     placeholder="Year of Passing"
                     error={errors.pgYear}
+                    whiteBg={true}
+                    label="Year of Passing"
                   />
+                </div>
+                <div className="grid md:grid-cols-2 gap-6">
                   <InputField
                     name="pgPercentage"
                     value={formData.pgPercentage}
                     onChange={handleInputChange}
                     placeholder="Percentage / CGPA"
                     error={errors.pgPercentage}
+                    whiteBg={true}
+                    label="Percentage / CGPA"
                   />
+                  <div className="w-full">
+                    <div className="relative">
+                      <input
+                        type="file"
+                        name="pgMarksheet"
+                        id="pgMarksheet"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          setFormData((prev) => ({
+                            ...prev,
+                            pgMarksheet: file,
+                          }));
+                        }}
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="pgMarksheet"
+                        className="flex items-center border border-gray-300 rounded-xl w-full text-sm transition-all cursor-pointer hover:border-indigo-500 overflow-hidden"
+                      >
+                        <span className="bg-blue-600 text-white px-4 py-2.5 text-sm font-medium whitespace-nowrap">
+                          Choose File
+                        </span>
+                        <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
+                          {formData.pgMarksheet ? formData.pgMarksheet.name : "No file chosen"}
+                        </span>
+                      </label>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Upload Marksheet (Optional)
+                    </p>
+                  </div>
                 </div>
               </div>
             </section>
@@ -1355,78 +2310,206 @@ function RegistrationForm() {
                   </span>
                   Current Address
                 </h4>
-                <div className="mb-4">
+                <div className="grid md:grid-cols-2 gap-6 mb-4">
                   <InputField
-                    name="currentAddress"
-                    value={formData.currentAddress}
+                    name="currentHouseNo"
+                    value={formData.currentHouseNo}
                     onChange={handleInputChange}
-                    placeholder="Street Address *"
-                    error={errors.currentAddress}
+                    placeholder="House / Flat No *"
+                    error={errors.currentHouseNo}
+                    whiteBg={true}
+                    label="House / Flat No"
+                  />
+                  <InputField
+                    name="currentStreet"
+                    value={formData.currentStreet}
+                    onChange={handleInputChange}
+                    placeholder="Street / Road *"
+                    error={errors.currentStreet}
+                    whiteBg={true}
+                    label="Street / Road"
                   />
                 </div>
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className="grid md:grid-cols-2 gap-6 mb-4">
+                  <InputField
+                    name="currentArea"
+                    value={formData.currentArea}
+                    onChange={handleInputChange}
+                    placeholder="Area / Locality *"
+                    error={errors.currentArea}
+                    whiteBg={true}
+                    label="Area / Locality"
+                  />
+                  <InputField
+                    name="currentLandmark"
+                    value={formData.currentLandmark}
+                    onChange={handleInputChange}
+                    placeholder="Landmark"
+                    error={errors.currentLandmark}
+                    whiteBg={true}
+                    label="Landmark"
+                  />
+                </div>
+                <div className="grid md:grid-cols-2 gap-6 mb-4">
                   <InputField
                     name="currentCity"
                     value={formData.currentCity}
                     onChange={handleInputChange}
                     placeholder="City *"
                     error={errors.currentCity}
+                    whiteBg={true}
+                    label="City"
                   />
+                  <InputField
+                    name="currentDistrict"
+                    value={formData.currentDistrict}
+                    onChange={handleInputChange}
+                    placeholder="District *"
+                    error={errors.currentDistrict}
+                    whiteBg={true}
+                    label="District"
+                  />
+                </div>
+                <div className="grid md:grid-cols-3 gap-6">
                   <InputField
                     name="currentState"
                     value={formData.currentState}
                     onChange={handleInputChange}
                     placeholder="State *"
                     error={errors.currentState}
+                    whiteBg={true}
+                    label="State"
                   />
                   <InputField
-                    name="currentZipCode"
-                    value={formData.currentZipCode}
+                    name="currentPincode"
+                    value={formData.currentPincode}
                     onChange={handleInputChange}
-                    placeholder="ZIP Code *"
-                    error={errors.currentZipCode}
+                    placeholder="Pincode *"
+                    error={errors.currentPincode}
+                    whiteBg={true}
+                    label="Pincode"
+                  />
+                  <InputField
+                    name="currentCountry"
+                    value={formData.currentCountry}
+                    onChange={handleInputChange}
+                    placeholder="Country *"
+                    error={errors.currentCountry}
+                    whiteBg={true}
+                    label="Country"
                   />
                 </div>
               </div>
 
               {/* Permanent Address */}
-              <div className="mb-6 bg-teal-50 p-6 rounded-2xl border border-teal-100">
-                <h4 className="text-lg font-semibold text-gray-800 mb-5 flex items-center">
-                  <span className="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm mr-3">
-                    2
-                  </span>
-                  Permanent Address
-                </h4>
-                <div className="mb-4">
+              <div className="mb-8 bg-teal-50 p-6 rounded-2xl border border-teal-100">
+                <div className="flex items-center justify-between mb-5">
+                  <h4 className="text-lg font-semibold text-gray-800 flex items-center">
+                    <span className="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm mr-3">
+                      2
+                    </span>
+                    Permanent Address
+                  </h4>
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="sameAsCurrent"
+                      checked={formData.sameAsCurrent}
+                      onChange={handleSameAsCurrentChange}
+                      className="w-5 h-5 accent-teal-600 cursor-pointer"
+                    />
+                    <span className="text-sm font-medium text-gray-700">
+                      Same as Current Address
+                    </span>
+                  </label>
+                </div>
+                <div className="grid md:grid-cols-2 gap-6 mb-4">
                   <InputField
-                    name="permanentAddress"
-                    value={formData.permanentAddress}
+                    name="permanentHouseNo"
+                    value={formData.permanentHouseNo}
                     onChange={handleInputChange}
-                    placeholder="Street Address *"
-                    error={errors.permanentAddress}
+                    placeholder="House / Flat No *"
+                    error={errors.permanentHouseNo}
+                    whiteBg={true}
+                    label="House / Flat No"
+                  />
+                  <InputField
+                    name="permanentStreet"
+                    value={formData.permanentStreet}
+                    onChange={handleInputChange}
+                    placeholder="Street / Road *"
+                    error={errors.permanentStreet}
+                    whiteBg={true}
+                    label="Street / Road"
                   />
                 </div>
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className="grid md:grid-cols-2 gap-6 mb-4">
+                  <InputField
+                    name="permanentArea"
+                    value={formData.permanentArea}
+                    onChange={handleInputChange}
+                    placeholder="Area / Locality *"
+                    error={errors.permanentArea}
+                    whiteBg={true}
+                    label="Area / Locality"
+                  />
+                  <InputField
+                    name="permanentLandmark"
+                    value={formData.permanentLandmark}
+                    onChange={handleInputChange}
+                    placeholder="Landmark"
+                    error={errors.permanentLandmark}
+                    whiteBg={true}
+                    label="Landmark"
+                  />
+                </div>
+                <div className="grid md:grid-cols-2 gap-6 mb-4">
                   <InputField
                     name="permanentCity"
                     value={formData.permanentCity}
                     onChange={handleInputChange}
                     placeholder="City *"
                     error={errors.permanentCity}
+                    whiteBg={true}
+                    label="City"
                   />
+                  <InputField
+                    name="permanentDistrict"
+                    value={formData.permanentDistrict}
+                    onChange={handleInputChange}
+                    placeholder="District *"
+                    error={errors.permanentDistrict}
+                    whiteBg={true}
+                    label="District"
+                  />
+                </div>
+                <div className="grid md:grid-cols-3 gap-6">
                   <InputField
                     name="permanentState"
                     value={formData.permanentState}
                     onChange={handleInputChange}
                     placeholder="State *"
                     error={errors.permanentState}
+                    whiteBg={true}
+                    label="State"
                   />
                   <InputField
-                    name="permanentZipCode"
-                    value={formData.permanentZipCode}
+                    name="permanentPincode"
+                    value={formData.permanentPincode}
                     onChange={handleInputChange}
-                    placeholder="ZIP Code *"
-                    error={errors.permanentZipCode}
+                    placeholder="Pincode *"
+                    error={errors.permanentPincode}
+                    whiteBg={true}
+                    label="Pincode"
+                  />
+                  <InputField
+                    name="permanentCountry"
+                    value={formData.permanentCountry}
+                    onChange={handleInputChange}
+                    placeholder="Country *"
+                    error={errors.permanentCountry}
+                    whiteBg={true}
+                    label="Country"
                   />
                 </div>
               </div>
@@ -1521,7 +2604,8 @@ function RegistrationForm() {
           </form>
         </div>
       </div>
-    </div>
+  
+      </div>
   );
 }
 
