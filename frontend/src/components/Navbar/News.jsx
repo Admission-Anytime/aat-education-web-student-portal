@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { Search, Calendar, Clock, ChevronRight } from "lucide-react";
 import axios from "axios";
 
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
+
 const categories = [
   "All",
   "Announcements",
@@ -23,7 +25,7 @@ function News() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:4001/api/news")
+      .get(`${BASE_URL}/api/news`)
       .then((res) => {
         setNewsList(res.data);
         setLoading(false);
@@ -133,7 +135,7 @@ function News() {
             <div className="bg-white rounded-xl shadow-lg overflow-hidden md:flex">
               <div className="md:w-1/2">
                 <img
-                  src={`http://localhost:4001/Uploads/${featuredNews.image}`}
+                  src={`${BASE_URL}/Uploads/${featuredNews.image}`}
                   alt={featuredNews.title}
                   className="w-full h-64 md:h-full object-cover"
                 />
@@ -191,7 +193,7 @@ function News() {
               >
                 <div className="relative">
                   <img
-                    src={`http://localhost:4001/Uploads/${item.image}`}
+                    src={`${BASE_URL}/Uploads/${item.image}`}
                     alt={item.title}
                     className="w-full h-48 object-cover"
                   />

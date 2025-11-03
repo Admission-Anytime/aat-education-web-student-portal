@@ -3,6 +3,8 @@ import axios from "axios";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
+
 //to edit or add news and updates page entries
 function AddNewArticle({ editingEntry, onSubmit, onBack }) {
   const [title, setTitle] = useState("");
@@ -47,13 +49,13 @@ console.log(editingEntry.readTime);
       if (editingEntry) {
         // Edit
         response = await axios.put(
-          `api/news/${editingEntry._id}`,
+          `${BASE_URL}/api/news/${editingEntry._id}`,
           formData,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
       } else {
         // Add
-        response = await axios.post("api/news", formData, {
+        response = await axios.post(`${BASE_URL}/api/news`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       }
@@ -172,7 +174,7 @@ console.log(editingEntry.readTime);
           />
           {editingEntry && editingEntry.image && !image && (
             <img
-              src={`http://localhost:4001/Uploads/${editingEntry.image}`}
+              src={`${BASE_URL}/Uploads/${editingEntry.image}`}
               alt="current"
               className="mt-2 w-32 h-32 object-cover rounded"
             />

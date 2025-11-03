@@ -3,6 +3,8 @@ import axios from "axios";
 import * as Icons from "lucide-react";
 import { ChevronRight, Mail, Search, X } from "lucide-react";
 
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
+
 const CorporateTrainingProgram = () => {
   const [programs, setPrograms] = useState([]);
   const [selectedProgram, setSelectedProgram] = useState(null);

@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
+
 const Courses = () => {
   const [testimonials, setTestimonials] = useState([]);
   const [visibleCount, setVisibleCount] = useState(6); // initial number to show
@@ -10,11 +12,11 @@ const Courses = () => {
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
-        const res = await axios.get("http://localhost:4001/api/testimonials");
+        const res = await axios.get(`${BASE_URL}/api/testimonials`);
         const dataWithUrl = res.data.map((t) => ({
           ...t,
           profileImageUrl: t.profileImage
-            ? `http://localhost:4001${t.profileImage}`
+            ? `${BASE_URL}${t.profileImage}`
             : fallbackImage,
         }));
         setTestimonials(dataWithUrl);

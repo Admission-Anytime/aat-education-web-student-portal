@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { PencilSquareIcon, TrashIcon,EyeSlashIcon, EyeIcon } from "@heroicons/react/24/outline";
 import AddNewArticle from "./AddNewArticle";
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
 function NewsArticlesManagement() {
   const [articles, setArticles] = useState([]);
   const [showAddArticle, setShowAddArticle] = useState(false);
@@ -15,7 +15,7 @@ function NewsArticlesManagement() {
 // Toggle visibility
 const toggleVisibility = async (id) => {
   try {
-    const response = await axios.patch(`/api/news/${id}/toggle-visibility`);
+    const response = await axios.patch(`${BASE_URL}/api/news/${id}/toggle-visibility`);
     const updatedArticle = response.data;
 
     // Update state
@@ -30,7 +30,7 @@ const toggleVisibility = async (id) => {
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const response = await axios.get("/api/news"); // new endpoint
+        const response = await axios.get(`${BASE_URL}/api/news`); // new endpoint
         setArticles(response.data);
       } catch (error) {
         console.error("Error fetching articles:", error);
@@ -47,7 +47,7 @@ const toggleVisibility = async (id) => {
 
   const handleEditArticleSubmit = async (updatedEntry) => {
     try {
-      await axios.put(`/api/news/${updatedEntry._id}`, updatedEntry);
+      await axios.put(`${BASE_URL}/api/news/${updatedEntry._id}`, updatedEntry);
       setArticles((prev) =>
         prev.map((a) => (a._id === updatedEntry._id ? updatedEntry : a))
       );
@@ -62,7 +62,7 @@ const toggleVisibility = async (id) => {
     if (!window.confirm("Are you sure you want to delete this article?"))
       return;
     try {
-      await axios.delete(`/api/news/${id}`);
+      await axios.delete(`${BASE_URL}/api/news/${id}`);
       setArticles(articles.filter((a) => a._id !== id));
     } catch (error) {
       console.error("Error deleting article:", error);

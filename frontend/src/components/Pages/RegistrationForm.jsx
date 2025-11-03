@@ -15,6 +15,8 @@ import {
   LogOut,
 } from "lucide-react";
 
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
+
 // Reusable Input Field Component (with error handling)
 const InputField = ({
   name,
@@ -28,6 +30,7 @@ const InputField = ({
   label,
 }) => (
   <div className="w-full">
+    {label && <p className="text-gray-600 text-sm mb-1">{label}</p>}
     <input
       type={type}
       name={name}
@@ -48,9 +51,6 @@ const InputField = ({
         <span className="ml-1">{error}</span>
       </p>
     )}
-    {label && (
-      <p className="text-gray-600 text-xs mt-1">{label}</p>
-    )}
   </div>
 );
 
@@ -60,123 +60,126 @@ function RegistrationForm() {
   const preFilledData = location.state || {};
 
   const [formData, setFormData] = useState({
-    programmeName: preFilledData.programmeName || "",
-    specialisation: preFilledData.specialisation || "",
-    registrationId: "",
-    photo: null,
+    ProgrammeName: preFilledData.programmeName || "",
+    Specialisation: preFilledData.specialisation || "",
+    RegistrationId: "",
+    Photo: null,
     photoPreview: null,
-    aadhaarCard: null,
-    abcId: null,
-    bedId: null,
-    studentFirstName: "",
-    studentMiddleName: "",
-    studentLastName: "",
-    gender: "",
-    dateOfBirth: "",
-    quota: "",
-    quotaDocument: null,
-    category: "",
-    categoryCertificate: null,
-    subCategory: "",
-    subCategoryDocument: null,
-    qualification: "",
-    studentPhone: preFilledData.phoneNumber || "",
-    whatsappNo: preFilledData.phoneNumber || "",
-    studentEmail: "",
-    grade: "",
-    program: "", // Not used in current UI, but kept in state
+    AadhaarCard: null,
+    AadhaarNumber: "",
+    AbcId: null,
+    AbcIdNumber: "",
+    DebId: null,
+    DebIdNumber: "",
+    StudentFirstName: "",
+    StudentMiddleName: "",
+    StudentLastName: "",
+    Gender: "",
+    DateOfBirth: "",
+    Quota: "",
+    QuotaDocument: null,
+    Category: "",
+    CategoryCertificate: null,
+    SubCategory: "",
+    SubCategoryDocument: null,
+    Qualification: "",
+    StudentPhone: preFilledData.phoneNumber || "",
+    WhatsappNo: preFilledData.phoneNumber || "",
+    StudentEmail: "",
+    Grade: "",
+    Program: "", // Not used in current UI, but kept in state
     // Current Address
-    currentHouseNo: "",
-    currentStreet: "",
-    currentArea: "",
-    currentLandmark: "",
-    currentCity: "",
-    currentDistrict: "",
-    currentState: "",
-    currentPincode: "",
-    currentCountry: "",
+    CurrentHouseNo: "",
+    CurrentStreet: "",
+    CurrentArea: "",
+    CurrentLandmark: "",
+    CurrentCity: "",
+    CurrentDistrict: "",
+    CurrentState: "",
+    CurrentPincode: "",
+    CurrentCountry: "",
     // Permanent Address
-    permanentHouseNo: "",
-    permanentStreet: "",
-    permanentArea: "",
-    permanentLandmark: "",
-    permanentCity: "",
-    permanentDistrict: "",
-    permanentState: "",
-    permanentPincode: "",
-    permanentCountry: "",
-    sameAsCurrent: false,
-    fatherFirstName: "",
-    fatherMiddleName: "",
-    fatherLastName: "",
-    fatherEmail: "",
-    fatherPhone: "",
-    fatherWhatsapp: "",
-    motherFirstName: "",
-    motherMiddleName: "",
-    motherLastName: "",
-    motherEmail: "",
-    motherPhone: "",
-    motherWhatsapp: "",
-    guardianFirstName: "",
-    guardianMiddleName: "",
-    guardianLastName: "",
-    parentEmail: "",
-    parentPhone: "",
-    relationship: "",
-    previousSchool: "",
+    PermanentHouseNo: "",
+    PermanentStreet: "",
+    PermanentArea: "",
+    PermanentLandmark: "",
+    PermanentCity: "",
+    PermanentDistrict: "",
+    PermanentState: "",
+    PermanentPincode: "",
+    PermanentCountry: "",
+    SameAsCurrent: false,
+    FatherFirstName: "",
+    FatherMiddleName: "",
+    FatherLastName: "",
+    FatherEmail: "",
+    FatherPhone: "",
+    FatherWhatsapp: "",
+    MotherFirstName: "",
+    MotherMiddleName: "",
+    MotherLastName: "",
+    MotherEmail: "",
+    MotherPhone: "",
+    MotherWhatsapp: "",
+    GuardianFirstName: "",
+    GuardianMiddleName: "",
+    GuardianLastName: "",
+    ParentEmail: "",
+    ParentPhone: "",
+    Relationship: "",
+    PreviousSchool: "",
     // 10th Grade
-    tenthBoard: "",
-    tenthSchool: "",
-    tenthSchoolAddress: "",
-    tenthYear: "",
-    tenthPercentage: "",
-    tenthMarksheet: null,
+    TenthBoard: "",
+    TenthSchool: "",
+    TenthSchoolAddress: "",
+    TenthYear: "",
+    TenthPercentage: "",
+    TenthMarksheet: null,
     // 12th Grade
-    twelfthBoard: "",
-    twelfthSchool: "",
-    twelfthSchoolAddress: "",
-    twelfthStream: "",
-    twelfthYear: "",
-    twelfthPercentage: "",
-    twelfthMarksheet: null,
+    TwelfthBoard: "",
+    TwelfthSchool: "",
+    TwelfthSchoolAddress: "",
+    TwelfthStream: "",
+    TwelfthYear: "",
+    TwelfthPercentage: "",
+    TwelfthMarksheet: null,
     // UG Diploma
-    ugDiplomaInstitute: "",
-    ugDiplomaCourse: "",
-    ugDiplomaSpecialization: "",
-    ugDiplomaYear: "",
-    ugDiplomaPercentage: "",
-    ugDiplomaMarksheet: null,
+    UgDiplomaInstitute: "",
+    UgDiplomaCourse: "",
+    UgDiplomaSpecialization: "",
+    UgDiplomaYear: "",
+    UgDiplomaPercentage: "",
+    UgDiplomaMarksheet: null,
     // UG
-    ugCollege: "",
-    ugCourse: "",
-    ugSpecialization: "",
-    ugYear: "",
-    ugPercentage: "",
-    ugMarksheet: null,
+    UgCollege: "",
+    UgCourse: "",
+    UgSpecialization: "",
+    UgYear: "",
+    UgPercentage: "",
+    UgMarksheet: null,
     // PG Diploma
-    pgDiplomaInstitute: "",
-    pgDiplomaCourse: "",
-    pgDiplomaSpecialization: "",
-    pgDiplomaYear: "",
-    pgDiplomaPercentage: "",
-    pgDiplomaMarksheet: null,
+    PgDiplomaInstitute: "",
+    PgDiplomaCourse: "",
+    PgDiplomaSpecialization: "",
+    PgDiplomaYear: "",
+    PgDiplomaPercentage: "",
+    PgDiplomaMarksheet: null,
     // PG
-    pgUniversity: "",
-    pgCourse: "",
-    pgSpecialization: "",
-    pgYear: "",
-    pgPercentage: "",
-    pgMarksheet: null,
-    gpa: "", // Not used in current UI, but kept in state
-    interests: "",
-    whyApplying: "", // Not used in current UI, but kept in state
-    emergencyName: "", // Not used in current UI, but kept in state
-    emergencyPhone: "", // Not used in current UI, but kept in state
-    emergencyRelationship: "", // Not used in current UI, but kept in state
-    specialNeeds: "",
-    medications: "",
-    agreeTerms: false,
+    PgUniversity: "",
+    PgCourse: "",
+    PgSpecialization: "",
+    PgYear: "",
+    PgPercentage: "",
+    PgMarksheet: null,
+    Gpa: "", // Not used in current UI, but kept in state
+    Interests: "",
+    WhyApplying: "", // Not used in current UI, but kept in state
+    EmergencyName: "", // Not used in current UI, but kept in state
+    EmergencyPhone: "", // Not used in current UI, but kept in state
+    EmergencyRelationship: "", // Not used in current UI, but kept in state
+    SpecialNeeds: "",
+    Medications: "",
+    AgreeTerms: false,
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -187,7 +190,11 @@ function RegistrationForm() {
 
   // Check if user came from login
   useEffect(() => {
-    if (preFilledData.phoneNumber && preFilledData.programmeName && preFilledData.specialisation) {
+    if (
+      preFilledData.phoneNumber &&
+      preFilledData.programmeName &&
+      preFilledData.specialisation
+    ) {
       setIsLoggedIn(true);
     } else {
       // If no pre-filled data, redirect to login
@@ -217,7 +224,7 @@ function RegistrationForm() {
       if (!file.type.startsWith("image/")) {
         setErrors((prev) => ({
           ...prev,
-          photo: "Please upload an image file.",
+          Photo: "Please upload an image file.",
         }));
         return;
       }
@@ -225,7 +232,7 @@ function RegistrationForm() {
       if (file.size > 5 * 1024 * 1024) {
         setErrors((prev) => ({
           ...prev,
-          photo: "Image size should be less than 5MB.",
+          Photo: "Image size should be less than 5MB.",
         }));
         return;
       }
@@ -235,10 +242,10 @@ function RegistrationForm() {
       reader.onloadend = () => {
         setFormData((prev) => ({
           ...prev,
-          photo: file,
+          Photo: file,
           photoPreview: reader.result,
         }));
-        setErrors((prev) => ({ ...prev, photo: undefined }));
+        setErrors((prev) => ({ ...prev, Photo: undefined }));
       };
       reader.readAsDataURL(file);
     }
@@ -247,10 +254,10 @@ function RegistrationForm() {
   const handleRemovePhoto = () => {
     setFormData((prev) => ({
       ...prev,
-      photo: null,
+      Photo: null,
       photoPreview: null,
     }));
-    setErrors((prev) => ({ ...prev, photo: undefined }));
+    setErrors((prev) => ({ ...prev, Photo: undefined }));
   };
 
   const handleAadhaarUpload = (e) => {
@@ -374,17 +381,17 @@ function RegistrationForm() {
     const isChecked = e.target.checked;
     setFormData((prev) => ({
       ...prev,
-      sameAsCurrent: isChecked,
+      SameAsCurrent: isChecked,
       ...(isChecked && {
-        permanentHouseNo: prev.currentHouseNo,
-        permanentStreet: prev.currentStreet,
-        permanentArea: prev.currentArea,
-        permanentLandmark: prev.currentLandmark,
-        permanentCity: prev.currentCity,
-        permanentDistrict: prev.currentDistrict,
-        permanentState: prev.currentState,
-        permanentPincode: prev.currentPincode,
-        permanentCountry: prev.currentCountry,
+        PermanentHouseNo: prev.CurrentHouseNo,
+        PermanentStreet: prev.CurrentStreet,
+        PermanentArea: prev.CurrentArea,
+        PermanentLandmark: prev.CurrentLandmark,
+        PermanentCity: prev.CurrentCity,
+        PermanentDistrict: prev.CurrentDistrict,
+        PermanentState: prev.CurrentState,
+        PermanentPincode: prev.CurrentPincode,
+        PermanentCountry: prev.CurrentCountry,
       }),
     }));
 
@@ -392,14 +399,14 @@ function RegistrationForm() {
     if (isChecked) {
       setErrors((prev) => ({
         ...prev,
-        permanentHouseNo: undefined,
-        permanentStreet: undefined,
-        permanentArea: undefined,
-        permanentCity: undefined,
-        permanentDistrict: undefined,
-        permanentState: undefined,
-        permanentPincode: undefined,
-        permanentCountry: undefined,
+        PermanentHouseNo: undefined,
+        PermanentStreet: undefined,
+        PermanentArea: undefined,
+        PermanentCity: undefined,
+        PermanentDistrict: undefined,
+        PermanentState: undefined,
+        PermanentPincode: undefined,
+        PermanentCountry: undefined,
       }));
     }
   };
@@ -408,79 +415,79 @@ function RegistrationForm() {
     let newErrors = {};
     let isValid = true;
     const requiredFields = [
-      "programmeName",
-      "specialisation",
-      "registrationId",
-      "studentFirstName",
-      "studentMiddleName",
-      "studentLastName",
-      "gender",
-      "dateOfBirth",
-      "quota",
-      "category",
-      "subCategory",
-      "qualification",
-      "studentPhone",
-      "whatsappNo",
-      "studentEmail",
-      "aadhaarCard",
-      "currentHouseNo",
-      "currentStreet",
-      "currentArea",
-      "currentCity",
-      "currentDistrict",
-      "currentState",
-      "currentPincode",
-      "currentCountry",
-      "permanentHouseNo",
-      "permanentStreet",
-      "permanentArea",
-      "permanentCity",
-      "permanentDistrict",
-      "permanentState",
-      "permanentPincode",
-      "permanentCountry",
-      "fatherFirstName",
-      "fatherMiddleName",
-      "fatherLastName",
-      "fatherEmail",
-      "fatherPhone",
-      "fatherWhatsapp",
-      "motherFirstName",
-      "motherMiddleName",
-      "motherLastName",
-      "motherEmail",
-      "motherPhone",
-      "motherWhatsapp",
-      "guardianFirstName",
-      "guardianMiddleName",
-      "guardianLastName",
-      "parentEmail",
-      "parentPhone",
-      "relationship",
-      "tenthBoard",
-      "tenthSchool",
-      "tenthSchoolAddress",
-      "tenthYear",
-      "tenthPercentage",
-      "twelfthBoard",
-      "twelfthSchool",
-      "twelfthSchoolAddress",
-      "twelfthStream",
-      "twelfthYear",
-      "twelfthPercentage",
-      "agreeTerms",
+      "ProgrammeName",
+      "Specialisation",
+      "RegistrationId",
+      "StudentFirstName",
+      "StudentMiddleName",
+      "StudentLastName",
+      "Gender",
+      "DateOfBirth",
+      "Quota",
+      "Category",
+      "SubCategory",
+      "Qualification",
+      "StudentPhone",
+      "WhatsappNo",
+      "StudentEmail",
+      "AadhaarCard",
+      "CurrentHouseNo",
+      "CurrentStreet",
+      "CurrentArea",
+      "CurrentCity",
+      "CurrentDistrict",
+      "CurrentState",
+      "CurrentPincode",
+      "CurrentCountry",
+      "PermanentHouseNo",
+      "PermanentStreet",
+      "PermanentArea",
+      "PermanentCity",
+      "PermanentDistrict",
+      "PermanentState",
+      "PermanentPincode",
+      "PermanentCountry",
+      "FatherFirstName",
+      "FatherMiddleName",
+      "FatherLastName",
+      "FatherEmail",
+      "FatherPhone",
+      "FatherWhatsapp",
+      "MotherFirstName",
+      "MotherMiddleName",
+      "MotherLastName",
+      "MotherEmail",
+      "MotherPhone",
+      "MotherWhatsapp",
+      "GuardianFirstName",
+      "GuardianMiddleName",
+      "GuardianLastName",
+      "ParentEmail",
+      "ParentPhone",
+      "Relationship",
+      "TenthBoard",
+      "TenthSchool",
+      "TenthSchoolAddress",
+      "TenthYear",
+      "TenthPercentage",
+      "TwelfthBoard",
+      "TwelfthSchool",
+      "TwelfthSchoolAddress",
+      "TwelfthStream",
+      "TwelfthYear",
+      "TwelfthPercentage",
+      "AgreeTerms",
     ];
 
-    // Add subCategoryDocument to required fields if subCategory is selected
-    if (formData.subCategory) {
-      requiredFields.push("subCategoryDocument");
+    // Add SubCategoryDocument to required fields if SubCategory is selected
+    if (formData.SubCategory) {
+      requiredFields.push("SubCategoryDocument");
     }
 
     requiredFields.forEach((field) => {
-      if (field === "agreeTerms") {
-        if (!formData.agreeTerms) {
-          newErrors.agreeTerms = "You must agree to the terms.";
+      if (field === "AgreeTerms") {
+        if (!formData.AgreeTerms) {
+          newErrors.AgreeTerms = "You must agree to the terms.";
           isValid = false;
         }
       } else if (!formData[field]) {
@@ -490,27 +497,27 @@ function RegistrationForm() {
     });
 
     // Photo validation - now optional
-    // if (!formData.photo) {
-    //   newErrors.photo = "Please upload a photo.";
+    // if (!formData.Photo) {
+    //   newErrors.Photo = "Please upload a photo.";
     //   isValid = false;
     // }
 
     // Email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (formData.parentEmail && !emailRegex.test(formData.parentEmail)) {
-      newErrors.parentEmail = "Invalid email format.";
+    if (formData.ParentEmail && !emailRegex.test(formData.ParentEmail)) {
+      newErrors.ParentEmail = "Invalid email format.";
       isValid = false;
     }
-    if (formData.studentEmail && !emailRegex.test(formData.studentEmail)) {
-      newErrors.studentEmail = "Invalid email format.";
+    if (formData.StudentEmail && !emailRegex.test(formData.StudentEmail)) {
+      newErrors.StudentEmail = "Invalid email format.";
       isValid = false;
     }
-    if (formData.fatherEmail && !emailRegex.test(formData.fatherEmail)) {
-      newErrors.fatherEmail = "Invalid email format.";
+    if (formData.FatherEmail && !emailRegex.test(formData.FatherEmail)) {
+      newErrors.FatherEmail = "Invalid email format.";
       isValid = false;
     }
-    if (formData.motherEmail && !emailRegex.test(formData.motherEmail)) {
-      newErrors.motherEmail = "Invalid email format.";
+    if (formData.MotherEmail && !emailRegex.test(formData.MotherEmail)) {
+      newErrors.MotherEmail = "Invalid email format.";
       isValid = false;
     }
     setErrors(newErrors);
@@ -581,34 +588,42 @@ function RegistrationForm() {
         formDataToSend.append("quotaDocument", formData.quotaDocument);
       }
       if (formData.categoryCertificate) {
-        formDataToSend.append("categoryCertificate", formData.categoryCertificate);
+        formDataToSend.append(
+          "categoryCertificate",
+          formData.categoryCertificate
+        );
       }
       if (formData.subCategoryDocument) {
-        formDataToSend.append("subCategoryDocument", formData.subCategoryDocument);
+        formDataToSend.append(
+          "subCategoryDocument",
+          formData.subCategoryDocument
+        );
       }
       if (formData.ugDiplomaMarksheet) {
-        formDataToSend.append("ugDiplomaMarksheet", formData.ugDiplomaMarksheet);
+        formDataToSend.append(
+          "ugDiplomaMarksheet",
+          formData.ugDiplomaMarksheet
+        );
       }
       if (formData.ugMarksheet) {
         formDataToSend.append("ugMarksheet", formData.ugMarksheet);
       }
       if (formData.pgDiplomaMarksheet) {
-        formDataToSend.append("pgDiplomaMarksheet", formData.pgDiplomaMarksheet);
+        formDataToSend.append(
+          "pgDiplomaMarksheet",
+          formData.pgDiplomaMarksheet
+        );
       }
       if (formData.pgMarksheet) {
         formDataToSend.append("pgMarksheet", formData.pgMarksheet);
       }
 
       // Send to backend
-      const response = await axios.post(
-        "api/registrations",
-        formDataToSend,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await axios.post(`${BASE_URL}/api/registrations`, formDataToSend, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       console.log("Registration successful:", response);
 
@@ -624,16 +639,18 @@ function RegistrationForm() {
 
       // Handle error
       if (error.response?.data?.message) {
-        alert(`Error: ${error.response.data.message}\n\nDetails: ${error.response.data.error || 'No additional details'}`);
+        alert(
+          `Error: ${error.response.data.message}\n\nDetails: ${
+            error.response.data.error || "No additional details"
+          }`
+        );
       } else {
         alert("Failed to submit registration. Please try again.");
       }
     }
   };
 
-  
-
-// removed duplicate early return; rendering logic continues below (if/submitted and main return)
+  // removed duplicate early return; rendering logic continues below (if/submitted and main return)
   if (submitted) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-emerald-50 flex items-center justify-center p-4">
@@ -679,7 +696,7 @@ function RegistrationForm() {
                 studentPhone: "",
                 whatsappNo: "",
                 studentEmail: "",
-                 program: "",
+                program: "",
                 currentAddress: "",
                 currentCity: "",
                 currentState: "",
@@ -795,10 +812,18 @@ function RegistrationForm() {
               {isLoggedIn && (
                 <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
                   <p className="text-sm text-blue-100 mb-1">Logged in as:</p>
-                  <p className="font-semibold text-lg">+91-{preFilledData.phoneNumber}</p>
+                  <p className="font-semibold text-lg">
+                    +91-{preFilledData.phoneNumber}
+                  </p>
                   <p className="text-sm text-blue-100 mt-2">
-                    Program: <span className="font-medium text-white">{preFilledData.programmeName}</span> | 
-                    Specialisation: <span className="font-medium text-white">{preFilledData.specialisation}</span>
+                    Program:{" "}
+                    <span className="font-medium text-white">
+                      {preFilledData.programmeName}
+                    </span>{" "}
+                    | Specialisation:{" "}
+                    <span className="font-medium text-white">
+                      {preFilledData.specialisation}
+                    </span>
                   </p>
                 </div>
               )}
@@ -826,63 +851,62 @@ function RegistrationForm() {
               <div className="grid md:grid-cols-2 gap-8 mb-6">
                 {/* Left Column: Programme Name, Specialisation, Registration Id */}
                 <div className="space-y-6">
-                   <InputField
-                    name="registrationId"
-                    value={formData.registrationId}
+                  <InputField
+                    name="RegistrationId"
+                    value={formData.RegistrationId}
                     onChange={handleInputChange}
                     placeholder="Registration ID *"
-                    error={errors.registrationId}
+                    error={errors.RegistrationId}
                     label="Registration ID"
                   />
                   <div className="w-full">
+                    <p className="text-gray-600 text-sm mb-1">Programme Name</p>
                     <input
                       type="text"
-                      name="programmeName"
+                      name="ProgrammeName"
                       placeholder="Programme Name *"
-                      value={formData.programmeName}
+                      value={formData.ProgrammeName}
                       onChange={handleInputChange}
                       disabled={isLoggedIn}
                       className={`border p-3 rounded-xl w-full transition-all focus:ring-2 focus:ring-opacity-50 ${
                         isLoggedIn
                           ? "bg-gray-100 cursor-not-allowed text-gray-700"
-                          : errors.programmeName
+                          : errors.ProgrammeName
                           ? "border-red-500 focus:border-red-500 focus:ring-red-100"
                           : "border-gray-300 focus:border-blue-500 focus:ring-blue-100"
                       }`}
                     />
-                    {errors.programmeName && (
+                    {errors.ProgrammeName && (
                       <p className="text-red-500 text-sm mt-1 flex items-center">
                         <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
-                        <span className="ml-1">{errors.programmeName}</span>
+                        <span className="ml-1">{errors.ProgrammeName}</span>
                       </p>
                     )}
-                    <p className="text-gray-600 text-xs mt-1">Programme Name</p>
                   </div>
                   <div className="w-full">
+                    <p className="text-gray-600 text-sm mb-1">Specialisation</p>
                     <input
                       type="text"
-                      name="specialisation"
+                      name="Specialisation"
                       placeholder="Specialisation *"
-                      value={formData.specialisation}
+                      value={formData.Specialisation}
                       onChange={handleInputChange}
                       disabled={isLoggedIn}
                       className={`border p-3 rounded-xl w-full transition-all focus:ring-2 focus:ring-opacity-50 ${
                         isLoggedIn
                           ? "bg-gray-100 cursor-not-allowed text-gray-700"
-                          : errors.specialisation
+                          : errors.Specialisation
                           ? "border-red-500 focus:border-red-500 focus:ring-red-100"
                           : "border-gray-300 focus:border-blue-500 focus:ring-blue-100"
                       }`}
                     />
-                    {errors.specialisation && (
+                    {errors.Specialisation && (
                       <p className="text-red-500 text-sm mt-1 flex items-center">
                         <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
-                        <span className="ml-1">{errors.specialisation}</span>
+                        <span className="ml-1">{errors.Specialisation}</span>
                       </p>
                     )}
-                    <p className="text-gray-600 text-xs mt-1">Specialisation</p>
                   </div>
-                 
                 </div>
 
                 {/* Right Column: Photo Upload */}
@@ -921,7 +945,9 @@ function RegistrationForm() {
                           >
                             Click to upload
                           </p>
-                          <p className="text-[10px] text-gray-500 mt-1">Max 5MB</p>
+                          <p className="text-[10px] text-gray-500 mt-1">
+                            Max 5MB
+                          </p>
                         </label>
                       </div>
                     ) : (
@@ -953,40 +979,41 @@ function RegistrationForm() {
               {/* Row 1: First Name, Middle Name, Last Name */}
               <div className="grid md:grid-cols-3 gap-6">
                 <InputField
-                  name="studentFirstName"
-                  value={formData.studentFirstName}
+                  name="StudentFirstName"
+                  value={formData.StudentFirstName}
                   onChange={handleInputChange}
                   placeholder="First Name *"
-                  error={errors.studentFirstName}
+                  error={errors.StudentFirstName}
                   label="First Name"
                 />
                 <InputField
-                  name="studentMiddleName"
-                  value={formData.studentMiddleName}
+                  name="StudentMiddleName"
+                  value={formData.StudentMiddleName}
                   onChange={handleInputChange}
                   placeholder="Middle Name *"
-                  error={errors.studentMiddleName}
+                  error={errors.StudentMiddleName}
                   label="Middle Name"
                 />
                 <InputField
-                  name="studentLastName"
-                  value={formData.studentLastName}
+                  name="StudentLastName"
+                  value={formData.StudentLastName}
                   onChange={handleInputChange}
                   placeholder="Last Name *"
-                  error={errors.studentLastName}
+                  error={errors.StudentLastName}
                   label="Last Name"
                 />
               </div>
 
-              {/* Row 2: Gender, DOB, Quota, Quota Document */}
-              <div className="grid md:grid-cols-4 gap-6 mt-6">
+              {/* Row 2: Gender, DOB, Eligible Qualification */}
+              <div className="grid md:grid-cols-3 gap-6 mt-6">
                 <div className="w-full">
+                  <p className="text-gray-600 text-sm mb-1">Gender</p>
                   <select
-                    name="gender"
-                    value={formData.gender}
+                    name="Gender"
+                    value={formData.Gender}
                     onChange={handleInputChange}
                     className={`border p-3 rounded-xl w-full transition-all focus:ring-2 focus:ring-opacity-50 ${
-                      errors.gender
+                      errors.Gender
                         ? "border-red-500 focus:border-red-500 focus:ring-red-100"
                         : "border-gray-300 focus:border-blue-500 focus:ring-blue-100"
                     }`}
@@ -996,67 +1023,207 @@ function RegistrationForm() {
                     <option value="Female">Female</option>
                     <option value="Other">Other</option>
                   </select>
-                  {errors.gender && (
+                  {errors.Gender && (
                     <p className="text-red-500 text-sm mt-1 flex items-center">
                       <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
-                      <span className="ml-1">{errors.gender}</span>
+                      <span className="ml-1">{errors.Gender}</span>
                     </p>
                   )}
-                  <p className="text-gray-600 text-xs mt-1">Gender</p>
                 </div>
                 <div className="w-full">
-                <div className="relative">
-  <input
-    type="date"
-    name="dateOfBirth"
-    value={formData.dateOfBirth}
-    onChange={handleInputChange}
-    className={`border p-3 rounded-xl w-full transition-all focus:ring-2 focus:ring-opacity-50 ${
-      errors.dateOfBirth
-        ? "border-red-500 focus:border-red-500 focus:ring-red-100"
-        : "border-gray-300 focus:border-blue-500 focus:ring-blue-100"
-    }`}
-    style={{
-      colorScheme: 'light',
-      color: formData.dateOfBirth ? 'inherit' : 'transparent',
-      position: 'relative',
-      zIndex: 1,
-      backgroundColor: 'transparent',
-    }}
-    onFocus={(e) => {
-      e.target.style.color = 'inherit';
-      const label = e.target.parentNode.querySelector('span');
-      if (label) label.style.display = 'none';
-    }}
-    onBlur={(e) => {
-      if (!e.target.value) {
-        const label = e.target.parentNode.querySelector('span');
-        if (label) label.style.display = 'block';
-      }
-    }}
-  />
-  {!formData.dateOfBirth && (
-    <span
-      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-base"
-      style={{
-        zIndex: 0,
-      }}
-    >
-      Date of Birth *
-    </span>
-  )}
-</div>
+                  <p className="text-gray-600 text-sm mb-1">Date of Birth</p>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      name="DateOfBirth"
+                      value={formData.DateOfBirth}
+                      onChange={handleInputChange}
+                      className={`border p-3 rounded-xl w-full transition-all focus:ring-2 focus:ring-opacity-50 ${
+                        errors.DateOfBirth
+                          ? "border-red-500 focus:border-red-500 focus:ring-red-100"
+                          : "border-gray-300 focus:border-blue-500 focus:ring-blue-100"
+                      }`}
+                      style={{
+                        colorScheme: "light",
+                        color: formData.DateOfBirth ? "inherit" : "transparent",
+                        position: "relative",
+                        zIndex: 1,
+                        backgroundColor: "transparent",
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.color = "inherit";
+                        const label = e.target.parentNode.querySelector("span");
+                        if (label) label.style.display = "none";
+                      }}
+                      onBlur={(e) => {
+                        if (!e.target.value) {
+                          const label =
+                            e.target.parentNode.querySelector("span");
+                          if (label) label.style.display = "block";
+                        }
+                      }}
+                    />
+                    {!formData.DateOfBirth && (
+                      <span
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-base"
+                        style={{
+                          zIndex: 0,
+                        }}
+                      >
+                        Date of Birth *
+                      </span>
+                    )}
+                  </div>
 
-{errors.dateOfBirth && (
-  <p className="text-red-500 text-sm mt-1 flex items-center">
-    <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
-    <span className="ml-1">{errors.dateOfBirth}</span>
-  </p>
-)}
-<p className="text-gray-600 text-xs mt-1">Date of Birth</p>
+                  {errors.DateOfBirth && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
+                      <span className="ml-1">{errors.DateOfBirth}</span>
+                    </p>
+                  )}
+                </div>
+                <InputField
+                  name="Qualification"
+                  value={formData.Qualification}
+                  onChange={handleInputChange}
+                  placeholder="Eligible Qualification*"
+                  error={errors.Qualification}
+                  label="Eligible Qualification"
+                />
+              </div>
 
+              {/* Row 3: Mobile No, Whatsapp No, Email ID */}
+              <div className="grid md:grid-cols-3 gap-6 mt-6">
+                <div className="w-full">
+                  <p className="text-gray-600 text-sm mb-1">Mobile No</p>
+                  <input
+                    type="tel"
+                    name="StudentPhone"
+                    placeholder="Mobile No *"
+                    value={formData.StudentPhone}
+                    onChange={handleInputChange}
+                    disabled={isLoggedIn}
+                    className={`border p-3 rounded-xl w-full transition-all focus:ring-2 focus:ring-opacity-50 ${
+                      isLoggedIn
+                        ? "bg-gray-100 cursor-not-allowed text-gray-700"
+                        : errors.StudentPhone
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-100"
+                        : "border-gray-300 focus:border-blue-500 focus:ring-blue-100"
+                    }`}
+                  />
+                  {errors.StudentPhone && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
+                      <span className="ml-1">{errors.StudentPhone}</span>
+                    </p>
+                  )}
                 </div>
                 <div className="w-full">
+                  <p className="text-gray-600 text-sm mb-1">WhatsApp No</p>
+                  <input
+                    type="tel"
+                    name="WhatsappNo"
+                    placeholder="Whatsapp No *"
+                    value={formData.WhatsappNo}
+                    onChange={handleInputChange}
+                    disabled={isLoggedIn}
+                    className={`border p-3 rounded-xl w-full transition-all focus:ring-2 focus:ring-opacity-50 ${
+                      isLoggedIn
+                        ? "bg-gray-100 cursor-not-allowed text-gray-700"
+                        : errors.WhatsappNo
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-100"
+                        : "border-gray-300 focus:border-blue-500 focus:ring-blue-100"
+                    }`}
+                  />
+                  {errors.WhatsappNo && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
+                      <span className="ml-1">{errors.WhatsappNo}</span>
+                    </p>
+                  )}
+                </div>
+                <InputField
+                  name="StudentEmail"
+                  type="email"
+                  value={formData.StudentEmail}
+                  onChange={handleInputChange}
+                  placeholder="Email ID *"
+                  error={errors.StudentEmail}
+                  label="Email ID"
+                />
+              </div>
+
+              {/* Row 4: Aadhaar Card Number, Quota, Category */}
+              <div className="grid md:grid-cols-3 gap-6 mt-6">
+                {/* Aadhaar Card Number */}
+                <div className="w-full">
+                  <InputField
+                    name="aadhaarNumber"
+                    value={formData.aadhaarNumber}
+                    onChange={handleInputChange}
+                    placeholder="Aadhaar Card Number *"
+                    error={errors.aadhaarNumber}
+                    label="Aadhaar Card Number"
+                  />
+                  <div className="flex justify-between ">
+
+                  <label className="block text-sm font-medium text-gray-700 mb-2 mt-2">
+                    Upload Aadhaar Card *
+                  </label>  
+                   {/* View Button appears only if file is uploaded */}
+    {formData.aadhaarCard && (
+      <button
+        type="button"
+        onClick={() =>
+          window.open(URL.createObjectURL(formData.aadhaarCard))
+        }
+        className="text-blue-600 hover:underline text-sm mt-2"
+      >
+        View
+      </button>
+    )}
+ </div>
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*,.pdf"
+                      onChange={handleAadhaarUpload}
+                      className="hidden"
+                      id="aadhaar-upload"
+                    />
+                    <label
+                      htmlFor="aadhaar-upload"
+                      className={`flex items-center border rounded-xl w-full text-sm transition-all cursor-pointer overflow-hidden ${
+                        errors.aadhaarCard
+                          ? "border-red-500"
+                          : "border-gray-300 hover:border-blue-500"
+                      }`}
+                    >
+                      <span className="bg-blue-600 text-white px-4 py-2.5 text-sm font-medium whitespace-nowrap">
+                        Choose File
+                      </span>
+                      <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
+                        {formData.aadhaarCard
+                          ? formData.aadhaarCard.name
+                          : "No file chosen"}
+                      </span>
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Images or PDF, Max 5MB
+                  </p>
+                  {errors.aadhaarCard && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
+                      <span className="ml-1">{errors.aadhaarCard}</span>
+                    </p>
+                  )}
+                </div>
+
+                {/* Quota */}
+                <div className="w-full">
+                  <p className="text-gray-600 text-sm mb-1">Quota</p>
+                  
                   <select
                     name="quota"
                     value={formData.quota}
@@ -1067,10 +1234,11 @@ function RegistrationForm() {
                         : "border-gray-300 focus:border-blue-500 focus:ring-blue-100"
                     }`}
                   >
-                    <option value="">Quota *</option>
-                    <option value="Ex Army">Ex Army</option>
-                    <option value="Teacher Staff">Teacher Staff</option>
-                    <option value="Not Applicable">Not Applicable</option>
+                    <option value="">Select Quota *</option>
+                    <option value="General">General</option>
+                    <option value="Reserved">Reserved</option>
+                    <option value="Management">Management</option>
+                    <option value="NRI">NRI</option>
                   </select>
                   {errors.quota && (
                     <p className="text-red-500 text-sm mt-1 flex items-center">
@@ -1078,9 +1246,22 @@ function RegistrationForm() {
                       <span className="ml-1">{errors.quota}</span>
                     </p>
                   )}
-                  <p className="text-gray-600 text-xs mt-1">Quota</p>
-                </div>
-                <div className="w-full">
+                  {/* Upload Quota Document */}<div className="flex item-center justify-between ">
+                  <p className="text-gray-600 text-sm mb-1 mt-3">
+                    Quota Document (if applicable)
+                  </p>  {/* View Button appears only if file is uploaded */}
+    {formData.quotaDocument && (
+      <button
+        type="button"
+        onClick={() =>
+          window.open(URL.createObjectURL(formData.quotaDocument))
+        }
+        className="text-blue-600 hover:underline text-sm mt-2"
+      >
+        View
+      </button>
+    )}
+ </div>
                   <div className="relative">
                     <input
                       type="file"
@@ -1090,11 +1271,11 @@ function RegistrationForm() {
                       onChange={(e) => {
                         const file = e.target.files[0];
                         if (file) {
-                          // Validate file size (max 5MB)
                           if (file.size > 5 * 1024 * 1024) {
                             setErrors((prev) => ({
                               ...prev,
-                              quotaDocument: "File size should be less than 5MB.",
+                              quotaDocument:
+                                "File size should be less than 5MB.",
                             }));
                             e.target.value = null;
                             return;
@@ -1103,7 +1284,10 @@ function RegistrationForm() {
                             ...prev,
                             quotaDocument: file,
                           }));
-                          setErrors((prev) => ({ ...prev, quotaDocument: undefined }));
+                          setErrors((prev) => ({
+                            ...prev,
+                            quotaDocument: undefined,
+                          }));
                         }
                       }}
                       className="hidden"
@@ -1120,26 +1304,19 @@ function RegistrationForm() {
                         Choose File
                       </span>
                       <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
-                        {formData.quotaDocument ? formData.quotaDocument.name : "No file chosen"}
+                        {formData.quotaDocument
+                          ? formData.quotaDocument.name
+                          : "No file chosen"}
                       </span>
                     </label>
-
+                  
+                    
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Quota Document (if applicable)
-                  </p>
-                  {errors.quotaDocument && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center">
-                      <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
-                      <span className="ml-1">{errors.quotaDocument}</span>
-                    </p>
-                  )}
                 </div>
-              </div>
 
-              {/* Row 3: Category, Category Certificate, Sub Category, Sub Category Certificate, Qualification */}
-              <div className="grid md:grid-cols-5 gap-6 mt-6">
+                {/* Category */}
                 <div className="w-full">
+                  <p className="text-gray-600 text-sm mb-1">Category</p>
                   <select
                     name="category"
                     value={formData.category}
@@ -1153,10 +1330,10 @@ function RegistrationForm() {
                     <option value="">Select Category *</option>
                     <option value="Unreserved">Unreserved</option>
                     <option value="Reserved">Reserved</option>
-                    <option value="Reserved">OBC</option>
-                    <option value="Reserved">ST</option>
-                    <option value="Reserved">SC</option>
-                    <option value="Reserved">EWS</option>
+                    <option value="OBC">OBC</option>
+                    <option value="ST">ST</option>
+                    <option value="SC">SC</option>
+                    <option value="EWS">EWS</option>
                   </select>
                   {errors.category && (
                     <p className="text-red-500 text-sm mt-1 flex items-center">
@@ -1164,9 +1341,23 @@ function RegistrationForm() {
                       <span className="ml-1">{errors.category}</span>
                     </p>
                   )}
-                  <p className="text-gray-600 text-xs mt-1">Category</p>
-                </div>
-                <div className="w-full">
+                  {/* Upload Category Certificate */}
+                  <div className="flex item-center justify-between ">
+                  <p className="text-gray-600 text-sm mb-1 mt-3">
+                    Category Certificate (if applicable)
+                  </p> {/* View Button appears only if file is uploaded */}
+    {formData.categoryCertificate && (
+      <button
+        type="button"
+        onClick={() =>
+          window.open(URL.createObjectURL(formData.categoryCertificate))
+        }
+        className="text-blue-600 hover:underline text-sm mt-2"
+      >
+        View
+      </button>
+    )}
+ </div>
                   <div className="relative">
                     <input
                       type="file"
@@ -1176,11 +1367,11 @@ function RegistrationForm() {
                       onChange={(e) => {
                         const file = e.target.files[0];
                         if (file) {
-                          // Validate file size (max 5MB)
                           if (file.size > 5 * 1024 * 1024) {
                             setErrors((prev) => ({
                               ...prev,
-                              categoryCertificate: "File size should be less than 5MB.",
+                              categoryCertificate:
+                                "File size should be less than 5MB.",
                             }));
                             e.target.value = null;
                             return;
@@ -1189,7 +1380,10 @@ function RegistrationForm() {
                             ...prev,
                             categoryCertificate: file,
                           }));
-                          setErrors((prev) => ({ ...prev, categoryCertificate: undefined }));
+                          setErrors((prev) => ({
+                            ...prev,
+                            categoryCertificate: undefined,
+                          }));
                         }
                       }}
                       className="hidden"
@@ -1206,21 +1400,22 @@ function RegistrationForm() {
                         Choose File
                       </span>
                       <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
-                        {formData.categoryCertificate ? formData.categoryCertificate.name : "No file chosen"}
+                        {formData.categoryCertificate
+                          ? formData.categoryCertificate.name
+                          : "No file chosen"}
                       </span>
                     </label>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Category Certificate (if applicable)
-                  </p>
-                  {errors.categoryCertificate && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center">
-                      <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
-                      <span className="ml-1">{errors.categoryCertificate}</span>
-                    </p>
-                  )}
                 </div>
+              </div>
+
+              {/* Row 5: Sub Category, ABC ID Number, DEB ID Number */}
+              <div className="grid md:grid-cols-3 gap-6 mt-6">
+                {/* Sub Category */}
                 <div className="w-full">
+                   <p className="text-gray-600 text-sm mb-1">Sub Category</p>
+                   {/* View Button appears only if file is uploaded */}
+    
                   <select
                     name="subCategory"
                     value={formData.subCategory}
@@ -1232,19 +1427,27 @@ function RegistrationForm() {
                     }`}
                   >
                     <option value="">Select Sub Category *</option>
-                    <option value="ST">ST</option>
-                    <option value="SC">SC</option>
-                    <option value="OBC">OBC</option>
+                    <option value="Special">Not Applicable</option>
+                    <option value="Other">Special</option>
+                    <option value="Other">PWD</option>
                   </select>
-                  {errors.subCategory && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center">
-                      <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
-                      <span className="ml-1">{errors.subCategory}</span>
-                    </p>
-                  )}
-                  <p className="text-gray-600 text-xs mt-1">Sub Category</p>
-                </div>
-                <div className="w-full">
+                    <div className="flex item-center justify-between ">
+                  <p className="text-gray-600 text-sm mb-1 mt-3">
+                    Sub Category Certificate (if applicable)
+                  </p>
+                   {/* View Button appears only if file is uploaded */}
+    {formData.subCategoryDocument && (
+      <button
+        type="button"
+        onClick={() =>
+          window.open(URL.createObjectURL(formData.subCategoryDocument))
+        }
+        className="text-blue-600 hover:underline text-sm mt-2"
+      >
+        View
+      </button>
+    )}
+ </div>
                   <div className="relative">
                     <input
                       type="file"
@@ -1266,135 +1469,41 @@ function RegistrationForm() {
                         Choose File
                       </span>
                       <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
-                        {formData.subCategoryDocument ? formData.subCategoryDocument.name : "No file chosen"}
+                        {formData.subCategoryDocument
+                          ? formData.subCategoryDocument.name
+                          : "No file chosen"}
                       </span>
                     </label>
+                    
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Sub Category Certificate (if applicable)
-                  </p>
-                  {errors.subCategoryDocument && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center">
-                      <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
-                      <span className="ml-1">{errors.subCategoryDocument}</span>
-                    </p>
-                  )}
                 </div>
-                <InputField
-                  name="qualification"
-                  value={formData.qualification}
-                  onChange={handleInputChange}
-                  placeholder="Eligible Qualification*"
-                  error={errors.qualification}
-                  label="Eligible Qualification"
-                />
-              </div>
 
-              {/* Row 4: Mobile No, Whatsapp No, Email ID */}
-              <div className="grid md:grid-cols-3 gap-6 mt-6">
+                {/* ABC ID */}
                 <div className="w-full">
-                  <input
-                    type="tel"
-                    name="studentPhone"
-                    placeholder="Mobile No *"
-                    value={formData.studentPhone}
+                  <InputField
+                    name="abcIdNumber"
+                    value={formData.abcIdNumber}
                     onChange={handleInputChange}
-                    disabled={isLoggedIn}
-                    className={`border p-3 rounded-xl w-full transition-all focus:ring-2 focus:ring-opacity-50 ${
-                      isLoggedIn
-                        ? "bg-gray-100 cursor-not-allowed text-gray-700"
-                        : errors.studentPhone
-                        ? "border-red-500 focus:border-red-500 focus:ring-red-100"
-                        : "border-gray-300 focus:border-blue-500 focus:ring-blue-100"
-                    }`}
+                    placeholder="ABC ID Number"
+                    error={errors.abcIdNumber}
+                    label="ABC ID Number"
                   />
-                  {errors.studentPhone && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center">
-                      <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
-                      <span className="ml-1">{errors.studentPhone}</span>
-                    </p>
-                  )}
-                  <p className="text-gray-600 text-xs mt-1">Mobile No</p>
-                </div>
-                <div className="w-full">
-                  <input
-                    type="tel"
-                    name="whatsappNo"
-                    placeholder="Whatsapp No *"
-                    value={formData.whatsappNo}
-                    onChange={handleInputChange}
-                    disabled={isLoggedIn}
-                    className={`border p-3 rounded-xl w-full transition-all focus:ring-2 focus:ring-opacity-50 ${
-                      isLoggedIn
-                        ? "bg-gray-100 cursor-not-allowed text-gray-700"
-                        : errors.whatsappNo
-                        ? "border-red-500 focus:border-red-500 focus:ring-red-100"
-                        : "border-gray-300 focus:border-blue-500 focus:ring-blue-100"
-                    }`}
-                  />
-                  {errors.whatsappNo && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center">
-                      <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
-                      <span className="ml-1">{errors.whatsappNo}</span>
-                    </p>
-                  )}
-                  <p className="text-gray-600 text-xs mt-1">WhatsApp No</p>
-                </div>
-                <InputField
-                  name="studentEmail"
-                  type="email"
-                  value={formData.studentEmail}
-                  onChange={handleInputChange}
-                  placeholder="Email ID *"
-                  error={errors.studentEmail}
-                  label="Email ID"
-                />
-              </div>
-
-              {/* Row 5: Aadhaar Card, ABC ID, and BED ID Upload */}
-              <div className="grid md:grid-cols-3 gap-6 mt-6">
-                <div className="w-full">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Upload Aadhaar Card *
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="file"
-                      accept="image/*,.pdf"
-                      onChange={handleAadhaarUpload}
-                      className="hidden"
-                      id="aadhaar-upload"
-                    />
-                    <label
-                      htmlFor="aadhaar-upload"
-                      className={`flex items-center border rounded-xl w-full text-sm transition-all cursor-pointer overflow-hidden ${
-                        errors.aadhaarCard
-                          ? "border-red-500"
-                          : "border-gray-300 hover:border-blue-500"
-                      }`}
-                    >
-                      <span className="bg-blue-600 text-white px-4 py-2.5 text-sm font-medium whitespace-nowrap">
-                        Choose File
-                      </span>
-                      <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
-                        {formData.aadhaarCard ? formData.aadhaarCard.name : "No file chosen"}
-                      </span>
-                    </label>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Images or PDF, Max 5MB
-                  </p>
-                  {errors.aadhaarCard && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center">
-                      <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
-                      <span className="ml-1">{errors.aadhaarCard}</span>
-                    </p>
-                  )}
-                </div>
-                <div className="w-full">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="flex item-center justify-between ">
+                  <label className="block text-sm font-medium text-gray-700 mb-2 mt-2">
                     Upload ABC ID
-                  </label>
+                  </label> {/* View Button appears only if file is uploaded */}
+    {formData.abcId && (
+      <button
+        type="button"
+        onClick={() =>
+          window.open(URL.createObjectURL(formData.abcId))
+        }
+        className="text-blue-600 hover:underline text-sm mt-2"
+      >
+        View
+      </button>
+    )}
+ </div>
                   <div className="relative">
                     <input
                       type="file"
@@ -1415,24 +1524,41 @@ function RegistrationForm() {
                         Choose File
                       </span>
                       <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
-                        {formData.abcId ? formData.abcId.name : "No file chosen"}
+                        {formData.abcId
+                          ? formData.abcId.name
+                          : "No file chosen"}
                       </span>
                     </label>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Images or PDF, Max 5MB (Optional)
-                  </p>
-                  {errors.abcId && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center">
-                      <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
-                      <span className="ml-1">{errors.abcId}</span>
-                    </p>
-                  )}
                 </div>
+
+                {/* DEB ID */}
                 <div className="w-full">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Upload BED ID
+                  <InputField
+                    name="debIdNumber"
+                    value={formData.debIdNumber}
+                    onChange={handleInputChange}
+                    placeholder="DEB ID Number"
+                    error={errors.debIdNumber}
+                    label="DEB ID Number (if applicable)"
+                  />
+                  <div className="flex item-center justify-between ">
+                  <label className="block text-sm font-medium text-gray-700 mb-2 mt-2">
+                    Upload DEB ID (if applicable)
                   </label>
+                   {/* View Button appears only if file is uploaded */}
+    {formData.bedId && (
+      <button
+        type="button"
+        onClick={() =>
+          window.open(URL.createObjectURL(formData.bedId))
+        }
+        className="text-blue-600 hover:underline text-sm mt-2"
+      >
+        View
+      </button>
+    )}
+ </div>
                   <div className="relative">
                     <input
                       type="file"
@@ -1453,22 +1579,14 @@ function RegistrationForm() {
                         Choose File
                       </span>
                       <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
-                        {formData.bedId ? formData.bedId.name : "No file chosen"}
+                        {formData.bedId
+                          ? formData.bedId.name
+                          : "No file chosen"}
                       </span>
                     </label>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Images or PDF, Max 5MB (Optional)
-                  </p>
-                  {errors.bedId && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center">
-                      <AlertCircle className="w-4 h-4 mr-1 inline shrink-0" />
-                      <span className="ml-1">{errors.bedId}</span>
-                    </p>
-                  )}
                 </div>
               </div>
-             
             </section>
 
             {/* === Parent/Guardian Info === */}
@@ -1790,6 +1908,23 @@ function RegistrationForm() {
                         }}
                         className="hidden"
                       />
+                      <div className="flex item-center justify-between ">
+                      <p className="text-gray-600 text-sm mt-1">
+                        Marksheet (Upload)           
+                      </p>
+                       {/* View Button appears only if file is uploaded */}
+    {formData.tenthMarksheet && (
+      <button
+        type="button"
+        onClick={() =>
+          window.open(URL.createObjectURL(formData.tenthMarksheet))
+        }
+        className="text-blue-600 hover:underline text-sm mt-2"
+      >
+        View
+      </button>
+    )}
+ </div>
                       <label
                         htmlFor="tenthMarksheet"
                         className="flex items-center border border-gray-300 rounded-xl w-full text-sm transition-all cursor-pointer hover:border-blue-500 overflow-hidden"
@@ -1798,13 +1933,12 @@ function RegistrationForm() {
                           Choose File
                         </span>
                         <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
-                          {formData.tenthMarksheet ? formData.tenthMarksheet.name : "No file chosen"}
+                          {formData.tenthMarksheet
+                            ? formData.tenthMarksheet.name
+                            : "No file chosen"}
                         </span>
                       </label>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Marksheet (Optional)
-                    </p>
                   </div>
                 </div>
               </div>
@@ -1894,6 +2028,22 @@ function RegistrationForm() {
                         }}
                         className="hidden"
                       />
+                      <div className="flex item-center justify-between ">
+                      <p className="text-gray-600 text-sm mt-1">
+                        Marksheet(Upload)
+                      </p> {/* View Button appears only if file is uploaded */}
+    {formData.twelfthMarksheet && (
+      <button
+        type="button"
+        onClick={() =>
+          window.open(URL.createObjectURL(formData.twelfthMarksheet))
+        }
+        className="text-blue-600 hover:underline text-sm mt-2"
+      >
+        View
+      </button>
+    )}
+ </div>
                       <label
                         htmlFor="twelfthMarksheet"
                         className="flex items-center border border-gray-300 rounded-xl w-full text-sm transition-all cursor-pointer hover:border-purple-500 overflow-hidden"
@@ -1902,13 +2052,12 @@ function RegistrationForm() {
                           Choose File
                         </span>
                         <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
-                          {formData.twelfthMarksheet ? formData.twelfthMarksheet.name : "No file chosen"}
+                          {formData.twelfthMarksheet
+                            ? formData.twelfthMarksheet.name
+                            : "No file chosen"}
                         </span>
                       </label>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Upload Marksheet 
-                    </p>
                   </div>
                 </div>
               </div>
@@ -1987,6 +2136,23 @@ function RegistrationForm() {
                         }}
                         className="hidden"
                       />
+                      <div className="flex item-center justify-between ">
+                      <p className="text-gray-600 text-sm mb-1">
+                        Upload Marksheet (Optional)
+                      </p>
+                       {/* View Button appears only if file is uploaded */}
+    {formData.ugDiplomaMarksheet && (
+      <button
+        type="button"
+        onClick={() =>
+          window.open(URL.createObjectURL(formData.ugDiplomaMarksheet))
+        }
+        className="text-blue-600 hover:underline text-sm mt-2"
+      >
+        View
+      </button>
+    )}
+ </div>
                       <label
                         htmlFor="ugDiplomaMarksheet"
                         className="flex items-center border border-gray-300 rounded-xl w-full text-sm transition-all cursor-pointer hover:border-green-500 overflow-hidden"
@@ -1995,13 +2161,12 @@ function RegistrationForm() {
                           Choose File
                         </span>
                         <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
-                          {formData.ugDiplomaMarksheet ? formData.ugDiplomaMarksheet.name : "No file chosen"}
+                          {formData.ugDiplomaMarksheet
+                            ? formData.ugDiplomaMarksheet.name
+                            : "No file chosen"}
                         </span>
                       </label>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Upload Marksheet (Optional)
-                    </p>
                   </div>
                 </div>
               </div>
@@ -2080,6 +2245,23 @@ function RegistrationForm() {
                         }}
                         className="hidden"
                       />
+                      <div className="flex item-center justify-between ">
+                      <p className="text-gray-600 text-sm mb-1">
+                        Upload Marksheet (Optional)
+                      </p>
+                       {/* View Button appears only if file is uploaded */}
+    {formData.ugMarksheet && (
+      <button
+        type="button"
+        onClick={() =>
+          window.open(URL.createObjectURL(formData.ugMarksheet))
+        }
+        className="text-blue-600 hover:underline text-sm mt-2"
+      >
+        View
+      </button>
+    )}
+ </div>
                       <label
                         htmlFor="ugMarksheet"
                         className="flex items-center border border-gray-300 rounded-xl w-full text-sm transition-all cursor-pointer hover:border-yellow-500 overflow-hidden"
@@ -2088,13 +2270,12 @@ function RegistrationForm() {
                           Choose File
                         </span>
                         <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
-                          {formData.ugMarksheet ? formData.ugMarksheet.name : "No file chosen"}
+                          {formData.ugMarksheet
+                            ? formData.ugMarksheet.name
+                            : "No file chosen"}
                         </span>
                       </label>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Upload Marksheet (Optional)
-                    </p>
                   </div>
                 </div>
               </div>
@@ -2173,6 +2354,22 @@ function RegistrationForm() {
                         }}
                         className="hidden"
                       />
+                      <div className="flex item-center justify-between ">
+                      <p className="text-gray-600 text-sm mb-1">
+                        Upload Marksheet (Optional)
+                      </p> {/* View Button appears only if file is uploaded */}
+    {formData.pgDiplomaMarksheet && (
+      <button
+        type="button"
+        onClick={() =>
+          window.open(URL.createObjectURL(formData.pgDiplomaMarksheet))
+        }
+        className="text-blue-600 hover:underline text-sm mt-2"
+      >
+        View
+      </button>
+    )}
+ </div>
                       <label
                         htmlFor="pgDiplomaMarksheet"
                         className="flex items-center border border-gray-300 rounded-xl w-full text-sm transition-all cursor-pointer hover:border-pink-500 overflow-hidden"
@@ -2181,13 +2378,12 @@ function RegistrationForm() {
                           Choose File
                         </span>
                         <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
-                          {formData.pgDiplomaMarksheet ? formData.pgDiplomaMarksheet.name : "No file chosen"}
+                          {formData.pgDiplomaMarksheet
+                            ? formData.pgDiplomaMarksheet.name
+                            : "No file chosen"}
                         </span>
                       </label>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Upload Marksheet (Optional)
-                    </p>
                   </div>
                 </div>
               </div>
@@ -2266,6 +2462,23 @@ function RegistrationForm() {
                         }}
                         className="hidden"
                       />
+                      <div className="flex item-center justify-between ">
+                      <p className="text-gray-600 text-sm mb-1">
+                        Upload Marksheet (Optional)
+                      </p>
+                       {/* View Button appears only if file is uploaded */}
+    {formData.pgMarksheet && (
+      <button
+        type="button"
+        onClick={() =>
+          window.open(URL.createObjectURL(formData.pgMarksheet))
+        }
+        className="text-blue-600 hover:underline text-sm mt-2"
+      >
+        View
+      </button>
+    )}
+ </div>
                       <label
                         htmlFor="pgMarksheet"
                         className="flex items-center border border-gray-300 rounded-xl w-full text-sm transition-all cursor-pointer hover:border-indigo-500 overflow-hidden"
@@ -2274,13 +2487,12 @@ function RegistrationForm() {
                           Choose File
                         </span>
                         <span className="flex-1 px-3 py-2.5 text-gray-600 text-sm truncate border-l border-gray-300">
-                          {formData.pgMarksheet ? formData.pgMarksheet.name : "No file chosen"}
+                          {formData.pgMarksheet
+                            ? formData.pgMarksheet.name
+                            : "No file chosen"}
                         </span>
                       </label>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Upload Marksheet (Optional)
-                    </p>
                   </div>
                 </div>
               </div>
@@ -2604,8 +2816,7 @@ function RegistrationForm() {
           </form>
         </div>
       </div>
-  
-      </div>
+    </div>
   );
 }
 

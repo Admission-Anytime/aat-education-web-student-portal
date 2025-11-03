@@ -1,8 +1,8 @@
 //InquiryForm jsx redesign with OTP verification and state-city dropdown
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import axios from "axios";
 // All Indian states and sample major cities 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
 const stateCityData = {
   "Andhra Pradesh": ["Alluri Sitharama Raju", "Anakapalli", "Ananthapuramu", "Annamayya", "Bapatla", "Chittoor", "Dr. B.R. Ambedkar Konaseema", "East Godavari", "Eluru", "Guntur", "Kakinada", "Krishna", "Kurnool", "Nandyal", "Nellore", "NTR", "Palnadu", "Parvathipuram Manyam", "Prakasam", "Srikakulam", "Sri Sathya Sai", "Tirupati", "Visakhapatnam", "Vizianagaram", "West Godavari", "YSR Kadapa"],
   "Arunachal Pradesh": ["Anjaw", "Changlang", "Dibang Valley", "East Kameng", "East Siang", "Kamle", "Kra Daadi", "Kurung Kumey", "Lepa Rada", "Lohit", "Longding", "Lower Dibang Valley", "Lower Siang", "Lower Subansiri", "Namsai", "Pakke-Kessang", "Papum Pare", "Shi Yomi", "Siang", "Tawang", "Tirap", "Upper Dibang Valley", "Upper Siang", "Upper Subansiri", "West Kameng", "West Siang", "Capital Complex Itanagar"],
@@ -97,24 +97,24 @@ const InquiryFormRedesign = () => {
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
   // Handle input changes
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
     let newValue = value;
-    
+
     // Enforce digit-only for phone and OTP
     if (name === "phone" || name === "otp") {
-        newValue = value.replace(/\D/g, ''); 
+        newValue = value.replace(/\D/g, '');
     }
-    
+
     setFormData((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : newValue }));
-  };
+  }, []);
 
   // Handle State change and update available cities
-  const handleStateChange = (e) => {
+  const handleStateChange = useCallback((e) => {
     const state = e.target.value;
     setFormData((prev) => ({ ...prev, state, city: "" }));
     setAvailableCities(stateCityData[state] || []);
-  };
+  }, []);
 
   // Custom message alert handler
   const showMessage = (msg, isError = false) => {
@@ -259,7 +259,7 @@ const response = await axios.post(`${BASE_URL}/api/inquiry/submit-form`, formDat
   // Custom Input Field Component
   const InputField = ({ name, type = "text", placeholder, value, onChange, required, icon: Icon }) => (
     <div className="relative mb-3">
-      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+      <div className="absolute inset-y-0 left-0 flex items-center pl-3 w-10 pointer-events-none text-gray-400">
         <Icon className="w-5 h-5" />
       </div>
       <input

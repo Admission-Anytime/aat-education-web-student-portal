@@ -34,6 +34,7 @@ import CoorporateTraining from "./models/CoorporateTraining.js";
 import CoorporateTrainingRoutes from "./routes/coorporatetrainRoutes.js";
 import registrationRoutes from "./routes/registrationRoutes.js";
 import otpRoutes from "./routes/otpRoutes.js";
+import feeStructureRoutes from "./routes/feeStructureRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -46,34 +47,26 @@ const MONGO_URL = process.env.MONGO_URI
 //middleware express instantiated
 const app = express();
 //middleware to ftech data
-app.use(express.urlencoded({ extended: true })); // optional for form data 
+app.use(express.urlencoded({ extended: true })); // optional for form data
 /*Routes for SignUp
 app.post("/api/auth/signup", signup);
 app.post("/api/auth/login", login);
 app.post("/api/auth/logout", logout);*/
 
 app.use(express.json());
- 
-app.use("/Uploads", express.static("Uploads"));
-// Courses Routes
- app.use("/api/courses", coursesRoutes);
- 
-
-
-app.use("/api/subscribers", subscribeRoutes);//subscribe us
-//footer routes 
-app.use('/api/footer', footerRoutes);
 
 //connection with frontend ======CORS======
 app.use(cookieParser());
 app.use(cors({
-  origin: "http://localhost:5173",   // frontend (Vite)
+  origin: ["http://localhost:5173", "http://localhost:4001"],   // frontend (Vite and React)
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
 
-app.use(express.json());
+app.use("/Uploads", express.static("Uploads"));
+// Courses Routes
+app.use("/api/courses", coursesRoutes);
 
  
 
@@ -182,6 +175,10 @@ app.use("/api/corporatetraining", CoorporateTrainingRoutes);
 app.use("/api/registrations", registrationRoutes);
 // OTP Routes
 app.use("/api/otp", otpRoutes);
+// Fee Structure Routes
+app.use("/api/fee-structures", feeStructureRoutes);
+// Footer Routes
+app.use("/api/footer", footerRoutes);
 
 
   //Cloudinary connection

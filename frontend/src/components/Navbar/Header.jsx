@@ -3,9 +3,11 @@ import logo_image from "../../assets/img/Logo.jpg";
 import { NavLink } from "react-router-dom";
 import { Menu } from "lucide-react";
 import axios from "axios";
+
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
+
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-const BASE_URL = import.meta.env.VITE_BASE_URL ;
 
   //dynamic institute info fetching
 

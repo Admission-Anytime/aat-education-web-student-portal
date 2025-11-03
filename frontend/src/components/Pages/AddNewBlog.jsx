@@ -4,7 +4,7 @@ import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
 
 const AddNewBlog = () => {
   const [title, setTitle] = useState("");

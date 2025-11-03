@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
+
 export default function AboutAdmin() {
   const [title, setTitle] = useState("About Our Institute");
   const [description, setDescription] = useState(

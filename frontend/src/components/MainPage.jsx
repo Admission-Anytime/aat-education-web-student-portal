@@ -24,9 +24,11 @@ import {
 import axios from "axios";
 import { createPortal } from "react-dom";
 
-//const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
+//const BASE_URL = import.meta.env.VITE_BASE_URL; || "http://localhost:4001";
 console.log("Base URL:", BASE_URL);
+
+
 export default function MainPage() {
   //courses or progtrams section
   // BookOpen icon component
@@ -121,7 +123,7 @@ console.log(formatted, "from mainpage.jsx line 81 courses axios.get");
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/api/news`); // your backend route
+        const res = await axios.get(`${BASE_URL}/api/news`); //   backend route
         console.log("News API Response:", res.data);
         const sortedNews = res.data.sort(
           (a, b) => new Date(b.date) - new Date(a.date)

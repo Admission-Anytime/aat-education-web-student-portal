@@ -9,7 +9,7 @@ const BlogEntriesPage = () => {
   const [blogEntries, setBlogEntries] = useState([]); // initially empty
   const [loading, setLoading] = useState(true);
   const [showAddBlog, setShowAddBlog] = useState(false);
-const BASE_URL = process.env.REACT_APP_BASE_URL ;
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
   const fallbackImage =
     "https://media.istockphoto.com/id/1453843862/photo/business-meeting.jpg?s=612x612&w=0&k=20&c=4k9H7agmpn92B7bkUywvkK5Ckwm9Y8f8QrGs4DRDWpE=";
 

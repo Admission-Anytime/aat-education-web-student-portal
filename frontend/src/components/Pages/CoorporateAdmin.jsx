@@ -5,6 +5,8 @@ import { ChevronRight, Mail, X } from "lucide-react";
 import AddNewProgram from "./AddNewProgram"; // Your form component for add/edit
 import { PencilSquareIcon, TrashIcon,EyeSlashIcon, EyeIcon } from "@heroicons/react/24/outline";
 
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
+
 const CorporateTrainingProgramTable = () => {
   const [programs, setPrograms] = useState([]);
   const [selectedProgram, setSelectedProgram] = useState(null);
@@ -154,7 +156,7 @@ const CorporateTrainingProgramTable = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 lg:p-8">
+    <div className="container mx-auto p-2 sm:p-4 lg:p-4">
       {/* Header + Add Button */}
       <div className="flex flex-col sm:flex-row items-center justify-between mb-6 space-y-4 sm:space-y-0">
         <div className="flex items-center space-x-2">

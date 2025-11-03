@@ -3,6 +3,8 @@ import axios from "axios";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
+
 function AddNewArticle({ editingEntry, onSubmit, onBack }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -150,7 +152,7 @@ function AddNewArticle({ editingEntry, onSubmit, onBack }) {
           />
           {editingEntry && editingEntry.image && !image && (
             <img
-              src={`http://localhost:4001/Uploads/${editingEntry.image}`}
+              src={`${BASE_URL}/Uploads/${editingEntry.image}`}
               alt="current"
               className="mt-2 w-32 h-32 object-cover rounded"
             />

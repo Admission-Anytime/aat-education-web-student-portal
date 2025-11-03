@@ -1,442 +1,149 @@
-import express from "express";
+import { Router } from "express";
+import Registration from "../models/Registration.js";
 import multer from "multer";
 import path from "path";
-import Registration from "../models/Registration.js";
 
-const router = express.Router();
+const router = Router();
 
-// =====================
-// Multer Configuration for File Uploads
-// =====================
+// Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "Uploads/"); // Save to Uploads folder
+    cb(null, "aat/Backend/Uploads/"); // Adjust path as needed
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + file.originalname;
-    cb(null, uniqueSuffix);
+    cb(null, Date.now() + path.extname(file.originalname));
   },
 });
 
-// File filter to accept only images and PDFs
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|pdf/;
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedTypes.test(file.mimetype);
+const upload = multer({ storage });
 
-  if (extname && mimetype) {
-    cb(null, true);
-  } else {
-    cb(new Error("Only images (JPEG, JPG, PNG) and PDF files are allowed!"));
-  }
-};
+// Middleware for multiple file uploads
+const uploadFields = upload.fields([
+  { name: "Photo", maxCount: 1 },
+  { name: "AadhaarCard", maxCount: 1 },
+  { name: "AbcId", maxCount: 1 },
+  { name: "DebId", maxCount: 1 },
+  { name: "QuotaDocument", maxCount: 1 },
+  { name: "CategoryCertificate", maxCount: 1 },
+  { name: "SubCategoryDocument", maxCount: 1 },
+  { name: "TenthMarksheet", maxCount: 1 },
+  { name: "TwelfthMarksheet", maxCount: 1 },
+  { name: "UgDiplomaMarksheet", maxCount: 1 },
+  { name: "UgMarksheet", maxCount: 1 },
+  { name: "PgDiplomaMarksheet", maxCount: 1 },
+  { name: "PgMarksheet", maxCount: 1 },
+]);
 
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter: fileFilter,
-});
-
-// =====================
-// CREATE - Submit New Registration
-// =====================
-router.post(
-  "/",
-upload.fields([
-    { name: "photo", maxCount: 1 },
-    { name: "aadhaarCard", maxCount: 1 },
-    { name: "abcId", maxCount: 1 },
-    { name: "bedId", maxCount: 1 },
-    { name: "tenthMarksheet", maxCount: 1 },
-    { name: "twelfthMarksheet", maxCount: 1 },
-    { name: "quotaDocument", maxCount: 1 },
-    { name: "categoryCertificate", maxCount: 1 },
-    { name: "subCategoryDocument", maxCount: 1 },
-    { name: "ugDiplomaMarksheet", maxCount: 1 },
-    { name: "ugMarksheet", maxCount: 1 },
-    { name: "pgDiplomaMarksheet", maxCount: 1 },
-    { name: "pgMarksheet", maxCount: 1 },
-  ]),
-  async (req, res) => {
-    try {
-      // Extract file paths
-      const photo = req.files?.photo ? req.files.photo[0].filename : null;
-      const aadhaarCard = req.files?.aadhaarCard
-        ? req.files.aadhaarCard[0].filename
-        : null;
-      const abcId = req.files?.abcId
-        ? req.files.abcId[0].filename
-        : null;
-      const bedId = req.files?.bedId
-        ? req.files.bedId[0].filename
-        : null;
-      const tenthMarksheet = req.files?.tenthMarksheet
-        ? req.files.tenthMarksheet[0].filename
-        : null;
-      const twelfthMarksheet = req.files?.twelfthMarksheet
-        ? req.files.twelfthMarksheet[0].filename
-        : null;
-      const quotaDocument = req.files?.quotaDocument
-        ? req.files.quotaDocument[0].filename
-        : null;
-      const categoryCertificate = req.files?.categoryCertificate
-        ? req.files.categoryCertificate[0].filename
-        : null;
-      const subCategoryDocument = req.files?.subCategoryDocument
-        ? req.files.subCategoryDocument[0].filename
-        : null;
-      const ugDiplomaMarksheet = req.files?.ugDiplomaMarksheet
-        ? req.files.ugDiplomaMarksheet[0].filename
-        : null;
-      const ugMarksheet = req.files?.ugMarksheet
-        ? req.files.ugMarksheet[0].filename
-        : null;
-      const pgDiplomaMarksheet = req.files?.pgDiplomaMarksheet
-        ? req.files.pgDiplomaMarksheet[0].filename
-        : null;
-      const pgMarksheet = req.files?.pgMarksheet
-        ? req.files.pgMarksheet[0].filename
-        : null;
-
-      // Create registration data
-      const registrationData = {
-        ...req.body,
-        photo: photo || 'default-photo.jpg', // Use default if no photo uploaded
-        aadhaarCard,
-        abcId,
-        bedId,
-        tenthMarksheet,
-        twelfthMarksheet,
-        quotaDocument,
-        categoryCertificate,
-        subCategoryDocument,
-        ugDiplomaMarksheet,
-        ugMarksheet,
-        pgDiplomaMarksheet,
-        pgMarksheet,
-        agreeTerms: req.body.agreeTerms === "true" || req.body.agreeTerms === true,
-      };
-
-      // Create new registration
-      const newRegistration = new Registration(registrationData);
-      await newRegistration.save();
-
-      res.status(201).json({
-        message: "Registration submitted successfully",
-        registration: newRegistration,
-      });
-    } catch (error) {
-      console.error("Error creating registration:", error);
-      res.status(400).json({
-        message: "Failed to submit registration",
-        error: error.message,
-      });
-    }
-  }
-);
-
-// =====================
-// READ ALL - Get All Registrations (with pagination and filtering)
-// =====================
+// @route   GET /api/registrations
+// @desc    Get all registrations
+// @access  Public
 router.get("/", async (req, res) => {
   try {
-    const {
-      page = 1,
-      limit = 10,
-      status,
-      search,
-      sortBy = "createdAt",
-      order = "desc",
-    } = req.query;
-
-    // Build query
-    const query = {};
-
-    // Filter by status
-    if (status) {
-      query.status = status;
-    }
-
-    // Search by name, email, or registration ID
-    if (search) {
-      query.$or = [
-        { studentFirstName: { $regex: search, $options: "i" } },
-        { studentLastName: { $regex: search, $options: "i" } },
-        { studentEmail: { $regex: search, $options: "i" } },
-        { registrationId: { $regex: search, $options: "i" } },
-      ];
-    }
-
-    // Calculate pagination
-    const skip = (page - 1) * limit;
-    const sortOrder = order === "asc" ? 1 : -1;
-
-    // Fetch registrations
-    const registrations = await Registration.find(query)
-      .sort({ [sortBy]: sortOrder })
-      .skip(skip)
-      .limit(parseInt(limit));
-
-    // Get total count
-    const total = await Registration.countDocuments(query);
-
-    res.json({
-      registrations,
-      pagination: {
-        total,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        totalPages: Math.ceil(total / limit),
-      },
-    });
-  } catch (error) {
-    console.error("Error fetching registrations:", error);
-    res.status(500).json({
-      message: "Failed to fetch registrations",
-      error: error.message,
-    });
+    const registrations = await Registration.find();
+    res.json({ registrations });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 
-// =====================
-// READ ONE - Get Single Registration by ID
-// =====================
+// @route   GET /api/registrations/:id
+// @desc    Get single registration by ID
+// @access  Public
 router.get("/:id", async (req, res) => {
   try {
     const registration = await Registration.findById(req.params.id);
-
-    if (!registration) {
+    if (!registration)
       return res.status(404).json({ message: "Registration not found" });
-    }
-
     res.json(registration);
-  } catch (error) {
-    console.error("Error fetching registration:", error);
-    res.status(500).json({
-      message: "Failed to fetch registration",
-      error: error.message,
-    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 
-// =====================
-// SEARCH - Search by Registration ID, Email, or Phone
-// =====================
-router.get("/search/:query", async (req, res) => {
+// @route   POST /api/registrations
+// @desc    Create a new registration
+// @access  Public
+router.post("/", uploadFields, async (req, res) => {
   try {
-    const { query } = req.params;
+    const formData = req.body;
 
-    const registrations = await Registration.find({
-      $or: [
-        { registrationId: { $regex: query, $options: "i" } },
-        { studentEmail: { $regex: query, $options: "i" } },
-        { studentPhone: { $regex: query, $options: "i" } },
-        { studentFirstName: { $regex: query, $options: "i" } },
-        { studentLastName: { $regex: query, $options: "i" } },
-      ],
-    }).limit(20);
-
-    res.json({
-      count: registrations.length,
-      registrations,
-    });
-  } catch (error) {
-    console.error("Error searching registrations:", error);
-    res.status(500).json({
-      message: "Failed to search registrations",
-      error: error.message,
-    });
-  }
-});
-
-// =====================
-// UPDATE - Update Registration by ID
-// =====================
-router.put(
-  "/:id",
-  upload.fields([
-    { name: "photo", maxCount: 1 },
-    { name: "aadhaarCard", maxCount: 1 },
-    { name: "abcId", maxCount: 1 },
-    { name: "bedId", maxCount: 1 },
-    { name: "tenthMarksheet", maxCount: 1 },
-    { name: "twelfthMarksheet", maxCount: 1 },
-    { name: "quotaDocument", maxCount: 1 },
-    { name: "categoryCertificate", maxCount: 1 },
-    { name: "subCategoryDocument", maxCount: 1 },
-    { name: "ugDiplomaMarksheet", maxCount: 1 },
-    { name: "ugMarksheet", maxCount: 1 },
-    { name: "pgDiplomaMarksheet", maxCount: 1 },
-    { name: "pgMarksheet", maxCount: 1 },
-  ]),
-  async (req, res) => {
-    try {
-      const registration = await Registration.findById(req.params.id);
-
-      if (!registration) {
-        return res.status(404).json({ message: "Registration not found" });
-      }
-
-      // Update file paths if new files are uploaded
-      if (req.files?.photo) {
-        req.body.photo = req.files.photo[0].filename;
-      }
-      if (req.files?.aadhaarCard) {
-        req.body.aadhaarCard = req.files.aadhaarCard[0].filename;
-      }
-      if (req.files?.abcId) {
-        req.body.abcId = req.files.abcId[0].filename;
-      }
-      if (req.files?.bedId) {
-        req.body.bedId = req.files.bedId[0].filename;
-      }
-      if (req.files?.tenthMarksheet) {
-        req.body.tenthMarksheet = req.files.tenthMarksheet[0].filename;
-      }
-      if (req.files?.twelfthMarksheet) {
-        req.body.twelfthMarksheet = req.files.twelfthMarksheet[0].filename;
-      }
-      if (req.files?.quotaDocument) {
-        req.body.quotaDocument = req.files.quotaDocument[0].filename;
-      }
-      if (req.files?.categoryCertificate) {
-        req.body.categoryCertificate = req.files.categoryCertificate[0].filename;
-      }
-      if (req.files?.subCategoryDocument) {
-        req.body.subCategoryDocument = req.files.subCategoryDocument[0].filename;
-      }
-      if (req.files?.ugDiplomaMarksheet) {
-        req.body.ugDiplomaMarksheet = req.files.ugDiplomaMarksheet[0].filename;
-      }
-      if (req.files?.ugMarksheet) {
-        req.body.ugMarksheet = req.files.ugMarksheet[0].filename;
-      }
-      if (req.files?.pgDiplomaMarksheet) {
-        req.body.pgDiplomaMarksheet = req.files.pgDiplomaMarksheet[0].filename;
-      }
-      if (req.files?.pgMarksheet) {
-        req.body.pgMarksheet = req.files.pgMarksheet[0].filename;
-      }
-
-      // Handle boolean conversion for agreeTerms
-      if (req.body.agreeTerms !== undefined) {
-        req.body.agreeTerms =
-          req.body.agreeTerms === "true" || req.body.agreeTerms === true;
-      }
-
-      // Update registration
-      const updatedRegistration = await Registration.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        { new: true, runValidators: true } 
-      );
-   
-      res.json({
-        message: "Registration updated successfully",
-        registration: updatedRegistration,
-      });
-    } catch (error) {
-      console.error("Error updating registration:", error);
-      res.status(400).json({
-        message: "Failed to update registration",
-        error: error.message,
+    // Handle file uploads
+    if (req.files) {
+      Object.keys(req.files).forEach((field) => {
+        if (req.files[field][0]) {
+          formData[field] = req.files[field][0].filename;
+        }
       });
     }
+
+    const newRegistration = new Registration(formData);
+    const savedRegistration = await newRegistration.save();
+    res.status(201).json(savedRegistration);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
   }
-);
+});
 
-// =====================
-// PATCH - Update Registration Status
-// =====================
-router.patch("/:id/status", async (req, res) => {
+// @route   PUT /api/registrations/:id
+// @desc    Update a registration
+// @access  Public
+router.put("/:id", uploadFields, async (req, res) => {
   try {
-    const { status } = req.body;
+    const formData = req.body;
 
-    if (!["Pending", "Approved", "Rejected", "Under Review"].includes(status)) {
-      return res.status(400).json({ message: "Invalid status value" });
+    // Handle file uploads
+    if (req.files) {
+      Object.keys(req.files).forEach((field) => {
+        if (req.files[field][0]) {
+          formData[field] = req.files[field][0].filename;
+        }
+      });
     }
 
     const updatedRegistration = await Registration.findByIdAndUpdate(
       req.params.id,
-      { status },
+      formData,
       { new: true }
     );
-
-    if (!updatedRegistration) {
+    if (!updatedRegistration)
       return res.status(404).json({ message: "Registration not found" });
-    }
-
-    res.json({
-      message: "Status updated successfully",
-      registration: updatedRegistration,
-    });
-  } catch (error) {
-    console.error("Error updating status:", error);
-    res.status(500).json({
-      message: "Failed to update status",
-      error: error.message,
-    });
+    res.json(updatedRegistration);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
   }
 });
 
-// =====================
-// DELETE - Delete Registration by ID
-// =====================
+// @route   DELETE /api/registrations/:id
+// @desc    Delete a registration
+// @access  Public
 router.delete("/:id", async (req, res) => {
   try {
     const registration = await Registration.findByIdAndDelete(req.params.id);
-
-    if (!registration) {
+    if (!registration)
       return res.status(404).json({ message: "Registration not found" });
-    }
-
-    res.json({
-      message: "Registration deleted successfully",
-      registration,
-    });
-  } catch (error) {
-    console.error("Error deleting registration:", error);
-    res.status(500).json({
-      message: "Failed to delete registration",
-      error: error.message,
-    });
+    res.json({ message: "Registration deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 
-// =====================
-// GET Statistics - Get registration statistics
-// =====================
-router.get("/stats/overview", async (req, res) => {
+// @route   PATCH /api/registrations/:id/status
+// @desc    Update registration status
+// @access  Public
+router.patch("/:id/status", async (req, res) => {
+  const { id } = req.params;
+  const { Status } = req.body;
   try {
-    const total = await Registration.countDocuments();
-    const pending = await Registration.countDocuments({ status: "Pending" });
-    const approved = await Registration.countDocuments({ status: "Approved" });
-    const rejected = await Registration.countDocuments({ status: "Rejected" });
-    const underReview = await Registration.countDocuments({
-      status: "Under Review",
-    });
-
-    // Get recent registrations (last 7 days)
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const recentCount = await Registration.countDocuments({
-      createdAt: { $gte: sevenDaysAgo },
-    });
-
-    res.json({
-      total,
-      pending,
-      approved,
-      rejected,
-      underReview,
-      recentCount,
-    });
-  } catch (error) {
-    console.error("Error fetching statistics:", error);
-    res.status(500).json({
-      message: "Failed to fetch statistics",
-      error: error.message,
-    });
+    const updatedRegistration = await Registration.findByIdAndUpdate(
+      id,
+      { Status },
+      { new: true }
+    );
+    if (!updatedRegistration)
+      return res.status(404).json({ message: "Registration not found" });
+    res.json(updatedRegistration);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 

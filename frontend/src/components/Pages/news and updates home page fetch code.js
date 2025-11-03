@@ -1,7 +1,7 @@
 //temporry
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-const BASE_URL = process.env.REACT_APP_BASE_URL ;
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
 const NewsSection = () => {
   const [news, setNews] = useState([]);
   const [featuredPost, setFeaturedPost] = useState(null);

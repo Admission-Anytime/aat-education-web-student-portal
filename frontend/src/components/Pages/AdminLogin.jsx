@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { LogIn, Mail, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
 // --- Custom Components ---
 const PrimaryButton = ({ children, icon: Icon, onClick, className = '', disabled = false }) => (
   <button

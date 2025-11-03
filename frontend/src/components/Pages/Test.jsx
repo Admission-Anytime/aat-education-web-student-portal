@@ -35,13 +35,13 @@ const CourseCatalog = () => {
   const [isCopied, setIsCopied] = useState(false);
 
   const [courses, setCourses] = useState([]);
-  const BASE_URL = import.meta.env.VITE_BASE_URL;
-  console.log("BASE_URL:", BASE_URL);
+  const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
+  console.log("BASE_URL test.jsx:", BASE_URL);
 
   useEffect(() => {
     console.log("useEffect fired"); // ✅ Debug
     axios
-      .get("/api/courses")
+      .get(`${BASE_URL}/api/courses`)
       .then((res) => {
         console.log("Courses data:", res.data);
         setCourses(res.data);

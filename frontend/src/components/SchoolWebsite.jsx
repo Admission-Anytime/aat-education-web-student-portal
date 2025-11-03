@@ -11,6 +11,9 @@ import Header from './Navbar/Header'
 import axios from 'axios'
 import { GraduationCap, ClipboardCheck, UserCheck } from "lucide-react";
 
+
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
+
 const SchoolWebsite = () => {
   
 
@@ -41,7 +44,7 @@ const SchoolWebsite = () => {
   };
  
   useEffect(() => {
-    axios.get("/api/footer")
+    axios.get(`${BASE_URL}/api/footer`)
       .then(res => 
       {setFooterData(res.data)
         console.log(res.data);

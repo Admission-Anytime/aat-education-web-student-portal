@@ -25,11 +25,13 @@ import Slideradminpanel from "./components/Pages/NewsAdminPage";
 import NewsAdminPage from "./components/Pages/NewsAdminPage";
 import NewsDetail from "./components/Pages/NewsDetail";
 import Homepagecourses from "./components/Pages/Homepagecourses";
-import Newssectionnewlook from "./components/Pages/Newssectionnewlook";
+import InquireNow from "./components/Pages/Inquirenow.jsx";//Side Inquiry form file
 import FooterAdmin from "./components/Pages/FooterAdmin";
 import AdminLogin from "./components/Pages/AdminLogin";
 import ProtectedRoute from "./components/Panel/ProtectedRoute";
  //import inquiryformforrightcorner from "./components/inquiryformforrightcorner.jsx"
+ import CourseFees from "./components/Pages/CourseFees.jsx";
+ import FeeStructureGenerator from "./components/Pages/FeeStructureGenerator.jsx";
  const App = () => {
   return (
     <div>
@@ -43,7 +45,7 @@ import ProtectedRoute from "./components/Panel/ProtectedRoute";
               path="CorporateTraining"
               element={<CooperateTrainingProgram />}
             />
-            {/* <Route path="test" element={<Newssectionnewlook />} />*/}
+            {/* <Route path="test" element={<InquireNow />} />*/}
             <Route path="News&Updates" element={<News />} />
             <Route path="apply-now" element={<RegistrationForm/>}/>
           </Route>
@@ -68,9 +70,10 @@ import ProtectedRoute from "./components/Panel/ProtectedRoute";
       <Route path="*" element={<Navigate to="/login" replace />} /> */}
 
         {/*<Route path="testing" element={<inquiryformforrightcorner/>} />*/}
-        <Route path="slideer" element={<FooterAdmin />} />
+        <Route path="slideer" element={<CourseFees />} />
 
         <Route path="/add-blog" element={<AddNewBlog />} />
+         <Route path="/test" element={<FeeStructureGenerator />} />
 
         {/*news and updates route for read more */}
         <Route path="/news/:id" element={<NewsDetail />} />

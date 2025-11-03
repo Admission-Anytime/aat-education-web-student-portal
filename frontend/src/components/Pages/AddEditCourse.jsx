@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
+
 function AddEditCourse({ editingCourse, onSubmit, onBack }) {
   const [title, setTitle] = useState("");
   const [type, setType] = useState("");

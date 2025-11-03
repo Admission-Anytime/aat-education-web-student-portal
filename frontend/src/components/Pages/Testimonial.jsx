@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Edit2 as PencilSquareIcon, Trash2 as TrashIcon } from "lucide-react";
-const BASE_URL = import.meta.env.REACT_APP_BASE_URL;
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
 const Testimonial = () => {
   const [testimonials, setTestimonials] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -225,7 +225,7 @@ console.log("Updated Testimonial:", updatedTestimonial);
   };
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 lg:p-8">
+    <div className="container mx-auto ">
       {showAddForm ? (
         <TestimonialForm
           onCancel={() => setShowAddForm(false)}

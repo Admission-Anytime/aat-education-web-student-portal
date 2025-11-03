@@ -3,6 +3,8 @@ import axios from "axios";
 import { Edit2 as PencilIcon,  Plus as PlusIcon } from "lucide-react";
 import { PencilSquareIcon, TrashIcon,EyeSlashIcon, EyeIcon } from "@heroicons/react/24/outline";
 
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
+
 const FooterAdmin = () => {
   const [footer, setFooter] = useState(null);
   const [expandedMainLinks, setExpandedMainLinks] = useState(false);

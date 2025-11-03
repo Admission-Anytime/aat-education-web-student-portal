@@ -5,6 +5,8 @@ import AddEditCourse from "./AddEditCourse";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid"; // for visibility toggle
 
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
+
 const CoursesAdminPanel = () => {
   const [courses, setCourses] = useState([]);
   const [editingCourse, setEditingCourse] = useState(null);
@@ -12,14 +14,14 @@ const CoursesAdminPanel = () => {
   // Fetch courses from backend
   useEffect(() => {
     axios
-      .get("/api/courses")
+      .get(`${BASE_URL}/api/courses`)
       .then((res) => setCourses(res.data))
       .catch((err) => console.error(err));
   }, []);
 
   const handleDelete = (id) => {
     axios
-      .delete(`/api/courses/${id}`)
+      .delete(`${BASE_URL}/api/courses/${id}`)
       .then(() => setCourses(courses.filter((c) => c._id !== id)))
       .catch((err) => console.error(err));
   };
@@ -49,7 +51,7 @@ const CoursesAdminPanel = () => {
 
     // Update backend
     axios
-      .patch(`/api/courses/${id}`, { visible: updatedVisibility })
+      .patch(`${BASE_URL}/api/courses/${id}`, { visible: updatedVisibility })
       .then(() => {
         // Update frontend
         setCourses((prev) =>

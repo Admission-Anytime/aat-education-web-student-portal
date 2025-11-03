@@ -3,6 +3,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Phone, Lock, GraduationCap, CheckCircle, ArrowRight, RefreshCw } from "lucide-react";
 
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
+
 function LoginWithOTP() {
   const navigate = useNavigate();
   
@@ -89,7 +91,7 @@ function LoginWithOTP() {
     setSuccess("");
 
     try {
-      const response = await axios.post("http://localhost:4001/api/otp/send", {
+      const response = await axios.post(`${BASE_URL}/api/otp/send`, {
         phoneNumber,
       });
 
@@ -142,7 +144,7 @@ function LoginWithOTP() {
     setSuccess("");
 
     try {
-      const response = await axios.post("http://localhost:4001/api/otp/verify", {
+      const response = await axios.post(`${BASE_URL}/api/otp/verify`, {
         phoneNumber,
         otp: otpString,
       });
@@ -167,7 +169,7 @@ function LoginWithOTP() {
     setSuccess("");
 
     try {
-      const response = await axios.post("http://localhost:4001/api/otp/resend", {
+      const response = await axios.post(`${BASE_URL}/api/otp/resend`, {
         phoneNumber,
       });
 
@@ -196,7 +198,7 @@ function LoginWithOTP() {
     setError("");
 
     try {
-      const response = await axios.post("http://localhost:4001/api/otp/complete-login", {
+      const response = await axios.post(`${BASE_URL}/api/otp/complete-login`, {
         phoneNumber,
         programmeName,
         specialisation,

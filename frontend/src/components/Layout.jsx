@@ -1,6 +1,6 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom'
-import Newssectionnewlook from "./Pages/Newssectionnewlook"; // import the component
+import Newssectionnewlook from "./Pages/Inquirenow"; // import the component
 
 const Layout = () => {
     return (
