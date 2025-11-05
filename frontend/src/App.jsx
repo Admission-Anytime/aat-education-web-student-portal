@@ -32,6 +32,7 @@ import ProtectedRoute from "./components/Panel/ProtectedRoute";
  //import inquiryformforrightcorner from "./components/inquiryformforrightcorner.jsx"
  import CourseFees from "./components/Pages/CourseFees.jsx";
  import FeeStructureGenerator from "./components/Pages/FeeStructureGenerator.jsx";
+import StudentPanel from "./components/studentpanel/studentpanel.jsx";
  const App = () => {
   return (
     <div>
@@ -74,6 +75,7 @@ import ProtectedRoute from "./components/Panel/ProtectedRoute";
 
         <Route path="/add-blog" element={<AddNewBlog />} />
          <Route path="/test" element={<FeeStructureGenerator />} />
+         <Route path="/stp" element={<StudentPanel />} />
 
         {/*news and updates route for read more */}
         <Route path="/news/:id" element={<NewsDetail />} />

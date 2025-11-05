@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Phone, Lock, GraduationCap, CheckCircle, ArrowRight, RefreshCw } from "lucide-react";
 
-const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
+const BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:4001";
 
 function LoginWithOTP() {
   const navigate = useNavigate();

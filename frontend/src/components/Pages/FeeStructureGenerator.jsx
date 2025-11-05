@@ -13,11 +13,13 @@ const feeFields = [
   "securityDeposit",
   "identityCardFee",
   "collegeUniformFee",
+  "othersAdmissionFee",
   "tuitionFee",
   "developmentInfrastructureFee",
   "libraryFee",
   "laboratoryPracticalFee",
   "computerLabItFacilityFee",
+  "othersAcademicFee",
   "examinationFee",
   "universityBoardAffiliationFee",
   "certificationConvocationFee",
@@ -36,9 +38,10 @@ const calculateAllFees = (data) => {
 
 // --- FIELD LABEL MAPPING FOR PROPER FORMATTING ---
 const fieldLabels = {
-  admissionFee: "Admission Fee",
+  admissionFee: "Registration Fee",//Admission Fee
   registrationUniversityEnrollmentFee:
-    "Registration / University Enrollment Fee",
+    "University Enrollment Fee",// simplified label"Registration / University Enrollment Fee",
+
   securityDeposit: "Security Deposit",
   identityCardFee: "Identity Card Fee",
   collegeUniformFee: "College Uniform Fee",
@@ -57,6 +60,8 @@ const fieldLabels = {
   reAdmissionBacklogFee: "Re-Admission / Backlog Fee",
   lateFeeFine: "Late Fee",
   miscellaneousCharges: "Miscellaneous Charges",
+  othersAdmissionFee: "Others",
+  othersAcademicFee: "Others",
   studentId: "Student ID",
   applicationNo: "Application No",
   studentName: "Student Name",
@@ -69,7 +74,7 @@ const fieldLabels = {
 
 // --- FEE STRUCTURE COMPONENT ---
 
-const FeeStructureGenerator = ({ registrationId = "REG12345" }) => {
+const FeeStructureGenerator = ({ registrationId = "REG12345", onBack }) => {
   const [feeStructure, setFeeStructure] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -90,6 +95,191 @@ const FeeStructureGenerator = ({ registrationId = "REG12345" }) => {
 
   const toggleMainSection = () => {
     setIsCollapsed(prev => !prev);
+  };
+
+  // Function to handle printing the fee structure
+  const handlePrint = () => {
+    if (!feeStructure) {
+      alert("No fee structure available to print.");
+      return;
+    }
+
+    // Generate printable HTML content
+    const printableContent = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Fee Structure - ${feeStructure.studentName || 'Student'}</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: #333;
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+          }
+          .header h1 {
+            margin: 0;
+            font-size: 24px;
+          }
+          .student-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+          }
+          .info-item {
+            display: flex;
+            justify-content: space-between;
+          }
+          .fee-section {
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+          }
+          .fee-section h3 {
+            margin-top: 0;
+            color: #555;
+          }
+          .fee-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+          }
+          .fee-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+          }
+          .total {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+          }
+          .scholarship {
+            background-color: #e8f5e8;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+          }
+          .scholarship-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+          }
+          @media print {
+            body { margin: 0; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>Fee Structure</h1>
+          <p>Academic Session: ${feeStructure.academicSession || 'N/A'}</p>
+        </div>
+
+        <div class="student-info">
+          <div class="info-item"><strong>Application No:</strong> ${feeStructure.applicationNo || 'N/A'}</div>
+          <div class="info-item"><strong>Student ID:</strong> ${feeStructure.studentId || 'N/A'}</div>
+          <div class="info-item"><strong>Student Name:</strong> ${feeStructure.studentName || 'N/A'}</div>
+          <div class="info-item"><strong>Course/Program:</strong> ${feeStructure.courseProgram || 'N/A'}</div>
+          <div class="info-item"><strong>Specialization:</strong> ${feeStructure.specialization || 'N/A'}</div>
+          <div class="info-item"><strong>Year/Semester:</strong> ${feeStructure.yearSemester || 'N/A'}</div>
+          <div class="info-item"><strong>Payment Plan:</strong> ${feeStructure.paymentPlan || 'N/A'}</div>
+          ${feeStructure.paymentPlan === "Installments" ? `<div class="info-item"><strong>No. of Installments:</strong> ${feeStructure.numberOfInstallments || 1}</div>` : ''}
+        </div>
+
+        <div class="fee-section">
+          <h3>1. One-Time Admission Fees</h3>
+          <div class="fee-grid">
+            <div class="fee-item"><span>Admission Fee:</span> ₹${(feeStructure.admissionFee || 0).toLocaleString()}</div>
+            <div class="fee-item"><span>Registration/Enrollment Fee:</span> ₹${(feeStructure.registrationUniversityEnrollmentFee || 0).toLocaleString()}</div>
+            <div class="fee-item"><span>Security Deposit:</span> ₹${(feeStructure.securityDeposit || 0).toLocaleString()}</div>
+            <div class="fee-item"><span>Identity Card Fee:</span> ₹${(feeStructure.identityCardFee || 0).toLocaleString()}</div>
+            <div class="fee-item"><span>College Uniform Fee:</span> ₹${(feeStructure.collegeUniformFee || 0).toLocaleString()}</div>
+            <div class="fee-item"><span>Others:</span> ₹${(feeStructure.othersAdmissionFee || 0).toLocaleString()}</div>
+          </div>
+        </div>
+
+        <div class="fee-section">
+          <h3>2. Academic & Institutional Fees</h3>
+          <div class="fee-grid">
+            <div class="fee-item"><span>Tuition Fee:</span> ₹${(feeStructure.tuitionFee || 0).toLocaleString()}</div>
+            <div class="fee-item"><span>Development/Infrastructure Fee:</span> ₹${(feeStructure.developmentInfrastructureFee || 0).toLocaleString()}</div>
+            <div class="fee-item"><span>Library Fee:</span> ₹${(feeStructure.libraryFee || 0).toLocaleString()}</div>
+            <div class="fee-item"><span>Laboratory/Practical Fee:</span> ₹${(feeStructure.laboratoryPracticalFee || 0).toLocaleString()}</div>
+            <div class="fee-item"><span>Computer Lab/IT Facility Fee:</span> ₹${(feeStructure.computerLabItFacilityFee || 0).toLocaleString()}</div>
+            <div class="fee-item"><span>Others:</span> ₹${(feeStructure.othersAcademicFee || 0).toLocaleString()}</div>
+          </div>
+        </div>
+
+        <div class="fee-section">
+          <h3>3. Examination & Certification Fees</h3>
+          <div class="fee-grid">
+            <div class="fee-item"><span>Examination Fee:</span> ₹${(feeStructure.examinationFee || 0).toLocaleString()}</div>
+            <div class="fee-item"><span>University/Board Affiliation Fee:</span> ₹${(feeStructure.universityBoardAffiliationFee || 0).toLocaleString()}</div>
+            <div class="fee-item"><span>Certification/Convocation Fee:</span> ₹${(feeStructure.certificationConvocationFee || 0).toLocaleString()}</div>
+          </div>
+        </div>
+
+        <div class="fee-section">
+          <h3>4. Accommodation & Transport Fees</h3>
+          <div class="fee-grid">
+            <div class="fee-item"><span>Hostel Fee:</span> ₹${(feeStructure.hostelFee || 0).toLocaleString()}</div>
+            <div class="fee-item"><span>Mess Fee:</span> ₹${(feeStructure.hostelMessFee || 0).toLocaleString()}</div>
+            <div class="fee-item"><span>Hostel Transport Fee:</span> ₹${(feeStructure.hostelTransportFee || 0).toLocaleString()}</div>
+            <div class="fee-item"><span>Total Transport Fee:</span> ₹${(feeStructure.monthlyFee || 0).toLocaleString()}</div>
+          </div>
+        </div>
+
+        <div class="fee-section">
+          <h3>5. Special/Conditional Fees</h3>
+          <div class="fee-grid">
+            <div class="fee-item"><span>Re-Admission/Backlog Fee:</span> ₹${(feeStructure.reAdmissionBacklogFee || 0).toLocaleString()}</div>
+            <div class="fee-item"><span>Late Fee/Fine:</span> ₹${(feeStructure.lateFeeFine || 0).toLocaleString()}</div>
+            <div class="fee-item"><span>Miscellaneous Charges:</span> ₹${(feeStructure.miscellaneousCharges || 0).toLocaleString()}</div>
+          </div>
+        </div>
+
+        ${feeStructure.scholarships && feeStructure.scholarships.length > 0 ? `
+          <div class="scholarship">
+            <h3>Scholarship Details</h3>
+            ${feeStructure.scholarships.map(s => `<div class="scholarship-item"><span>${s.reason}:</span> ₹${(s.amount || 0).toLocaleString()}</div>`).join('')}
+            <div class="scholarship-item"><strong>Total Scholarship:</strong> ₹${feeStructure.scholarships.reduce((sum, s) => sum + (s.amount || 0), 0).toLocaleString()}</div>
+          </div>
+        ` : ''}
+
+        <div class="total">
+          Total Payable Fee: ₹${(feeStructure.totalFee || 0).toLocaleString()}
+        </div>
+
+        <div style="margin-top: 30px; text-align: center; font-size: 12px; color: #666;">
+          Status: ${feeStructure.status || 'N/A'} | Generated By: ${feeStructure.generatedBy || 'N/A'}
+        </div>
+      </body>
+      </html>
+    `;
+
+    // Open a new window with the printable content
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(printableContent);
+    printWindow.document.close();
+
+    // Wait for content to load, then print
+    printWindow.onload = () => {
+      printWindow.print();
+    };
   };
 
   // Initial state matching the comprehensive structure
@@ -114,9 +304,38 @@ const FeeStructureGenerator = ({ registrationId = "REG12345" }) => {
   useEffect(() => {
     if (registrationId) {
       fetchFeeStructure();
+      fetchRegistration();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [registrationId]);
+
+  // Fetches registration data using the API
+  const fetchRegistration = async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/registrations/${registrationId}`
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+
+      // Populate form data with registration details
+      setFormData((prev) => ({
+        ...prev,
+        studentId: data.RegistrationId || data.registrationId || "",
+        applicationNo: data.RegistrationId || data.registrationId || "",
+        studentName: `${data.StudentFirstName || ""} ${data.StudentMiddleName || ""} ${data.StudentLastName || ""}`.trim(),
+        academicSession: data.Session || "",
+        courseProgram: data.ProgrammeName || "",
+        specialization: data.Specialisation || "",
+        yearSemester: "", // Not available in registration
+        courseDuration: "", // Not available in registration
+      }));
+    } catch (error) {
+      console.error("Error fetching registration:", error);
+    }
+  };
 
   // Fetches data using the API
   const fetchFeeStructure = async () => {
@@ -284,14 +503,13 @@ const FeeStructureGenerator = ({ registrationId = "REG12345" }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {feeKeys.map((key) => (
                 <div key={key}>
-                  <label className="block text-sm font-medium text-gray-700">
-                    {fieldLabels[key] ||
-                      key
-                        .replace(/([A-Z])/g, " $1")
-                        .replace("Fee", " Fee")
-                        .trim()}{" "}
-                    (₹)
-                  </label>
+                <label className="block text-sm font-medium text-gray-700">
+                  {fieldLabels[key] ||
+                    key
+                      .replace(/([A-Z])/g, " $1")
+                      .replace("Fee", " Fee")
+                      .trim()}
+                </label>
                   <input
                     type="number"
                     name={key}
@@ -323,6 +541,16 @@ const FeeStructureGenerator = ({ registrationId = "REG12345" }) => {
     <div className="max-w-6xl mx-auto bg-white p-8 rounded-xl shadow-3xl border border-gray-100 font-sans">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 border-b pb-4">
         <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={onBack}
+            className="px-4 py-2 bg-transparent border-2 border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-600 hover:text-white focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 flex items-center group"
+          >
+            <svg className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
           <h2 className="text-3xl md:text-4xl font-extrabold text-indigo-700 leading-tight">
             Fee Structure Management
           </h2>
@@ -343,12 +571,25 @@ const FeeStructureGenerator = ({ registrationId = "REG12345" }) => {
           </button>
         </div>
         {!isEditing && (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="mt-4 sm:mt-0 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:bg-indigo-700 transition duration-150 transform hover:scale-105"
-          >
-            {feeStructure ? "Edit Fee Structure" : "Generate Initial Structure"}
-          </button>
+          <div className="flex gap-4 mt-4 sm:mt-0">
+            {feeStructure && (
+              <button
+                onClick={handlePrint}
+                className="px-6 py-3 bg-green-600 text-white font-semibold rounded-xl shadow-lg hover:bg-green-700 transition duration-150 transform hover:scale-105 flex items-center"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                Print
+              </button>
+            )}
+            <button
+              onClick={() => setIsEditing(true)}
+              className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:bg-indigo-700 transition duration-150 transform hover:scale-105"
+            >
+              {feeStructure ? "Edit Fee Structure" : "Generate Initial Structure"}
+            </button>
+          </div>
         )}
       </div>
 
@@ -376,7 +617,7 @@ const FeeStructureGenerator = ({ registrationId = "REG12345" }) => {
                           .trim()}
                     </label>
                     <input
-                      type={key === 'academicSession' ? 'date' : 'text'}
+                      type="text"
                       name={key}
                       value={formData[key]}
                       onChange={handleInputChange}
@@ -398,6 +639,7 @@ const FeeStructureGenerator = ({ registrationId = "REG12345" }) => {
                 "securityDeposit",
                 "identityCardFee",
                 "collegeUniformFee",
+                "othersAdmissionFee",
               ],
               "Sub-Total (One-Time)",
               "admission"
@@ -412,6 +654,7 @@ const FeeStructureGenerator = ({ registrationId = "REG12345" }) => {
                 "libraryFee",
                 "laboratoryPracticalFee",
                 "computerLabItFacilityFee",
+                "othersAcademicFee",
               ],
               "Sub-Total (Academic)",
               "academic"
@@ -572,7 +815,8 @@ const FeeStructureGenerator = ({ registrationId = "REG12345" }) => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      Late Fee / Fine (₹)
+                      Late Fee / Fine
+
                     </label>
                     <input
                       type="number"
@@ -588,7 +832,7 @@ const FeeStructureGenerator = ({ registrationId = "REG12345" }) => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      Miscellaneous Charges (₹)
+                      Miscellaneous Charges
                     </label>
                     <input
                       type="number"
@@ -700,7 +944,7 @@ const FeeStructureGenerator = ({ registrationId = "REG12345" }) => {
                     <div key={index} className="flex gap-2 mb-2">
                       <input
                         type="number"
-                        placeholder="Amount (₹)"
+                        placeholder="Amount"
                         value={scholarship.amount}
                         onChange={(e) => {
                           const newScholarships = [...formData.scholarships];
@@ -890,6 +1134,11 @@ const FeeStructureGenerator = ({ registrationId = "REG12345" }) => {
                   value={feeStructure.collegeUniformFee}
                   currency
                 />
+                <DataDisplayItem
+                  label="Others"
+                  value={feeStructure.othersAdmissionFee}
+                  currency
+                />
               </div>
             </div>
 
@@ -922,6 +1171,11 @@ const FeeStructureGenerator = ({ registrationId = "REG12345" }) => {
                 <DataDisplayItem
                   label="Computer Lab / IT Facility Fee"
                   value={feeStructure.computerLabItFacilityFee}
+                  currency
+                />
+                <DataDisplayItem
+                  label="Others"
+                  value={feeStructure.othersAcademicFee}
                   currency
                 />
               </div>

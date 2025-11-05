@@ -43,6 +43,8 @@ import CorporateTrainingProgramTable from "../Pages/CoorporateAdmin";
 //import XLSX from "xlsx";
 import RegistrationsAdminPanel from "../Pages/RegistrationAdmin";
 
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL || "http://localhost:4001";
+
 const AdminPanel = () => {
   const navigate = useNavigate();
 
@@ -233,7 +235,7 @@ const AdminPanel = () => {
 
   const fetchInstitute = async () => {
     try {
-      const res = await axios.get("http://localhost:4001/api/institute/");
+      const res = await axios.get(`${BASE_URL}/api/institute/`);
       console.log("Fetched institute data adminpanel.jsx:", res.data);
 
       if (res.data) {
@@ -243,7 +245,7 @@ const AdminPanel = () => {
         setInstituteName(institute.name || "");
         setAboutInstitute(institute.about || "");
         if (institute.logo) {
-          setLogoPreview(`http://localhost:4001/Uploads/${institute.logo}`);
+          setLogoPreview(`${BASE_URL}/Uploads/${institute.logo}`);
         }
 
         setIsInstituteEditing(true);
@@ -269,7 +271,7 @@ const AdminPanel = () => {
       let res;
       if (isInstituteEditing) {
         res = await axios.put(
-          "http://localhost:4001/api/institute/",
+          `${BASE_URL}/api/institute/`,
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
@@ -278,7 +280,7 @@ const AdminPanel = () => {
         alert("Institute info updated successfully!");
       } else {
         res = await axios.post(
-          "http://localhost:4001/api/institute/",
+          `${BASE_URL}/api/institute/`,
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
@@ -318,7 +320,7 @@ const AdminPanel = () => {
   useEffect(() => {
     const fetchCarousel = () => {
       axios
-        .get("http://localhost:4001/api/carousel")
+        .get(`${BASE_URL}/api/carousel`)
         .then((res) => setCarouselItems(res.data))
         .catch((err) => console.error("Error fetching carousel:", err));
     };
@@ -386,7 +388,7 @@ const AdminPanel = () => {
       let res;
       if (isEditing) {
         res = await axios.put(
-          `http://localhost:4001/api/carousel/${formData.id}`,
+          `${BASE_URL}/api/carousel/${formData.id}`,
           data,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
@@ -400,7 +402,7 @@ const AdminPanel = () => {
           prevItems.map((item) => (item._id === formData.id ? res.data : item))
         );
       } else {
-        res = await axios.post("http://localhost:4001/api/carousel", data, {
+        res = await axios.post(`${BASE_URL}/api/carousel`, data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         setCarouselItems([...carouselItems, res.data]);
@@ -415,7 +417,7 @@ const AdminPanel = () => {
 
   // Delete item
   const handlecarouselDelete = async (id) => {
-    const res = await axios.delete(`http://localhost:4001/api/carousel/${id}`);
+    const res = await axios.delete(`${BASE_URL}/api/carousel/${id}`);
     console.log("Delete Button response:", res.data); // just check delete button response
     setCarouselItems(carouselItems.filter((item) => item._id !== id)); // Functional update ensures latest state is used
   };
@@ -424,7 +426,7 @@ const AdminPanel = () => {
   const toggleVisibility = async (id) => {
     try {
       const res = await axios.patch(
-        `http://localhost:4001/api/carousel/${id}/toggle`
+        `${BASE_URL}/api/carousel/${id}/toggle`
       );
       setCarouselItems((prevItems) =>
         prevItems.map((item) => (item._id === id ? res.data : item))
@@ -443,7 +445,7 @@ const AdminPanel = () => {
 
   const fetchAbout = async () => {
     try {
-      const res = await axios.get("http://localhost:4001/api/about");
+      const res = await axios.get(`${BASE_URL}/api/about`);
       console.log("Fetched about data adminpanel.jsx:", res.data);
       if (res.data) {
         setHeading(res.data.heading || "");
@@ -1004,7 +1006,7 @@ const AdminPanel = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const response = await axios.get("http://localhost:4001/api/blogs");
+        const response = await axios.get(`${BASE_URL}/api/blogs`);
         setBlogEntries(response.data); // backend should return array of blogs
       } catch (error) {
         console.error("Error fetching blogs:", error);
@@ -1267,7 +1269,7 @@ if (activeTab !== "institute") return null;*/
                                   <td className="p-3">
                                     {item.imagename ? (
                                       <img
-                                        src={`http://localhost:4001/Uploads/${item.imagename}`}
+                                        src={`${BASE_URL}/Uploads/${item.imagename}`}
                                         alt={item.title}
                                         className="w-20 h-12 object-cover rounded border"
                                       />

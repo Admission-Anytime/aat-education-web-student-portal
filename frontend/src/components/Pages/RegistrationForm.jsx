@@ -28,6 +28,7 @@ const InputField = ({
   error,
   whiteBg = false,
   label,
+  disabled = false,
 }) => (
   <div className="w-full">
     {label && <p className="text-gray-600 text-sm mb-1">{label}</p>}
@@ -37,8 +38,11 @@ const InputField = ({
       placeholder={placeholder}
       value={value}
       onChange={onChange}
+      disabled={disabled}
       className={`border p-3 rounded-xl w-full transition-all focus:ring-2 focus:ring-opacity-50 ${
         whiteBg ? "bg-white" : ""
+      } ${
+        disabled ? "bg-gray-100 cursor-not-allowed text-gray-700" : ""
       } ${
         error
           ? "border-red-500 focus:border-red-500 focus:ring-red-100"
@@ -83,7 +87,7 @@ function RegistrationForm() {
     SubCategory: "",
     SubCategoryDocument: null,
     Qualification: "",
-    StudentPhone: preFilledData.phoneNumber || "",
+    StudentPhone: "",
     WhatsappNo: preFilledData.phoneNumber || "",
     StudentEmail: "",
     Grade: "",
@@ -196,6 +200,14 @@ function RegistrationForm() {
       preFilledData.specialisation
     ) {
       setIsLoggedIn(true);
+      // Generate unique Registration ID automatically after login
+      const timestamp = Date.now();
+      const lastFourDigits = preFilledData.phoneNumber.slice(-4);
+      const registrationId = `REG-${timestamp}-${lastFourDigits}`;
+      setFormData((prev) => ({
+        ...prev,
+        RegistrationId: registrationId,
+      }));
     } else {
       // If no pre-filled data, redirect to login
       navigate("/student-login", { replace: true });
@@ -627,6 +639,10 @@ function RegistrationForm() {
 
       console.log("Registration successful:", response);
 
+      // Store registration ID in localStorage and redirect to student panel
+      localStorage.setItem("registrationId", formData.RegistrationId);
+      navigate("/stp");
+
       // Set application ID from response
       setApplicationId(response.data.registration._id);
       setSubmitted(true);
@@ -858,6 +874,7 @@ function RegistrationForm() {
                     placeholder="Registration ID *"
                     error={errors.RegistrationId}
                     label="Registration ID"
+                    disabled={true}
                   />
                   <div className="w-full">
                     <p className="text-gray-600 text-sm mb-1">Programme Name</p>
@@ -1102,11 +1119,8 @@ function RegistrationForm() {
                     placeholder="Mobile No *"
                     value={formData.StudentPhone}
                     onChange={handleInputChange}
-                    disabled={isLoggedIn}
                     className={`border p-3 rounded-xl w-full transition-all focus:ring-2 focus:ring-opacity-50 ${
-                      isLoggedIn
-                        ? "bg-gray-100 cursor-not-allowed text-gray-700"
-                        : errors.StudentPhone
+                      errors.StudentPhone
                         ? "border-red-500 focus:border-red-500 focus:ring-red-100"
                         : "border-gray-300 focus:border-blue-500 focus:ring-blue-100"
                     }`}
@@ -1167,8 +1181,8 @@ function RegistrationForm() {
                   />
                   <div className="flex justify-between ">
 
-                  <label className="block text-sm font-medium text-gray-700 mb-2 mt-2">
-                    Upload Aadhaar Card *
+                  <label className="block text-sm text-gray-700 mb-2 mt-2">
+                    Aadhaar Card Upload *
                   </label>  
                    {/* View Button appears only if file is uploaded */}
     {formData.aadhaarCard && (
@@ -1248,7 +1262,7 @@ function RegistrationForm() {
                   )}
                   {/* Upload Quota Document */}<div className="flex item-center justify-between ">
                   <p className="text-gray-600 text-sm mb-1 mt-3">
-                    Quota Document (if applicable)
+                    Quota Doc Upload (if applicable)
                   </p>  {/* View Button appears only if file is uploaded */}
     {formData.quotaDocument && (
       <button
@@ -1344,7 +1358,7 @@ function RegistrationForm() {
                   {/* Upload Category Certificate */}
                   <div className="flex item-center justify-between ">
                   <p className="text-gray-600 text-sm mb-1 mt-3">
-                    Category Certificate (if applicable)
+                    Category Doc Upload (if applicable)
                   </p> {/* View Button appears only if file is uploaded */}
     {formData.categoryCertificate && (
       <button
@@ -1433,7 +1447,7 @@ function RegistrationForm() {
                   </select>
                     <div className="flex item-center justify-between ">
                   <p className="text-gray-600 text-sm mb-1 mt-3">
-                    Sub Category Certificate (if applicable)
+                    Sub Category Doc Upload (if applicable)
                   </p>
                    {/* View Button appears only if file is uploaded */}
     {formData.subCategoryDocument && (
@@ -1489,8 +1503,8 @@ function RegistrationForm() {
                     label="ABC ID Number"
                   />
                   <div className="flex item-center justify-between ">
-                  <label className="block text-sm font-medium text-gray-700 mb-2 mt-2">
-                    Upload ABC ID
+                  <label className="block text-sm  text-gray-700 mb-2 mt-2">
+                    ABC ID Doc Upload
                   </label> {/* View Button appears only if file is uploaded */}
     {formData.abcId && (
       <button
@@ -1543,8 +1557,8 @@ function RegistrationForm() {
                     label="DEB ID Number (if applicable)"
                   />
                   <div className="flex item-center justify-between ">
-                  <label className="block text-sm font-medium text-gray-700 mb-2 mt-2">
-                    Upload DEB ID (if applicable)
+                  <label className="block text-sm  text-gray-700 mb-2 mt-2">
+                    DEB ID Doc Upload (if applicable)
                   </label>
                    {/* View Button appears only if file is uploaded */}
     {formData.bedId && (
@@ -1803,7 +1817,7 @@ function RegistrationForm() {
                     placeholder="Guardian Phone *"
                     error={errors.parentPhone}
                     whiteBg={true}
-                    label="Guardian Phone"
+                    label="Guardian Phone Number"
                   />
                   <InputField
                     name="relationship"
@@ -1910,7 +1924,7 @@ function RegistrationForm() {
                       />
                       <div className="flex item-center justify-between ">
                       <p className="text-gray-600 text-sm mt-1">
-                        Marksheet (Upload)           
+                       Upload Marksheet           
                       </p>
                        {/* View Button appears only if file is uploaded */}
     {formData.tenthMarksheet && (
@@ -2030,7 +2044,7 @@ function RegistrationForm() {
                       />
                       <div className="flex item-center justify-between ">
                       <p className="text-gray-600 text-sm mt-1">
-                        Marksheet(Upload)
+                        Upload Marksheet
                       </p> {/* View Button appears only if file is uploaded */}
     {formData.twelfthMarksheet && (
       <button

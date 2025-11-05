@@ -7,7 +7,6 @@ import {
   DollarSign,
   ChevronLeft,
   CheckCircle,
-  AlertTriangle,
   ChevronDown,
 } from "lucide-react";
 import SendMailForm from "./SendMailForm";
@@ -154,9 +153,11 @@ const AddEditRegistration = ({ editingRegistration, onSubmit, onBack, registrati
   const [showPhotoPreview, setShowPhotoPreview] = useState(false);
   const [sectionChecked, setSectionChecked] = useState({});
   const [showMailForm, setShowMailForm] = useState(false);
-  // ✅ New state for Fee Generator 
+  //  New state for Fee Generator
   const [showFeeGenerator, setShowFeeGenerator] = useState(false);
   const [feeGenerated, setFeeGenerated] = useState(false);
+  // New states for view/edit mode and review modal
+  const [isViewing, setIsViewing] = useState(!!editingRegistration);
   const [errors, setErrors] = useState({});
   const [collapsedSections, setCollapsedSections] = useState({
     "Student Information": false,
@@ -513,7 +514,8 @@ const AddEditRegistration = ({ editingRegistration, onSubmit, onBack, registrati
             name={name}
             value={formData[name]}
             onChange={handleChange}
-            className="border border-gray-300 rounded-md p-2"
+            disabled={isViewing}
+            className={`border border-gray-300 rounded-md p-2 ${isViewing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
           >
             <option value="Pending">Pending</option>
             <option value="Approved">Approved</option>
@@ -530,6 +532,8 @@ const AddEditRegistration = ({ editingRegistration, onSubmit, onBack, registrati
             name={name}
             checked={formData[name]}
             onChange={handleChange}
+            disabled={isViewing}
+            className={isViewing ? 'cursor-not-allowed' : ''}
           />
         </>
       ) : (
@@ -592,9 +596,10 @@ const AddEditRegistration = ({ editingRegistration, onSubmit, onBack, registrati
                 type="file"
                 name={name}
                 onChange={handleChange}
-                className="mt-1 block w-full text-sm text-gray-700 border border-gray-300 rounded-md cursor-pointer
+                disabled={isViewing}
+                className={`mt-1 block w-full text-sm text-gray-700 border border-gray-300 rounded-md cursor-pointer
                 file:mr-4 file:py-2.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium
-                file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+                file:bg-blue-600 file:text-white hover:file:bg-blue-700 ${isViewing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               />
               {formData[name] && (
                 <button
@@ -627,7 +632,8 @@ const AddEditRegistration = ({ editingRegistration, onSubmit, onBack, registrati
               name={name}
               value={formData[name]}
               onChange={handleChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+              disabled={isViewing}
+              className={`mt-1 block w-full border border-gray-300 rounded-md p-2 ${isViewing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
             />
           )}
         </>
@@ -638,58 +644,68 @@ const AddEditRegistration = ({ editingRegistration, onSubmit, onBack, registrati
   // ✅ Render Form
   return (
     <div className="bg-white rounded-lg  max-w-6xl mx-auto overflow-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold mb-4 text-gray-900">
-          {editingRegistration
-            ? "Edit Registration Form"
-            : "Add New Registration"}
-        </h2>
-
-        {/* --- MODIFIED: Button Group for Actions (Fee Generator added) --- */}
-        <div className="flex space-x-3">
-          {/* New 'Generate Fee' Button */}
-          <button
-            type="button"
-            onClick={() => setShowFeeGenerator(true)}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center"
-          >
-            <DollarSign className="w-4 h-4 mr-1" /> Generate Fee
-          </button>
-
-          {/* Original 'Send Correction Mail' Button */}
-          <button
-            type="button"
-            onClick={() => {
-              if (feeGenerated) {
-                alert("No correction mail can be sent after fee generation.");
-              } else {
-                setShowMailForm(true);
-              }
-            }}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center"
-          >
-            <Mail className="w-4 h-4 mr-1" /> Send Correction Mail
-          </button>
-        </div>
-      </div>
-
       {/* --- New: Conditionally render the Fee Structure Generator component --- */}
-      {showFeeGenerator && (
+      {showFeeGenerator ? (
         <FeeStructureGenerator
-          // You might pass relevant data (e.g., formData) and a close handler
-          registrationData={formData}
-          onClose={() => setShowFeeGenerator(false)}
+          registrationId={editingRegistration?._id || registrationId}
+          onBack={() => setShowFeeGenerator(false)}
         />
-      )}
+      ) : (
+        <>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold mb-4 text-gray-900">
+              {editingRegistration
+                ? "Edit Registration Form"
+                : "Add New Registration"}
+            </h2>
 
-      {showMailForm && (
-        <SendMailForm
-          uncheckedSections={getUncheckedSections()}
-          onClose={() => setShowMailForm(false)}
-        />
-      )}
+            {/* --- MODIFIED: Button Group for Actions (Edit, Review, Generate Fee) --- */}
+            <div className="flex space-x-3">
+              {/* Edit Button - only show if viewing existing registration */}
+              {editingRegistration && isViewing && (
+                <button
+                  type="button"
+                  onClick={() => setIsViewing(false)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+                >
+                  <CheckCircle className="w-4 h-4 mr-1" /> Edit
+                </button>
+              )}
+ 
+              {/* Generate Fee Button */}
+              <button
+                type="button"
+                onClick={() => setShowFeeGenerator(true)}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center"
+              >
+                <DollarSign className="w-4 h-4 mr-1" /> Generate Fee
+              </button>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Send Correction Mail Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (feeGenerated) {
+                    alert("No correction mail can be sent after fee generation.");
+                  } else {
+                    setShowMailForm(true);
+                  }
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center"
+              >
+                <Mail className="w-4 h-4 mr-1" /> Send Correction Mail
+              </button>
+            </div>
+          </div>
+
+          {showMailForm && (
+            <SendMailForm
+              uncheckedSections={getUncheckedSections()}
+              onClose={() => setShowMailForm(false)}
+            />
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
         {sections.map((section) => (
           <div key={section.title}>
             {/* Section Header with Verification Checkbox */}
@@ -911,8 +927,10 @@ const AddEditRegistration = ({ editingRegistration, onSubmit, onBack, registrati
           </button>
         </div>
       </form>
-    </div>
-  );
+      </>
+    )}
+  </div>
+);
 };
 
 export default AddEditRegistration;

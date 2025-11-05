@@ -60,6 +60,20 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// @route   GET /api/registrations/by-registration-id/:registrationId
+// @desc    Get single registration by RegistrationId
+// @access  Public
+router.get("/by-registration-id/:registrationId", async (req, res) => {
+  try {
+    const registration = await Registration.findOne({ RegistrationId: req.params.registrationId });
+    if (!registration)
+      return res.status(404).json({ message: "Registration not found" });
+    res.json(registration);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // @route   POST /api/registrations
 // @desc    Create a new registration
 // @access  Public

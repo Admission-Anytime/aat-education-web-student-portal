@@ -88,6 +88,10 @@ const feeStructureSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    othersAdmissionFee: {
+      type: Number,
+      default: 0,
+    },
     // 2. Academic & Institutional Fees
     tuitionFee: {
       type: Number,
@@ -106,6 +110,10 @@ const feeStructureSchema = new mongoose.Schema(
       default: 0,
     },
     computerLabItFacilityFee: {
+      type: Number,
+      default: 0,
+    },
+    othersAcademicFee: {
       type: Number,
       default: 0,
     },
@@ -224,8 +232,8 @@ const feeStructureSchema = new mongoose.Schema(
 // Calculate total fee before saving
 feeStructureSchema.pre("save", function (next) {
   const feeFields = [
-    'admissionFee', 'registrationUniversityEnrollmentFee', 'securityDeposit', 'identityCardFee', 'collegeUniformFee',
-    'tuitionFee', 'developmentInfrastructureFee', 'libraryFee', 'laboratoryPracticalFee', 'computerLabItFacilityFee',
+    'admissionFee', 'registrationUniversityEnrollmentFee', 'securityDeposit', 'identityCardFee', 'collegeUniformFee', 'othersAdmissionFee',
+    'tuitionFee', 'developmentInfrastructureFee', 'libraryFee', 'laboratoryPracticalFee', 'computerLabItFacilityFee', 'othersAcademicFee',
     'examinationFee', 'universityBoardAffiliationFee', 'certificationConvocationFee',
     'hostelFee', 'hostelMessFee', 'hostelTransportFee',
     'monthlyFee',
@@ -238,7 +246,6 @@ feeStructureSchema.pre("save", function (next) {
 });
 
 // Index for faster queries
-feeStructureSchema.index({ registrationId: 1 });
 feeStructureSchema.index({ status: 1 });
 feeStructureSchema.index({ createdAt: -1 });
 

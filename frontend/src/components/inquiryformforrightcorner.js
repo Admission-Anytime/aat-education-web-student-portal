@@ -12,6 +12,8 @@ const App = () => {
   const [showCountryCode, setShowCountryCode] = useState(false);
   const [otpSent, setOtpSent] = useState(false); // tracks if OTP has been sent
   const [otpVerified, setOtpVerified] = useState(false); // tracks if OTP is verified
+  const [loadingOtp, setLoadingOtp] = useState(false); // tracks loading state for OTP operations
+  const [otpError, setOtpError] = useState(null); // tracks OTP-related errors
   const [alert, setAlert] = useState(null);
 
   const countryCodes = [
@@ -48,22 +50,71 @@ const App = () => {
     showAlert("Form submitted successfully!");
   };
 
-  const sendOtp = () => {
+  const sendOtp = async () => {
     if (!formData.mobile) {
       showAlert("Enter mobile number to send OTP.");
       return;
     }
-    setOtpSent(true);
-    showAlert(`OTP sent to ${formData.countryCode}-${formData.mobile}`);
-    // In real app, call your API to send OTP here
+    setLoadingOtp(true);
+    setOtpError(null);
+    try {
+      const response = await fetch('https://counselling.admissionanytime.com/api/user/send/otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phone: formData.mobile,
+          code: formData.countryCode,
+        }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setOtpSent(true);
+        showAlert(`OTP sent to ${formData.countryCode}-${formData.mobile}`);
+      } else {
+        setOtpError(data.message || 'Failed to send OTP');
+        showAlert(data.message || 'Failed to send OTP');
+      }
+    } catch (error) {
+      setOtpError('Network error occurred');
+      showAlert('Network error occurred while sending OTP');
+    } finally {
+      setLoadingOtp(false);
+    }
   };
 
-  const verifyOtp = () => {
-    if (formData.otp === '1234') { // For demo, assume OTP is always 1234
-      setOtpVerified(true);
-      showAlert("OTP verified successfully!");
-    } else {
-      showAlert("Invalid OTP. Try again!");
+  const verifyOtp = async () => {
+    if (!formData.otp) {
+      showAlert("Please enter OTP.");
+      return;
+    }
+    setLoadingOtp(true);
+    setOtpError(null);
+    try {
+      const response = await fetch('https://counselling.admissionanytime.com/api/user/verify/otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phone: formData.mobile,
+          userOtp: formData.otp,
+        }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setOtpVerified(true);
+        showAlert("OTP verified successfully!");
+      } else {
+        setOtpError(data.message || 'OTP verification failed');
+        showAlert(data.message || 'OTP verification failed');
+      }
+    } catch (error) {
+      setOtpError('Network error occurred');
+      showAlert('Network error occurred while verifying OTP');
+    } finally {
+      setLoadingOtp(false);
     }
   };
 
@@ -178,9 +229,10 @@ const App = () => {
                         <button
                           type="button"
                           onClick={sendOtp}
-                          className="mt-2 w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition duration-300"
+                          disabled={loadingOtp}
+                          className="mt-2 w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          Send OTP
+                          {loadingOtp ? 'Sending...' : 'Send OTP'}
                         </button>
                       )}
                     </div>
@@ -199,9 +251,10 @@ const App = () => {
                         <button
                           type="button"
                           onClick={verifyOtp}
-                          className="mt-2 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-300"
+                          disabled={loadingOtp}
+                          className="mt-2 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          Verify OTP
+                          {loadingOtp ? 'Verifying...' : 'Verify OTP'}
                         </button>
                       </div>
                     )}
