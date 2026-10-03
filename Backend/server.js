@@ -1,3 +1,7 @@
+import dns from "node:dns";
+// Fix for MongoDB Atlas querySrv ECONNREFUSED on Windows / ISP DNS
+dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
+
 import express from "express";
 import webpack from "webpack";
 import mongoose from "mongoose";
@@ -21,8 +25,11 @@ import newsRoutes from "./routes/news.js"
 import testimonialRoutes from "./routes/testimonialRoutes.js" 
 import subscribeRoutes from "./routes/subscribeRoutes.js";
 import coursesRoutes from "./routes/coursesRoutes.js"; // path must be correct
+import categoryRoutes from "./routes/categoryRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 import { MongoClient } from "mongodb";
  import Course from "./models/courses.js"; // <-- Make sure the path is correct
+ import { initialCourses } from "./seedData.js";
  // Define __filename and __dirname in ES module
  import footerRoutes from './routes/footerRoutes.js';
  import Footer from './models/Footer.js';
@@ -34,10 +41,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
-// Define port from .env 
-const port = process.env.PORT ;
 dotenv.config();
-const MONGO_URL = process.env.MONGO_URI
+// Define port from .env 
+const port = process.env.PORT || 4001;
+const MONGO_URL = process.env.MONGODB_URI || process.env.MONGO_URI;
 //middleware express instantiated
 const app = express();
 //middleware to ftech data
@@ -51,7 +58,9 @@ app.use(express.json());
  
 app.use("/Uploads", express.static("Uploads"));
 // Courses Routes
- app.use("/api/courses", coursesRoutes);
+app.use("/api/courses", coursesRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/users", userRoutes);
  
 
 
@@ -61,10 +70,37 @@ app.use('/api/footer', footerRoutes);
 
 //connection with frontend ======CORS======
 app.use(cookieParser());
+
+const configuredOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim())
+  : [];
+
+const defaultOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:5174",
+  process.env.FRONTEND_URL,
+  process.env.ADMIN_URL,
+].filter(Boolean);
+
+const allowedOriginsList = Array.from(new Set([...defaultOrigins, ...configuredOrigins]));
+
 app.use(cors({
-  origin: "http://localhost:5173",   // frontend (Vite)
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (
+      allowedOriginsList.includes(origin) ||
+      origin.endsWith(".vercel.app") ||
+      origin.includes("aayushinstitute") ||
+      process.env.NODE_ENV !== "production"
+    ) {
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
   credentials: true
 }));
 
@@ -127,10 +163,24 @@ app.use(cookieParser()); //extract token cereated in cookies while creaating a b
 
 //Mongo DB Connection
 mongoose.connect(MONGO_URL)
-  .then(() => console.log("✅ Connected to MongoDB"))
+  .then(async () => {
+    console.log("✅ Connected to MongoDB");
+    try {
+      const courseCount = await Course.countDocuments();
+      if (courseCount === 0) {
+        console.log("🌱 Database has 0 courses. Auto-seeding initial Aayush Institute courses...");
+        const inserted = await Course.insertMany(initialCourses);
+        console.log(`✅ Auto-seeded ${inserted.length} courses into MongoDB successfully!`);
+      } else {
+        console.log(`ℹ️ MongoDB already has ${courseCount} courses.`);
+      }
+    } catch (seedErr) {
+      console.error("⚠️ Auto-seeding courses note:", seedErr.message);
+    }
+  })
   .catch(err => {
     console.error("❌ MongoDB connection error:", err.message);
-    process.exit(1); // stop the server if MongoDB connection fails
+    // Keep server running even if DB is reconnecting
   });
 
  
@@ -165,8 +215,9 @@ seedAdmin(); */
 
 
 
-// inquiry Routes
+// inquiry & student admission Routes
 app.use("/api/inquiry", inquiryRoutes);
+app.use("/api/user/admin/admission", inquiryRoutes);
 app.use("/api/auth", AdminLogin); // all /signup, /login, /logout routes go here
 
 
@@ -193,7 +244,7 @@ app.use("/", instituteRoutes);
 
 
 
-app.listen(4001, () => {
+app.listen(port, "0.0.0.0", () => {
   console.log(`Server is running on port ${port}`);
 });
 

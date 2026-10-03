@@ -5,230 +5,278 @@ import CooperateTrainingProgram from './Navbar/CooperateTrainingProgram'
 import News from './Navbar/News'
 import Courses from './Navbar/Courses'
 import logo_image from '../assets/img/Logo.jpg'
-import { Building, Mail, MapPin, Menu, Phone } from 'lucide-react'
+import { Facebook, Instagram, Linkedin, MapPin, Youtube } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
 import Header from './Navbar/Header'
-import axios from 'axios'
-import { GraduationCap, ClipboardCheck, UserCheck } from "lucide-react";
+
 
 const SchoolWebsite = () => {
-  
+    const [footerData, setFooterData] = useState(null);
 
-   const [footerData, setFooterData] = useState(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  // Static main links
-  const mainLinks = [
-    { text: "About us", href: "#" },
-    { text: "Contact us", href: "#" },
-    { text: "Terms and Conditions", href: "#" },
-    { text: "Blog", href: "#" },
-    { text: "Career", href: "#" },
-    { text: "FAQs", href: "#" },
-  ];
- // Function to handle moving to the next testimonial, wrapping around if needed
-  const handleNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
-  };
+    useEffect(() => {
+        const fetchFooter = async () => {
+            try {
+                const res = await fetch('/api/footer');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && (data.mainLinks?.length > 0 || data.sections?.length > 0 || data.copyrightText)) {
+                        setFooterData(data);
+                    }
+                }
+            } catch (err) {}
+        };
+        fetchFooter();
+        const poll = setInterval(fetchFooter, 6000);
+        return () => clearInterval(poll);
+    }, []);
 
-  // Function to handle moving to the previous testimonial, wrapping around if needed
-  const handlePrevious = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + testimonials.length) % testimonials.length);
-  };
-  
-  // Function to handle jumping to a specific testimonial
-  const handleDotClick = (index) => {
-    setCurrentIndex(index);
-  };
- 
-  useEffect(() => {
-    axios.get("/api/footer")
-      .then(res => 
-      {setFooterData(res.data)
-        console.log(res.data);
-      })
-      .catch(err => console.log(err));
-  }, []);
+    const defaultQuickLinks = [
+        { text: 'About us', href: '/AboutUs' },
+        { text: 'Contact us', href: '/ContactUs' },
+        { text: 'Terms and Conditions', href: '/terms' },
+        { text: 'Blog', href: '/blogs' },
+        { text: 'Admission', href: '/admission' },
+        { text: 'Student Portal', href: '/profile' },
+        { text: 'Result', href: '/result' },
+        { text: 'FAQs', href: '/FAQ' },
+        { text: 'Our Faculty & Staff', href: '/staff' },
+        { text: 'Staff Portal', href: '/login?type=staff' }
+    ];
 
-  if (!footerData) return null;
-   // State to manage the starting index of the currently displayed group of testimonials
+    const quickLinks = (footerData?.mainLinks && footerData.mainLinks.length > 0)
+        ? footerData.mainLinks
+        : defaultQuickLinks;
 
-  /* Testimonial data array
-  const testimonials = [
-    {
-      name: 'Jane Doe',
-      title: 'Marketing Director',
-      quote: 'This service exceeded all my expectations. The results were fantastic, and the process was seamless from start to finish.',
-      image: 'https://placehold.co/120x120/4338CA/FFFFFF?text=JD',
-    },
-    {
-      name: 'John Smith',
-      title: 'Founder & CEO',
-      quote: 'A truly game-changing solution for our business. The support team was incredibly responsive and helpful.',
-      image: 'https://placehold.co/120x120/A855F7/FFFFFF?text=JS',
-    },
-    {
-      name: 'Emily Chen',
-      title: 'Lead Developer',
-      quote: 'I was impressed with the level of detail and professionalism. The platform is intuitive and powerful.',
-      image: 'https://placehold.co/120x120/22C55E/FFFFFF?text=EC',
-    },
-    {
-      name: 'Michael Brown',
-      title: 'Small Business Owner',
-      quote: 'The value I received was outstanding. It helped me grow my business more than I thought possible.',
-      image: 'https://placehold.co/120x120/F59E0B/FFFFFF?text=MB',
-    },
-    {
-      name: 'Jessica Lee',
-      title: 'Creative Designer',
-      quote: 'Creative freedom combined with excellent functionality. I would highly recommend this to anyone in the field.',
-      image: 'https://placehold.co/120x120/EF4444/FFFFFF?text=JL',
-    },
-    {
-      name: 'David Wilson',
-      title: 'Product Manager',
-      quote: 'This product has streamlined our workflow and improved team collaboration immensely. A top-tier tool!',
-      image: 'https://placehold.co/120x120/10B981/FFFFFF?text=DW',
-    },
-    {
-      name: 'Sarah Kim',
-      title: 'Customer Support Lead',
-      quote: 'The customer service is unparalleled. They are always there to help with any questions or issues.',
-      image: 'https://placehold.co/120x120/6366F1/FFFFFF?text=SK',
-    },
-    {
-      name: 'Chris Evans',
-      title: 'Financial Analyst',
-      quote: 'An essential tool for anyone in my line of work. It provides accurate data and clear insights.',
-      image: 'https://placehold.co/120x120/3B82F6/FFFFFF?text=CE',
-    },
-    {
-      name: 'Olivia Rodriguez',
-      title: 'Student',
-      quote: 'As a student, this has been an incredible resource for my projects. The learning curve was minimal.',
-      image: 'https://placehold.co/120x120/EC4899/FFFFFF?text=OR',
-    },
-    {
-      name: 'Robert Davis',
-      title: 'Architect',
-      quote: 'The design tools are intuitive and have saved me countless hours on my projects. Highly recommended.',
-      image: 'https://placehold.co/120x120/60A5FA/FFFFFF?text=RD',
-    },
-  ];*/
-
- 
-  
-const FooterLink = ({ href, children }) => {
-  return (
-    <a 
-      href={href} 
-      className="text-gray-400 hover:text-orange-400 transform hover:translate-x-1 transition-all duration-300 ease-in-out"
-    >
-      {children}
-    </a>
-  );
-};
-
-
-/*const FooterSection = ({ title, children, icon }) => {
-  return (
-    <div className="flex flex-col items-center md:items-start text-center md:text-left">
-      <div className="flex items-center mb-4 text-white">
-        {icon}
-        <h3 className="text-lg font-bold ml-2">{title}</h3>
-      </div>
-      <nav className="flex flex-col space-y-2">
-        {children}
-      </nav>
-    </div>
-  );
-};*/
-
-const getIcon = (title) => {
-    if (title.includes("Career")) return <GraduationCap className="h-6 w-6 text-orange-400" />;
-    if (title.includes("Exam")) return <ClipboardCheck className="h-6 w-6 text-orange-400" />;
-    if (title.includes("Counseling")) return <UserCheck className="h-6 w-6 text-orange-400" />;
-    return <MapPin className="h-6 w-6 text-orange-400" />;
-  };
     return (
 
-        <div className='min-h-screen bg-white font-sans'>
+        <div className='min-h-screen bg-white font-sans overflow-x-hidden w-full max-w-full'>
 
             {/* Header */}
             <Header />
 
             <Outlet />
 
-            {/* <MainPage /> */}
-
-            {/* <AboutUs /> */}
-
-            {/* <CooperateTrainingProgram /> */}
-
-            {/* <News /> */}
-
-            {/* <Courses /> */}
-
             {/* Footer */}
-     
-  {/* Footer */}
-   <footer className="bg-gray-900 text-gray-400 py-12">
-      {/* Main Links */}
-      <div className=" mx-auto  flex flex-wrap justify-center space-x-10 mb-8">
-        {footerData.mainLinks.map((link, index) => (
-          <a
-            key={index}
-            href={link.href}
-            className="hover:text-orange-400 transition-transform transform hover:translate-x-1"
-          >
-            {link.text}
-          </a>
-        ))}
-      </div>
+            <footer className="bg-gradient-to-b from-[#001c44] via-[#001432] to-[#000d22] text-white relative border-t border-blue-400/20 shadow-[0_-8px_30px_rgba(0,18,50,0.25)]">
+                
+                {/* 1. Top Quick Links Navigation Bar */}
+                <div className="border-b border-white/10 bg-[#00102b]/60 backdrop-blur-sm py-2">
+                    <div className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10 flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-7 gap-y-1.5 text-xs sm:text-[13px] font-medium text-slate-300">
+                        {quickLinks.map((item, idx) => (
+                            <NavLink
+                                key={idx}
+                                to={item.href || item.to || '#'}
+                                className={({ isActive }) => `transition-colors hover:text-white ${isActive ? 'text-[#fed000] font-semibold' : ''}`}
+                            >
+                                {item.text || item.title || item.label}
+                            </NavLink>
+                        ))}
+                    </div>
+                </div>
 
-      {/* Sections */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 px-6">
-        {footerData.sections.map((section, index) => (
-          <div key={index} className="flex flex-col">
-            <div className="flex items-center mb-4 space-x-2">
-              {getIcon(section.title)}
-              <h3 className="font-bold text-white">{section.title}</h3>
-            </div>
-            <nav className="flex flex-col space-y-2">
-              {section.links.map((link, i) => (
-                <a
-                  key={i}
-                  href={link.href}
-                  className="hover:text-orange-400 transition-transform transform hover:translate-x-1"
-                >
-                  {link.text}
-                </a>
-              ))}
-            </nav>
-          </div>
-        ))}
-      </div>
+                {/* 2. Main Footer Body: Compact & Proportionate */}
+                <div className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10 py-7 sm:py-8">
+                    <div className="grid grid-cols-2 md:grid-cols-12 gap-y-7 gap-x-5 lg:gap-x-8 items-start">
 
-      {/* Copyright */}
-      <div className="mt-12 text-center text-sm text-gray-500">
-        {footerData.copyrightText}
-      </div>
-    </footer>
+                        {/* Left Brand Column */}
+                        <div className="col-span-2 md:col-span-4 flex flex-col items-center md:items-start text-center md:text-left pr-0 md:pr-4">
+                            <div className="relative group">
+                                <img
+                                    src="/ayush_circle_logo.png"
+                                    alt="Aayush Institute"
+                                    className="w-20 h-20 sm:w-22 sm:h-22 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)] transition-transform duration-200 group-hover:scale-105"
+                                />
+                            </div>
 
-   
+                            <h3 className="text-white font-bold text-[16px] sm:text-[17px] leading-snug mt-2.5 max-w-xs">
+                                Aayush Institute Of Professional Studies
+                            </h3>
+
+                            {/* Crisp Tagline */}
+                            <div className="text-xs sm:text-[12.5px] font-semibold tracking-wide mt-1.5 flex items-center justify-center md:justify-start gap-1.5 flex-wrap">
+                                <span className="text-[#fed000]">Learn</span>
+                                <span className="text-slate-400">•</span>
+                                <span className="text-emerald-400">Grow</span>
+                                <span className="text-slate-400">•</span>
+                                <span className="text-sky-300">Build Your Future</span>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-3 pt-2.5 border-t border-white/10 w-full justify-center md:justify-start">
+                                <MapPin className="w-3.5 h-3.5 text-[#fed000] flex-shrink-0" />
+                                <span className="truncate">Uttam Nagar East, New Delhi - 110059</span>
+                            </div>
+                        </div>
+
+                        {/* Column: Popular Course */}
+                        <div className="col-span-1 md:col-span-2 flex flex-col items-start text-left">
+                            <h4 className="text-white font-semibold text-xs sm:text-[13.5px] mb-2 sm:mb-2.5 tracking-tight border-b-2 border-[#fed000]/60 pb-1 inline-block">
+                                Popular Course
+                            </h4>
+                            <ul className="space-y-1 sm:space-y-1.5 text-xs sm:text-[12px] text-slate-300">
+                                {[
+                                    { title: 'IT & Stack Development', to: '/it-stack-development' },
+                                    { title: 'Web Development', to: '/web-development' },
+                                    { title: 'App Development', to: '/app-development' },
+                                    { title: 'Python Programming', to: '/python-programming' },
+                                    { title: 'UI/UX Design', to: '/ui-ux-design' },
+                                    { title: 'Digital Marketing', to: '/digital-marketing' },
+                                    { title: 'Tally & Accounting', to: '/tally-accounting' },
+                                ].map((item, idx) => (
+                                    <li key={idx}>
+                                        <NavLink
+                                            to={item.to}
+                                            className="hover:text-[#fed000] transition-colors duration-150 block truncate"
+                                        >
+                                            {item.title}
+                                        </NavLink>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* Column: Admission */}
+                        <div className="col-span-1 md:col-span-2 flex flex-col items-start text-left">
+                            <h4 className="text-white font-semibold text-xs sm:text-[13.5px] mb-2 sm:mb-2.5 tracking-tight border-b-2 border-emerald-400/60 pb-1 inline-block">
+                                Admission
+                            </h4>
+                            <ul className="space-y-1 sm:space-y-1.5 text-xs sm:text-[12px] text-slate-300">
+                                {[
+                                    { title: 'After 10th', to: '/admission' },
+                                    { title: 'After 12th', to: '/admission' },
+                                    { title: 'Graduation', to: '/admission' },
+                                    { title: 'LEET Programs', to: '/UniversityCourses' },
+                                    { title: 'Dual Degree Programs', to: '/UniversityCourses' },
+                                    { title: 'Scholarship', to: '/admission' },
+                                    { title: 'Education Loan', to: '/ContactUs' }
+                                ].map((item, idx) => (
+                                    <li key={idx}>
+                                        <NavLink to={item.to} className="hover:text-emerald-300 transition-colors duration-150 block truncate">
+                                            {item.title}
+                                        </NavLink>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* Column: Career After */}
+                        <div className="col-span-1 md:col-span-2 flex flex-col items-start text-left">
+                            <h4 className="text-white font-semibold text-xs sm:text-[13.5px] mb-2 sm:mb-2.5 tracking-tight border-b-2 border-sky-400/60 pb-1 inline-block">
+                                Career After
+                            </h4>
+                            <ul className="space-y-1 sm:space-y-1.5 text-xs sm:text-[12px] text-slate-300">
+                                {[
+                                    { title: '12th PCM', to: '/Placement' },
+                                    { title: '12th PCB', to: '/Placement' },
+                                    { title: '12th Management', to: '/Placement' },
+                                    { title: '12th Arts and Humanities', to: '/Placement' },
+                                    { title: '12th Commerce', to: '/Placement' },
+                                    { title: 'Top Paramedical Courses', to: '/Placement' },
+                                    { title: 'Vocational Course', to: '/Placement' }
+                                ].map((item, idx) => (
+                                    <li key={idx}>
+                                        <NavLink to={item.to} className="hover:text-sky-300 transition-colors duration-150 block truncate">
+                                            {item.title}
+                                        </NavLink>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* Column: Best Career Options */}
+                        <div className="col-span-1 md:col-span-2 flex flex-col items-start text-left">
+                            <h4 className="text-white font-semibold text-xs sm:text-[13.5px] mb-2 sm:mb-2.5 tracking-tight border-b-2 border-purple-400/60 pb-1 inline-block">
+                                Best Career Options
+                            </h4>
+                            <ul className="space-y-1 sm:space-y-1.5 text-xs sm:text-[12px] text-slate-300">
+                                {[
+                                    { title: 'NEET-UG 2026', to: '/UniversityCourses' },
+                                    { title: 'JEE Main 2026', to: '/UniversityCourses' },
+                                    { title: 'JEE Advance 2026', to: '/UniversityCourses' },
+                                    { title: 'UG CLAT 2026', to: '/UniversityCourses' },
+                                    { title: 'CUET 2026', to: '/UniversityCourses' },
+                                    { title: 'CAT 2026', to: '/UniversityCourses' },
+                                    { title: 'GGS IPU CET 2026', to: '/UniversityCourses' }
+                                ].map((item, idx) => (
+                                    <li key={idx}>
+                                        <NavLink to={item.to} className="hover:text-purple-300 transition-colors duration-150 block truncate">
+                                            {item.title}
+                                        </NavLink>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+
+                {/* 3. Bottom Bar: Copyright & Sleek Social Follow */}
+                <div className="border-t border-white/10 bg-[#000a1c] py-3">
+                    <div className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+                        
+                        <div>
+                            <span>&copy; {new Date().getFullYear()} {footerData?.copyrightText || 'Aayush Institute of Professional Studies. All Rights Reserved.'}</span>
+                        </div>
+
+                        {/* Right: Follow Us + Sleek Social Icons */}
+                        <div className="flex items-center gap-3">
+                            <span className="text-white text-xs font-semibold">
+                                Follow Us
+                            </span>
+                            
+                            <div className="flex items-center gap-1.5">
+                                {/* Facebook */}
+                                <a
+                                    href="https://facebook.com"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    aria-label="Facebook"
+                                    className="w-7 h-7 rounded-md bg-[#1877f2] text-white flex items-center justify-center transition-transform hover:scale-110 shadow-xs"
+                                >
+                                    <Facebook className="w-3.5 h-3.5 fill-current" />
+                                </a>
+
+                                {/* Instagram */}
+                                <a
+                                    href="https://instagram.com"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    aria-label="Instagram"
+                                    className="w-7 h-7 rounded-md bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] text-white flex items-center justify-center transition-transform hover:scale-110 shadow-xs"
+                                >
+                                    <Instagram className="w-3.5 h-3.5 stroke-[2]" />
+                                </a>
+
+                                {/* YouTube */}
+                                <a
+                                    href="https://youtube.com"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    aria-label="YouTube"
+                                    className="w-7 h-7 rounded-md bg-[#ff0000] text-white flex items-center justify-center transition-transform hover:scale-110 shadow-xs"
+                                >
+                                    <Youtube className="w-3.5 h-3.5 stroke-[2]" />
+                                </a>
+
+                                {/* LinkedIn */}
+                                <a
+                                    href="https://linkedin.com"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    aria-label="LinkedIn"
+                                    className="w-7 h-7 rounded-md bg-[#0a66c2] text-white flex items-center justify-center transition-transform hover:scale-110 shadow-xs"
+                                >
+                                    <Linkedin className="w-3.5 h-3.5 stroke-[2]" />
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </footer>
 
 
- 
-
-
-
-
-            
         </div>
-       
-      
-
-        
     )
 }
 

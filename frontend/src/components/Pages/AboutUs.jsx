@@ -1,598 +1,842 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
+import axios from 'axios';
 import {
-    Calendar,
-    Users,
     Award,
-    Heart,
-    Target,
     BookOpen,
-    Lightbulb,
-    TrendingUp,
-    Globe,
-    Star,
-    CheckCircle,
-    ArrowRight,
+    Briefcase,
+    CheckCircle2,
+    Clock,
+    Users,
     Building,
-    GraduationCap,
-    Briefcase
+    Shield,
+    Sparkles,
+    ArrowRight,
+    ChevronRight,
+    Phone,
+    Mail,
+    Globe,
+    MapPin,
+    Cpu,
+    GraduationCap
 } from 'lucide-react';
 
 const AboutUs = () => {
-    const stats = [
-        { number: "22+", label: "Years of Excellence", icon: <Calendar className="w-6 h-6" /> },
-        { number: "10,000+", label: "Students Enrolled", icon: <Users className="w-6 h-6" /> },
-        { number: "100+", label: "Qualified Teachers", icon: <Award className="w-6 h-6" /> },
-        { number: "95%", label: "Employment Rate", icon: <TrendingUp className="w-6 h-6" /> }
-    ];
+    const [facultyList, setFacultyList] = useState([]);
 
-    const values = [
-        {
-            icon: <Heart className="w-8 h-8" />,
-            title: "Inclusive Education",
-            description: "Empowering students from rural, marginalized, and economically disadvantaged communities"
-        },
-        {
-            icon: <Target className="w-8 h-8" />,
-            title: "Industry-Focused",
-            description: "Programs designed to meet real-world industry demands and current market needs"
-        },
-        {
-            icon: <Lightbulb className="w-8 h-8" />,
-            title: "Practical Learning",
-            description: "Hands-on training with live projects and real-time problem-solving experiences"
-        },
-        {
-            icon: <Globe className="w-8 h-8" />,
-            title: "Social Impact",
-            description: "Creating transformative opportunities for school dropouts and underserved youth"
-        }
-    ];
-
-    const achievements = [
-        "Hundreds of alumni in reputed organizations",
-        "Successful entrepreneurial ventures launched",
-        "Students re-entered academic mainstream",
-        "Government and private sector partnerships",
-        "Affordable and flexible program delivery",
-        "Expert mentorship and guidance"
-    ];
-
+    useEffect(() => {
+        const fetchFaculty = async () => {
+            try {
+                const res = await axios.get('/api/users?role=staff');
+                const list = Array.isArray(res.data?.data) ? res.data.data : Array.isArray(res.data) ? res.data : [];
+                if (list.length > 0) {
+                    setFacultyList(list.slice(0, 4));
+                }
+            } catch (err) {
+                console.warn('Faculty fetch in AboutUs:', err.message);
+            }
+        };
+        fetchFaculty();
+    }, []);
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-            {/* Hero Section */}
-            <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-                    <div className="text-center">
-                        <div className="flex items-center justify-center mb-6">
-                            {/* <div className="bg-white/10 p-4 rounded-full backdrop-blur-sm">
-                                <GraduationCap className="w-12 h-12 text-yellow-400" />
-                            </div> */}
+        <div className="min-h-screen bg-[#f8fafc]">
+            {/* 1. Hero Section - Compact & Restrained */}
+            <div 
+                className="relative overflow-hidden bg-no-repeat bg-cover bg-right md:bg-[right_center] border-b border-slate-200/60"
+                style={{ 
+                    backgroundImage: "url('/professional.png')",
+                    backgroundColor: '#d0e7ff'
+                }}
+            >
+                <div className="absolute inset-0 bg-gradient-to-r from-[#d0e7ff]/98 via-[#d0e7ff]/85 to-[#d0e7ff]/30 sm:from-[#d0e7ff]/95 sm:via-[#d0e7ff]/75 sm:to-transparent pointer-events-none"></div>
+
+                <div className="relative z-10 max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10">
+                    <div className="flex flex-col justify-center py-5 sm:py-6 lg:py-8 max-w-xl lg:max-w-2xl min-h-0">
+                        {/* Badge */}
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 text-[#003882] text-[11.5px] font-bold tracking-wider mb-2 border border-blue-200/80 shadow-xs w-fit">
+                            <Sparkles className="w-3.5 h-3.5 text-[#0055ff]" />
+                            <span>ABOUT US</span>
                         </div>
-                        <h1 className="text-4xl md:text-6xl font-bold mb-6">
-                            {/* About */}
-                            <h1 className="text-4xl text-blue-300 md:text-6xl font-bold mb-6 leading-tight">
-                                {/* Know more */}
-                                <span className="block  text-white">About Us</span>
-                            </h1>
+
+                        {/* Title */}
+                        <h1 className="text-2xl sm:text-3xl lg:text-[36px] xl:text-[38px] font-bold text-[#00285e] leading-[1.15] tracking-tight mb-1.5">
+                            AAYUSH INSTITUTE OF{' '}
+                            <span className="text-[#0062ff] block">PROFESSIONAL STUDIES</span>
                         </h1>
-                        <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed">
-                            Transforming lives through career-focused, skill-based, and inclusive learning since 2002
+
+                        {/* Subtitle */}
+                        <p className="text-[#004b93] font-semibold text-xs sm:text-[13px] mb-2 tracking-wide">
+                            Education • Skills • Industry Exposure • Career Development
                         </p>
-                        <div className="flex items-center justify-center space-x-2 text-sm bg-white/10 backdrop-blur-sm rounded-full px-6 py-3  ">
-                            <Calendar className="w-4 h-4 text-yellow-400" />
-                            <span>Founded on 2nd October 2002</span>
+
+                        {/* Description */}
+                        <p className="text-slate-600 text-xs sm:text-[13px] leading-relaxed mb-3.5 max-w-xl font-normal">
+                            Established in 2002, Aayush Institute of Professional Studies is a private education and training institute focused on IT education, professional skill development, university education, and practical learning.
+                        </p>
+
+                        {/* Quick CTA Actions */}
+                        <div className="flex flex-wrap items-center gap-3">
+                            <NavLink
+                                to="/Courses"
+                                className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg bg-[#0062ff] hover:bg-[#0052cc] text-white text-xs sm:text-[13px] font-bold shadow-sm hover:shadow-md transition-all"
+                            >
+                                <BookOpen className="w-4 h-4" />
+                                <span>Explore Courses</span>
+                            </NavLink>
+                            <NavLink
+                                to="/contact"
+                                className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg bg-white hover:bg-slate-50 text-[#00285e] border border-slate-300 text-xs sm:text-[13px] font-bold shadow-xs transition-all"
+                            >
+                                <Phone className="w-4 h-4 text-[#0062ff]" />
+                                <span>Contact Us</span>
+                            </NavLink>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Stats Section */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-10">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    {stats.map((stat, index) => (
-                        <div key={index} className="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow duration-300">
-                            <div className="flex items-center justify-center mb-3 text-blue-600">
-                                {stat.icon}
-                            </div>
-                            <div className="text-3xl font-bold text-gray-900 mb-2">{stat.number}</div>
-                            <div className="text-sm text-gray-600">{stat.label}</div>
-                        </div>
-                    ))}
-                </div>
-            </div>
+            {/* Main Content Sections - Compact Spacing */}
+            <div className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10 py-6 sm:py-8 space-y-4 sm:space-y-5">
 
-            {/* Main Content */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-                {/* Our Story */}
-                <div className="mb-20">
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Story</h2>
-                        <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-indigo-600 mx-auto rounded-full"></div>
-                    </div>
-
-                    <div className="grid lg:grid-cols-2 gap-12 items-center">
-                        <div className="space-y-6">
-                            <div className="bg-white rounded-xl shadow-lg p-8 border-l-4 border-blue-600">
-                                <p className="text-gray-700 leading-relaxed text-lg">
-                                    <strong className="text-blue-900">Aayush Institute of Professional Studies (AIPS)</strong>, founded on 2nd October 2002,
-                                    is a forward-thinking educational institution committed to shaping the future of India's youth through
-                                    career-focused, skill-based, and inclusive learning.
-                                </p>
-                            </div>
-
-                            <div className="bg-white rounded-xl shadow-lg p-8">
-                                <p className="text-gray-700 leading-relaxed">
-                                    Operated by the <strong className="text-indigo-700">New Aayush Education Welfare Society</strong>—a registered
-                                    non-profit under the Societies Act of 1856 (Delhi)—AIPS stands as a beacon of educational empowerment,
-                                    social development, and nation-building.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-8 text-white">
-                            <h3 className="text-2xl font-bold mb-6 flex items-center">
-                                <Building className="w-6 h-6 mr-3" />
-                                Our Foundation
-                            </h3>
-                            <div className="space-y-4">
-                                <div className="flex items-start space-x-3">
-                                    <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
-                                    <span>Registered non-profit organization</span>
-                                </div>
-                                <div className="flex items-start space-x-3">
-                                    <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
-                                    <span>Over two decades of dedicated service</span>
-                                </div>
-                                <div className="flex items-start space-x-3">
-                                    <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
-                                    <span>Trusted name in professional education</span>
-                                </div>
-                                <div className="flex items-start space-x-3">
-                                    <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
-                                    <span>Focus on marginalized communities</span>
-                                </div>
-                            </div>
-                        </div>
+                {/* 1.1 Introductory Overview Card */}
+                <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/70 shadow-xs">
+                    <div className="w-full space-y-2 text-left">
+                        <span className="text-[11px] font-semibold text-[#0055cc] uppercase tracking-wider block">
+                            Two Decades of Dedication
+                        </span>
+                        <h2 className="text-base sm:text-lg lg:text-xl font-bold text-[#0a2540]">
+                            More than Two Decades Associated with Education and Skill Development
+                        </h2>
+                        <p className="text-slate-600 text-xs sm:text-[13px] leading-relaxed font-normal">
+                            For more than two decades, the Institute has been associated with education and skill development, supporting students, graduates, working professionals, and career aspirants in developing academic knowledge, technical skills, and professional capabilities.
+                        </p>
+                        <p className="text-slate-600 text-xs sm:text-[13px] leading-relaxed font-normal">
+                            Our approach combines structured education, practical learning, industry exposure, and career guidance to help learners build relevant skills and make informed decisions about their pathways.
+                        </p>
                     </div>
                 </div>
 
-                {/* Our Values */}
-                <div className="mb-20">
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Core Values</h2>
-                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                            The principles that guide our mission to transform lives through education
+                {/* 2. OUR JOURNEY (From 2002 to Today) */}
+                <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/70 shadow-xs">
+                    <div className="w-full mb-4">
+                        <span className="text-[10px] font-semibold text-[#0055cc] uppercase tracking-wider block mb-0.5">
+                            Our Journey
+                        </span>
+                        <h2 className="text-base sm:text-lg font-bold text-[#0a2540]">
+                            From 2002 to Today
+                        </h2>
+                        <div className="text-slate-600 text-xs sm:text-[13px] space-y-2 mt-2 leading-relaxed font-normal">
+                            <p>
+                                Aayush Institute of Professional Studies was established in 2002 with a focus on education and professional skill development.
+                            </p>
+                            <p>
+                                Before 2026, the Institute operated under New Aayush Education Welfare Society, a society registered in Delhi under the Societies Registration Act, 1860.
+                            </p>
+                            <p>
+                                In 2026, the management and operations were taken over by Atri Admission Anytime Private Limited, a private limited company incorporated under the laws of India.
+                            </p>
+                            <p className="text-slate-600 font-normal">
+                                Under its current management, the Institute continues to develop its ecosystem with a focus on technology, practical skills, industry exposure, and career support.
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Timeline List - Plain, Clean & Unhighlighted */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-3 border-t border-slate-100">
+                        <div>
+                            <span className="text-xs font-bold text-slate-800 block mb-0.5">2002</span>
+                            <h4 className="text-xs font-semibold text-slate-800 mb-0.5">Institute Established</h4>
+                            <p className="text-slate-500 text-[11px] leading-snug">Founded with a focus on education and professional skills.</p>
+                        </div>
+                        <div>
+                            <span className="text-xs font-bold text-slate-800 block mb-0.5">Pre-2026</span>
+                            <h4 className="text-xs font-semibold text-slate-800 mb-0.5">Society Operations</h4>
+                            <p className="text-slate-500 text-[11px] leading-snug">Operated under New Aayush Education Welfare Society.</p>
+                        </div>
+                        <div>
+                            <span className="text-xs font-bold text-slate-800 block mb-0.5">2026</span>
+                            <h4 className="text-xs font-semibold text-slate-800 mb-0.5">Management Transition</h4>
+                            <p className="text-slate-500 text-[11px] leading-snug">Management taken over by Atri Admission Anytime Pvt. Ltd.</p>
+                        </div>
+                        <div>
+                            <span className="text-xs font-bold text-slate-800 block mb-0.5">Today</span>
+                            <h4 className="text-xs font-semibold text-slate-800 mb-0.5">Evolving Ecosystem</h4>
+                            <p className="text-slate-500 text-[11px] leading-snug">Focused on Education, Skills, Technology &amp; Careers.</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 3. OUR EDUCATION & TRAINING ECOSYSTEM */}
+                <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/70 shadow-xs">
+                    <div className="mb-4">
+                        <span className="text-[10px] font-bold text-[#0055cc] uppercase tracking-wider block mb-0.5">
+                            Ecosystem
+                        </span>
+                        <h2 className="text-base sm:text-lg font-bold text-[#0a2540]">
+                            Our Education &amp; Training Ecosystem
+                        </h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                        {/* 3.1 IT & Technology Education */}
+                        <div className="p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60 flex flex-col justify-between">
+                            <div>
+                                <div className="flex items-center gap-2 mb-2.5">
+                                    <Cpu className="w-4 h-4 text-[#0055ff]" />
+                                    <h3 className="text-xs sm:text-[13px] font-bold text-[#0a2540]">
+                                        IT &amp; TECHNOLOGY EDUCATION
+                                    </h3>
+                                </div>
+                                <p className="text-slate-600 text-[11px] leading-relaxed mb-2.5">
+                                    Practical and industry-relevant skills across core technological areas:
+                                </p>
+                                <div className="space-y-1">
+                                    {[
+                                        'Computer & Office Applications',
+                                        'Web & Software Development',
+                                        'Programming & Full Stack Development',
+                                        'Artificial Intelligence & Generative AI',
+                                        'Data Analytics & Business Intelligence',
+                                        'Cloud, DevOps & Cyber Security',
+                                        'Mobile App Development',
+                                        'UI/UX & Digital Design',
+                                        'Digital Marketing & E-Commerce',
+                                        'Computer Hardware & Networking'
+                                    ].map((item, idx) => (
+                                        <div key={idx} className="flex items-center gap-1.5 p-1 rounded bg-white text-[11px] font-medium text-slate-700 border border-slate-100">
+                                            <CheckCircle2 className="w-3 h-3 text-[#0055ff] flex-shrink-0" />
+                                            <span>{item}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 3.2 University & Distance Education */}
+                        <div className="p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60 flex flex-col justify-between">
+                            <div>
+                                <div className="flex items-center gap-2 mb-2.5">
+                                    <GraduationCap className="w-4 h-4 text-[#0055ff]" />
+                                    <h3 className="text-xs sm:text-[13px] font-bold text-[#0a2540]">
+                                        UNIVERSITY &amp; DISTANCE EDUCATION
+                                    </h3>
+                                </div>
+                                <p className="text-slate-600 text-[11px] leading-relaxed mb-2.5">
+                                    Guidance and support for eligible University and Distance programs:
+                                </p>
+                                <div className="space-y-1 mb-2.5">
+                                    {[
+                                        'Management & Business',
+                                        'Commerce & Finance',
+                                        'Computer Applications & IT',
+                                        'Arts & Humanities',
+                                        'Science',
+                                        'Education',
+                                        'Healthcare & Allied Areas',
+                                        'Engineering & Technology',
+                                        'Vocational & Professional Education'
+                                    ].map((item, idx) => (
+                                        <div key={idx} className="flex items-center gap-1.5 p-1 rounded bg-white text-[11px] font-medium text-slate-700 border border-slate-100">
+                                            <CheckCircle2 className="w-3 h-3 text-[#0055ff] flex-shrink-0" />
+                                            <span>{item}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                                <p className="text-[10px] text-slate-500 italic bg-amber-50/50 p-2 rounded border border-amber-200/40">
+                                    Availability and certification are subject to the rules of respective Universities.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* 3.3 Professional & Career Development */}
+                        <div className="p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60 flex flex-col justify-between">
+                            <div>
+                                <div className="flex items-center gap-2 mb-2.5">
+                                    <Briefcase className="w-4 h-4 text-[#0055ff]" />
+                                    <h3 className="text-xs sm:text-[13px] font-bold text-[#0a2540]">
+                                        PROFESSIONAL &amp; CAREER DEVELOPMENT
+                                    </h3>
+                                </div>
+                                <p className="text-slate-600 text-[11px] leading-relaxed mb-2.5">
+                                    Skill-based learning opportunities tailored for varied learner stages:
+                                </p>
+                                <div className="space-y-1 mb-2.5">
+                                    {[
+                                        'School & College Students',
+                                        'Diploma & ITI Students',
+                                        'Graduates & Freshers',
+                                        'Working Professionals',
+                                        'Career Changers',
+                                        'Job Seekers',
+                                        'Business & Professional Learners'
+                                    ].map((item, idx) => (
+                                        <div key={idx} className="flex items-center gap-1.5 p-1 rounded bg-white text-[11px] font-medium text-slate-700 border border-slate-100">
+                                            <CheckCircle2 className="w-3 h-3 text-[#0055ff] flex-shrink-0" />
+                                            <span>{item}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="bg-blue-50/60 border border-blue-100/60 p-2 rounded">
+                                    <p className="text-[11px] font-medium text-[#004b93] leading-snug">
+                                        Helps learners gain practical skills and prepare for professional opportunities.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 4. OUR LEARNING MODEL (From Education to Employability) */}
+                <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/70 shadow-xs">
+                    <div className="w-full mb-3.5">
+                        <span className="text-[10px] font-bold text-[#0055cc] uppercase tracking-wider block mb-0.5">
+                            Learning Model
+                        </span>
+                        <h2 className="text-base sm:text-lg font-bold text-[#0a2540]">
+                            From Education to Employability
+                        </h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 mb-3.5">
+                        <div className="p-3 rounded-lg bg-slate-50/80 border border-slate-200/60">
+                            <span className="text-[11px] font-bold text-[#0055ff] block mb-0.5">01 • EDUCATION</span>
+                            <p className="text-[11px] text-slate-600 leading-snug">Structured academic and professional foundational learning.</p>
+                        </div>
+                        <div className="p-3 rounded-lg bg-slate-50/80 border border-slate-200/60">
+                            <span className="text-[11px] font-bold text-slate-700 block mb-0.5">02 • SKILL DEVELOPMENT</span>
+                            <p className="text-[11px] text-slate-600 leading-snug">Practical technical, digital and professional capabilities.</p>
+                        </div>
+                        <div className="p-3 rounded-lg bg-slate-50/80 border border-slate-200/60">
+                            <span className="text-[11px] font-bold text-slate-700 block mb-0.5">03 • PRACTICAL EXPOSURE</span>
+                            <p className="text-[11px] text-slate-600 leading-snug">Assignments, practical exercises and project-based work.</p>
+                        </div>
+                        <div className="p-3 rounded-lg bg-slate-50/80 border border-slate-200/60">
+                            <span className="text-[11px] font-bold text-slate-700 block mb-0.5">04 • INDUSTRY EXPOSURE</span>
+                            <p className="text-[11px] text-slate-600 leading-snug">Live projects, internships and interaction with professionals.</p>
+                        </div>
+                        <div className="p-3 rounded-lg bg-slate-50/80 border border-slate-200/60">
+                            <span className="text-[11px] font-bold text-slate-700 block mb-0.5">05 • CAREER DEVELOPMENT</span>
+                            <p className="text-[11px] text-slate-600 leading-snug">Resume building, interview preparation and placement assistance.</p>
+                        </div>
+                    </div>
+
+                    {/* Progress Flow Banner - Subtle */}
+                    <div className="py-2 px-3 rounded-lg bg-slate-100 text-slate-700 flex flex-wrap items-center justify-center gap-2 text-[11px] font-semibold border border-slate-200/60">
+                        <span>LEARN</span>
+                        <span className="text-slate-400">→</span>
+                        <span>PRACTICE</span>
+                        <span className="text-slate-400">→</span>
+                        <span>EXPERIENCE</span>
+                        <span className="text-slate-400">→</span>
+                        <span>PREPARE</span>
+                        <span className="text-slate-400">→</span>
+                        <span>PROGRESS</span>
+                    </div>
+                </div>
+
+                {/* 5. CAREER GUIDANCE */}
+                <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/70 shadow-xs">
+                    <div className="w-full mb-3">
+                        <span className="text-[10px] font-bold text-[#0055cc] uppercase tracking-wider block mb-0.5">
+                            Advisory
+                        </span>
+                        <h2 className="text-base sm:text-lg font-bold text-[#0a2540]">
+                            Career Guidance — Professional Guidance for Better Decisions
+                        </h2>
+                        <p className="text-slate-600 text-xs mt-1 leading-relaxed">
+                            Aayush Institute provides <strong>career guidance at no additional cost</strong> to help learners understand suitable education and skill pathways.
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {values.map((value, index) => (
-                            <div key={index} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 hover:scale-105">
-                                <div className="text-blue-600 mb-4">
-                                    {value.icon}
-                                </div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-3">{value.title}</h3>
-                                <p className="text-gray-600 text-sm leading-relaxed">{value.description}</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 mb-3">
+                        {[
+                            'Career planning',
+                            'Course selection',
+                            'Industry trends',
+                            'Career pathways',
+                            'Technical skills',
+                            'Higher education',
+                            'Resume development',
+                            'Interview prep',
+                            'Internship guidance',
+                            'Job readiness'
+                        ].map((item, idx) => (
+                            <div key={idx} className="flex items-center gap-1.5 p-2 rounded-lg bg-slate-50 border border-slate-200/50">
+                                <CheckCircle2 className="w-3 h-3 text-[#0055ff] flex-shrink-0" />
+                                <span className="text-slate-700 text-[11px] font-medium">{item}</span>
                             </div>
                         ))}
                     </div>
+
+                    <p className="text-[11px] text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-200/60">
+                        Our objective is to help students make informed education and career decisions based on their interests, qualifications, and career goals.
+                    </p>
                 </div>
 
-                {/* Vision & Purpose */}
-                <div className="mb-20">
-                    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 md:p-12 text-white">
-                        <div className="text-center mb-8">
-                            <div className="flex items-center justify-center mb-4">
-                                <Target className="w-12 h-12 text-yellow-300" />
+                {/* 6. INDUSTRY EXPOSURE & LIVE PROJECT - Combined 2-Col Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    {/* 6. Industry Exposure & Internships */}
+                    <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/70 shadow-xs flex flex-col justify-between">
+                        <div>
+                            <span className="text-[10px] font-bold text-[#0055cc] uppercase tracking-wider block mb-0.5">
+                                Workplace Experience
+                            </span>
+                            <h3 className="text-sm sm:text-base font-bold text-[#0a2540] mb-1.5">
+                                Industry Exposure &amp; Internships
+                            </h3>
+                            <p className="text-slate-600 text-[11px] leading-relaxed mb-2.5">
+                                Where available, eligible students may access:
+                            </p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 mb-3">
+                                {[
+                                    'Corporate Internships',
+                                    'Paid Opportunities',
+                                    'Live Projects',
+                                    'Industry Projects',
+                                    'Practical Assignments',
+                                    'Technical Mentoring',
+                                    'Workplace Exposure',
+                                    'Project Documentation'
+                                ].map((item, idx) => (
+                                    <div key={idx} className="flex items-center gap-1.5 p-1.5 rounded bg-slate-50 text-[11px] font-medium text-slate-700 border border-slate-100">
+                                        <CheckCircle2 className="w-3 h-3 text-[#0055ff] flex-shrink-0" />
+                                        <span>{item}</span>
+                                    </div>
+                                ))}
                             </div>
-                            <h2 className="text-3xl md:text-4xl font-bold mb-4">🎯 Our Vision & Purpose</h2>
+                        </div>
+                        <p className="text-[10px] text-slate-500 italic pt-2 border-t border-slate-100">
+                            Internship opportunities are subject to availability, eligibility, and selection by the concerned company.
+                        </p>
+                    </div>
+
+                    {/* 7. Live Project & Practical Learning */}
+                    <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/70 shadow-xs flex flex-col justify-between">
+                        <div>
+                            <span className="text-[10px] font-bold text-[#0055cc] uppercase tracking-wider block mb-0.5">
+                                Hands-on Learning
+                            </span>
+                            <h3 className="text-sm sm:text-base font-bold text-[#0a2540] mb-1.5">
+                                Live Project &amp; Practical Learning
+                            </h3>
+                            <p className="text-slate-600 text-[11px] leading-relaxed mb-2.5">
+                                Practical assignments covering key domains:
+                            </p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 mb-3">
+                                {[
+                                    'Web & Software Development',
+                                    'Mobile Applications',
+                                    'AI & Data Analytics',
+                                    'Cloud & IT Systems',
+                                    'Cyber Security',
+                                    'UI/UX & Digital Design',
+                                    'Digital Business Tools'
+                                ].map((item, idx) => (
+                                    <div key={idx} className="flex items-center gap-1.5 p-1.5 rounded bg-slate-50 text-[11px] font-medium text-slate-700 border border-slate-100">
+                                        <CheckCircle2 className="w-3 h-3 text-[#0055ff] flex-shrink-0" />
+                                        <span>{item}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <p className="text-[10px] text-slate-600 bg-slate-50 p-2 rounded border border-slate-200/50">
+                            Build practical understanding, project documentation skills and a working portfolio.
+                        </p>
+                    </div>
+                </div>
+
+                {/* 8. CAREER & PLACEMENT SUPPORT */}
+                <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/70 shadow-xs">
+                    <div className="w-full mb-3">
+                        <span className="text-[10px] font-bold text-[#0055cc] uppercase tracking-wider block mb-0.5">
+                            Recruitment Readiness
+                        </span>
+                        <h2 className="text-base sm:text-lg font-bold text-[#0a2540]">
+                            Career &amp; Placement Support
+                        </h2>
+                        <p className="text-slate-600 text-xs mt-1 leading-relaxed">
+                            Career and placement assistance designed to help eligible students prepare for professional opportunities.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-2 mb-3">
+                        {[
+                            'Resume & CV Development',
+                            'Interview Preparation',
+                            'Mock Interviews',
+                            'Technical Interview Prep',
+                            'HR Interview Prep',
+                            'Workplace Skills',
+                            'Job Role Guidance',
+                            'Recruitment Updates',
+                            'Placement Assistance'
+                        ].map((item, idx) => (
+                            <div key={idx} className="flex items-center gap-1.5 p-2 rounded-lg bg-slate-50 border border-slate-200/50">
+                                <CheckCircle2 className="w-3 h-3 text-[#0055ff] flex-shrink-0" />
+                                <span className="text-slate-700 text-[11px] font-medium">{item}</span>
+                            </div>
+                        ))}
+                    </div>
+
+                    <p className="text-[10px] text-slate-500 italic bg-slate-50 p-2.5 rounded-lg border border-slate-200/50">
+                        Placement or employment is not guaranteed. Final recruitment decisions are made solely by the hiring employer.
+                    </p>
+                </div>
+
+                {/* 9. OUR CERTIFICATE & QUALIFICATION APPROACH */}
+                <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/70 shadow-xs">
+                    <div className="w-full mb-2.5">
+                        <div className="inline-flex items-center gap-1.5 text-[#0055cc] text-[10px] font-bold uppercase tracking-wider mb-0.5">
+                            <Shield className="w-3 h-3" />
+                            <span>Transparency &amp; Compliance</span>
+                        </div>
+                        <h2 className="text-base sm:text-lg font-bold text-[#0a2540]">
+                            Certificate &amp; Qualification Approach
+                        </h2>
+                    </div>
+
+                    <div className="space-y-1.5 text-xs text-slate-600 leading-relaxed">
+                        <p>
+                            Aayush Institute awards certificates for eligible students who successfully complete applicable Institute-conducted courses and fulfill course criteria.
+                        </p>
+                        <p>
+                            The Institute does not make any blanket guarantee that Institute-issued certificates are automatically accepted for every Government or private recruitment process. Acceptance depends strictly on the requirements of the recruiting authority or employer.
+                        </p>
+                        <p>
+                            For University or third-party programs, qualifications and certifications are governed by the respective University or awarding body.
+                        </p>
+                    </div>
+                </div>
+
+                {/* 10. WHO WE SERVE & 11. WHY AAYUSH INSTITUTE */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    {/* Who We Serve */}
+                    <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/70 shadow-xs">
+                        <span className="text-[10px] font-bold text-[#0055cc] uppercase tracking-wider block mb-0.5">
+                            Learner Profiles
+                        </span>
+                        <h2 className="text-base sm:text-lg font-bold text-[#0a2540] mb-3">
+                            Who We Serve
+                        </h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {[
+                                { title: 'Students', desc: 'Build academic and practical skills alongside education.' },
+                                { title: 'Graduates & Freshers', desc: 'Develop job-oriented technical and professional capabilities.' },
+                                { title: 'Working Professionals', desc: 'Upgrade skills and explore career advancement.' },
+                                { title: 'Career Changers', desc: 'Build skills for entering new domains.' },
+                                { title: 'Job Seekers', desc: 'Improve technical, digital and workplace readiness.' },
+                                { title: 'Business Learners', desc: 'Practical digital, business and productivity tools.' }
+                            ].map((item, idx) => (
+                                <div key={idx} className="p-2.5 rounded-lg bg-slate-50 border border-slate-200/50">
+                                    <h4 className="text-xs font-semibold text-[#0a2540] mb-0.5">{item.title}</h4>
+                                    <p className="text-[11px] text-slate-600 leading-snug">{item.desc}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Why Aayush Institute */}
+                    <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/70 shadow-xs">
+                        <span className="text-[10px] font-bold text-[#0055cc] uppercase tracking-wider block mb-0.5">
+                            Key Pillars
+                        </span>
+                        <h2 className="text-base sm:text-lg font-bold text-[#0a2540] mb-3">
+                            Why Aayush Institute
+                        </h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {[
+                                { title: 'Since 2002', desc: 'Over two decades associated with professional learning.' },
+                                { title: 'Practical Learning', desc: 'Focus on applying knowledge through exercises and projects.' },
+                                { title: 'Technology Skills', desc: 'Programs in IT, software, AI, data, and digital business.' },
+                                { title: 'University Programs', desc: 'Guidance and support for eligible Distance/Online degrees.' },
+                                { title: 'Career Guidance', desc: 'Advisory available at no additional cost.' },
+                                { title: 'Industry Exposure', desc: 'Live projects and internships wherever applicable.' }
+                            ].map((item, idx) => (
+                                <div key={idx} className="p-2.5 rounded-lg bg-slate-50 border border-slate-200/50">
+                                    <h4 className="text-xs font-semibold text-[#0055ff] mb-0.5">{item.title}</h4>
+                                    <p className="text-[11px] text-slate-600 leading-snug">{item.desc}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* 12. VISION & MISSION */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-3.5">
+                    {/* Vision */}
+                    <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/70 shadow-xs">
+                        <span className="text-[10px] font-bold text-[#0055cc] uppercase tracking-wider block mb-0.5">
+                            Our Vision
+                        </span>
+                        <h3 className="text-sm sm:text-base font-bold text-[#0a2540] mb-1.5">
+                            Accessible &amp; Relevant Learning Pathways
+                        </h3>
+                        <p className="text-slate-600 text-xs leading-relaxed">
+                            To contribute to an education ecosystem where learners can access relevant knowledge, practical skills, professional exposure and informed career guidance to support their long-term growth.
+                        </p>
+                    </div>
+
+                    {/* Mission */}
+                    <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/70 shadow-xs">
+                        <span className="text-[10px] font-bold text-[#0055cc] uppercase tracking-wider block mb-0.5">
+                            Our Mission
+                        </span>
+                        <h3 className="text-sm sm:text-base font-bold text-[#0a2540] mb-1.5">
+                            Educate • Develop • Connect • Progress
+                        </h3>
+                        <div className="space-y-1 text-xs text-slate-600">
+                            <p><strong className="text-slate-800">Educate:</strong> Structured and accessible learning opportunities.</p>
+                            <p><strong className="text-slate-800">Develop:</strong> Practical, technical and professional capabilities.</p>
+                            <p><strong className="text-slate-800">Connect:</strong> Industry exposure and professional interaction.</p>
+                            <p><strong className="text-slate-800">Progress:</strong> Support learners in making informed career decisions.</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 12.1 DYNAMIC FACULTY & MENTORS SHOWCASE */}
+                {facultyList.length > 0 && (
+                    <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                            <div>
+                                <span className="text-[10px] font-bold text-[#0055cc] uppercase tracking-wider block mb-0.5">
+                                    Academic Leadership
+                                </span>
+                                <h2 className="text-base sm:text-lg font-bold text-[#0a2540]">
+                                    Distinguished Faculty &amp; Industry Mentors
+                                </h2>
+                                <p className="text-xs text-slate-500 mt-0.5">
+                                    Learn from certified educators with decades of specialized corporate and research experience.
+                                </p>
+                            </div>
+                            <NavLink
+                                to="/staff"
+                                className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-800 transition shrink-0"
+                            >
+                                <span>View All Faculty Directory</span>
+                                <ChevronRight className="w-3.5 h-3.5" />
+                            </NavLink>
                         </div>
 
-                        <div className="grid lg:grid-cols-2 gap-8 items-center">
-                            <div className="space-y-6">
-                                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
-                                    <h3 className="text-xl font-bold mb-3 flex items-center">
-                                        <Briefcase className="w-5 h-5 mr-2" />
-                                        The Industry Challenge
-                                    </h3>
-                                    <p className="text-orange-100 leading-relaxed">
-                                        Thousands of students graduate with professional degrees like B.Tech, BCA, MCA, BBA, and MBA,
-                                        yet struggle to secure jobs due to the gap between theoretical education and practical industry demands.
-                                    </p>
-                                </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                            {facultyList.map((faculty, idx) => (
+                                <div
+                                    key={faculty._id || idx}
+                                    className="p-3.5 rounded-xl bg-slate-50/70 border border-slate-200/60 hover:border-blue-300 hover:bg-blue-50/30 transition-all flex flex-col justify-between group"
+                                >
+                                    <div>
+                                        <div className="flex items-center gap-3 mb-2.5">
+                                            {faculty.image ? (
+                                                <img
+                                                    src={faculty.image}
+                                                    alt={faculty.name}
+                                                    className="w-11 h-11 rounded-xl object-cover ring-2 ring-blue-100 shadow-xs shrink-0"
+                                                />
+                                            ) : (
+                                                <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-sm flex items-center justify-center shrink-0">
+                                                    {faculty.name ? faculty.name.charAt(0) : 'F'}
+                                                </div>
+                                            )}
+                                            <div className="min-w-0">
+                                                <h4 className="text-xs font-bold text-[#0a2540] truncate group-hover:text-blue-600 transition">
+                                                    {faculty.name}
+                                                </h4>
+                                                <p className="text-[11px] font-semibold text-blue-600 truncate">
+                                                    {faculty.designation || 'Senior Faculty'}
+                                                </p>
+                                            </div>
+                                        </div>
 
-                                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
-                                    <h3 className="text-xl font-bold mb-3 flex items-center">
-                                        <Star className="w-5 h-5 mr-2" />
-                                        Our Solution
-                                    </h3>
-                                    <p className="text-orange-100 leading-relaxed">
-                                        We bridge this gap with Corporate Training Courses that develop hands-on skills, live project experience,
-                                        and real-time problem-solving capabilities that employers actually seek.
-                                    </p>
-                                </div>
-                            </div>
+                                        <p className="text-[11px] text-slate-600 line-clamp-2 leading-relaxed mb-2">
+                                            {faculty.bio || faculty.course || faculty.department}
+                                        </p>
+                                    </div>
 
-                            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
-                                <h3 className="text-2xl font-bold mb-4 text-center">Job-Creator Mindset</h3>
-                                <p className="text-orange-100 leading-relaxed text-center mb-6">
-                                    Our mission extends beyond job placement—we transform students into capable professionals
-                                    with entrepreneurial thinking, ready to thrive in any corporate setting.
-                                </p>
-                                <div className="flex justify-center">
-                                    <div className="bg-yellow-400 text-orange-900 px-6 py-3 rounded-full font-semibold flex items-center">
-                                        <TrendingUp className="w-5 h-5 mr-2" />
-                                        Long-term Success
+                                    <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-[10.5px]">
+                                        <span className="text-slate-500 truncate max-w-[120px] font-medium">
+                                            {faculty.department}
+                                        </span>
+                                        <NavLink
+                                            to="/staff"
+                                            className="font-bold text-blue-600 hover:text-blue-800"
+                                        >
+                                            Profile →
+                                        </NavLink>
                                     </div>
                                 </div>
-                            </div>
+                            ))}
                         </div>
+                    </div>
+                )}
+
+                {/* 13. LOOKING AHEAD */}
+                <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/70 shadow-xs">
+                    <div className="w-full">
+                        <span className="text-[10px] font-bold text-[#0055cc] uppercase tracking-wider block mb-0.5">
+                            Forward Vision
+                        </span>
+                        <h2 className="text-base sm:text-lg font-bold text-[#0a2540] mb-1.5">
+                            Looking Ahead
+                        </h2>
+                        <p className="text-slate-600 text-xs leading-relaxed mb-2">
+                            Since 2002, the education and technology landscape has continued to evolve. Aayush Institute aims to continue evolving by expanding relevant learning opportunities across technology, professional education, and career development.
+                        </p>
+                        <p className="text-xs font-semibold text-[#004b93]">
+                            Our focus remains simple: Relevant Education • Practical Skills • Industry Exposure • Career Development.
+                        </p>
                     </div>
                 </div>
 
-                {/* Our Impact */}
-                <div className="mb-20">
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Impact</h2>
-                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                            Creating transformative opportunities and sustainable impact in communities
+                {/* 14. START YOUR LEARNING JOURNEY */}
+                <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/70 shadow-xs">
+                    <div className="w-full mb-3">
+                        <span className="text-[10px] font-bold text-[#0055cc] uppercase tracking-wider block mb-0.5">
+                            Get Started
+                        </span>
+                        <h2 className="text-base sm:text-lg font-bold text-[#0a2540]">
+                            Start Your Learning Journey
+                        </h2>
+                        <p className="text-slate-600 text-xs mt-0.5 leading-relaxed">
+                            Whether starting your first course or preparing for your career, explore the pathway relevant to your goals:
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {achievements.map((achievement, index) => (
-                            <div key={index} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
-                                <div className="flex items-start space-x-3">
-                                    <CheckCircle className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
-                                    <span className="text-gray-700 font-medium">{achievement}</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                        <NavLink
+                            to="/Courses"
+                            className="p-3 rounded-lg bg-slate-50 hover:bg-blue-50/70 border border-slate-200/60 hover:border-blue-200 transition-colors group flex flex-col justify-between"
+                        >
+                            <div>
+                                <h4 className="text-xs font-bold text-[#0a2540] group-hover:text-[#0055ff] mb-0.5">
+                                    Explore Courses
+                                </h4>
+                                <p className="text-[11px] text-slate-500 leading-snug mb-2">
+                                    IT, software and skill-based programs.
+                                </p>
+                            </div>
+                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#0055ff]">
+                                <span>Browse Courses</span>
+                                <ChevronRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
+                            </span>
+                        </NavLink>
+
+                        <NavLink
+                            to="/UniversityCourses"
+                            className="p-3 rounded-lg bg-slate-50 hover:bg-blue-50/70 border border-slate-200/60 hover:border-blue-200 transition-colors group flex flex-col justify-between"
+                        >
+                            <div>
+                                <h4 className="text-xs font-bold text-[#0a2540] group-hover:text-[#0055ff] mb-0.5">
+                                    University Degrees
+                                </h4>
+                                <p className="text-[11px] text-slate-500 leading-snug mb-2">
+                                    Online, Distance and professional degrees.
+                                </p>
+                            </div>
+                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#0055ff]">
+                                <span>Explore Degrees</span>
+                                <ChevronRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
+                            </span>
+                        </NavLink>
+
+                        <NavLink
+                            to="/contact"
+                            className="p-3 rounded-lg bg-slate-50 hover:bg-blue-50/70 border border-slate-200/60 hover:border-blue-200 transition-colors group flex flex-col justify-between"
+                        >
+                            <div>
+                                <h4 className="text-xs font-bold text-[#0a2540] group-hover:text-[#0055ff] mb-0.5">
+                                    Career Guidance
+                                </h4>
+                                <p className="text-[11px] text-slate-500 leading-snug mb-2">
+                                    Speak with our team at no additional cost.
+                                </p>
+                            </div>
+                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#0055ff]">
+                                <span>Talk to Advisor</span>
+                                <ChevronRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
+                            </span>
+                        </NavLink>
+
+                        <NavLink
+                            to="/contact"
+                            className="p-3 rounded-lg bg-slate-50 hover:bg-blue-50/70 border border-slate-200/60 hover:border-blue-200 transition-colors group flex flex-col justify-between"
+                        >
+                            <div>
+                                <h4 className="text-xs font-bold text-[#0a2540] group-hover:text-[#0055ff] mb-0.5">
+                                    Contact Us
+                                </h4>
+                                <p className="text-[11px] text-slate-500 leading-snug mb-2">
+                                    Course and admission enquiries.
+                                </p>
+                            </div>
+                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#0055ff]">
+                                <span>Contact Team</span>
+                                <ChevronRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
+                            </span>
+                        </NavLink>
+                    </div>
+                </div>
+
+                {/* 15. INSTITUTIONAL & CONTACT INFORMATION - Calm, Compact & Professional */}
+                <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/70 shadow-xs text-center">
+                    <div className="w-full space-y-3">
+                        <div>
+                            <span className="inline-block px-2.5 py-0.5 rounded-full bg-blue-50 text-[#0055cc] text-[10px] font-semibold tracking-wider uppercase border border-blue-100 mb-1">
+                                Established: 2002
+                            </span>
+                            <h3 className="text-sm sm:text-base font-bold text-[#0a2540]">
+                                AAYUSH INSTITUTE OF PROFESSIONAL STUDIES
+                            </h3>
+                            <p className="text-[11px] text-slate-500 mt-0.5">
+                                Operated &amp; Managed by Atri Admission Anytime Private Limited
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5 pt-3 border-t border-slate-100 text-xs">
+                            {/* Address */}
+                            <div className="lg:col-span-4 p-2.5 rounded-lg bg-slate-50 border border-slate-200/50 flex flex-col items-center text-center justify-center">
+                                <MapPin className="w-3.5 h-3.5 text-[#0055ff] mb-1" />
+                                <h4 className="font-semibold text-slate-700 uppercase text-[9.5px] tracking-wider mb-0.5">Address</h4>
+                                <p className="text-slate-600 text-[11px] leading-snug lg:whitespace-nowrap">
+                                    Plot 14, Block S, DLF Dilshad Ext. 2, Ghaziabad, UP – 201005
+                                </p>
+                            </div>
+
+                            {/* Phone */}
+                            <div className="lg:col-span-4 p-2.5 rounded-lg bg-slate-50 border border-slate-200/50 flex flex-col items-center text-center justify-center">
+                                <Phone className="w-3.5 h-3.5 text-[#0055ff] mb-1" />
+                                <h4 className="font-semibold text-slate-700 uppercase text-[9.5px] tracking-wider mb-0.5">Phone</h4>
+                                <div className="flex flex-wrap items-center justify-center gap-1.5 text-slate-600 text-[11px] font-medium whitespace-nowrap">
+                                    <a href="tel:01202611111" className="hover:text-[#0055ff] transition-colors">0120-2611111</a>
+                                    <span className="text-slate-300">•</span>
+                                    <a href="tel:+918800817447" className="hover:text-[#0055ff] transition-colors">+91-8800817447</a>
+                                    <span className="text-slate-300">•</span>
+                                    <a href="tel:+919311050670" className="hover:text-[#0055ff] transition-colors">+91-9311050670</a>
                                 </div>
                             </div>
-                        ))}
+
+                            {/* Email */}
+                            <div className="lg:col-span-2 p-2.5 rounded-lg bg-slate-50 border border-slate-200/50 flex flex-col items-center text-center justify-center">
+                                <Mail className="w-3.5 h-3.5 text-[#0055ff] mb-1" />
+                                <h4 className="font-semibold text-slate-700 uppercase text-[9.5px] tracking-wider mb-0.5">Email</h4>
+                                <a href="mailto:info@aayushinstitute.com" className="text-slate-600 hover:text-[#0055ff] text-[11px] whitespace-nowrap">
+                                    info@aayushinstitute.com
+                                </a>
+                            </div>
+
+                            {/* Website */}
+                            <div className="lg:col-span-2 p-2.5 rounded-lg bg-slate-50 border border-slate-200/50 flex flex-col items-center text-center justify-center">
+                                <Globe className="w-3.5 h-3.5 text-[#0055ff] mb-1" />
+                                <h4 className="font-semibold text-slate-700 uppercase text-[9.5px] tracking-wider mb-0.5">Website</h4>
+                                <a href="https://www.aayushinstitute.com" target="_blank" rel="noreferrer" className="text-slate-600 hover:text-[#0055ff] text-[11px] whitespace-nowrap">
+                                    www.aayushinstitute.com
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* Educational Ecosystem */}
-                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 md:p-12 text-white">
-                    <div className="text-center mb-8">
-                        <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Unique Educational Ecosystem</h2>
-                        <p className="text-emerald-100 text-lg max-w-3xl mx-auto leading-relaxed">
-                            Blending academic rigor with real-world relevance, fostering personal growth,
-                            professional readiness, and social responsibility
-                        </p>
-                    </div>
-
-                    <div className="grid md:grid-cols-3 gap-8">
-                        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center">
-                            <BookOpen className="w-12 h-12 text-yellow-300 mx-auto mb-4" />
-                            <h3 className="text-xl font-bold mb-3">Academic Excellence</h3>
-                            <p className="text-emerald-100">Rigorous curriculum designed for comprehensive learning</p>
-                        </div>
-
-                        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center">
-                            <Users className="w-12 h-12 text-yellow-300 mx-auto mb-4" />
-                            <h3 className="text-xl font-bold mb-3">Community Partnerships</h3>
-                            <p className="text-emerald-100">Collaborating with government, private, and community organizations</p>
-                        </div>
-
-                        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center">
-                            <Award className="w-12 h-12 text-yellow-300 mx-auto mb-4" />
-                            <h3 className="text-xl font-bold mb-3">Employment Focus</h3>
-                            <p className="text-emerald-100">Affordable, flexible, and employment-oriented programs</p>
-                        </div>
-                    </div>
-
-                    <div className="text-center mt-8">
-                        <p className="text-xl font-semibold text-yellow-300">
-                            "Education is not just about earning degrees—it's about transforming lives."
-                        </p>
-                    </div>
-                </div>
             </div>
         </div>
     );
 };
 
 export default AboutUs;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import React from 'react';
-// import {
-//     Users,
-//     BookOpen,
-//     Award,
-//     Target,
-//     Heart,
-//     Star,
-//     Building,
-//     GraduationCap,
-//     Globe,
-//     Trophy,
-//     Clock,
-//     MapPin
-// } from 'lucide-react';
-
-// const AboutUs = () => {
-//     const stats = [
-//         { icon: Users, value: '2,500+', label: 'Students' },
-//         { icon: GraduationCap, value: '150+', label: 'Faculty Members' },
-//         { icon: Trophy, value: '50+', label: 'Awards Won' },
-//         { icon: Clock, value: '25+', label: 'Years of Excellence' }
-//     ];
-
-//     const values = [
-//         {
-//             icon: BookOpen,
-//             title: 'Academic Excellence',
-//             description: 'We strive for the highest standards in education, fostering critical thinking and lifelong learning.'
-//         },
-//         {
-//             icon: Heart,
-//             title: 'Character Building',
-//             description: 'Developing integrity, empathy, and moral values that shape responsible global citizens.'
-//         },
-//         {
-//             icon: Globe,
-//             title: 'Global Perspective',
-//             description: 'Preparing students for an interconnected world through diverse experiences and cultural awareness.'
-//         },
-//         {
-//             icon: Target,
-//             title: 'Innovation',
-//             description: 'Embracing creativity and forward-thinking approaches to solve tomorrow\'s challenges.'
-//         }
-//     ];
-
-//     const facilities = [
-//         { name: 'Modern Laboratories', description: 'State-of-the-art science and computer labs' },
-//         { name: 'Digital Library', description: 'Extensive collection of books and digital resources' },
-//         { name: 'Sports Complex', description: 'Olympic-size pool, gymnasium, and outdoor fields' },
-//         { name: 'Arts Center', description: 'Music rooms, art studios, and performance theater' },
-//         { name: 'Innovation Hub', description: 'Maker space with 3D printing and robotics' },
-//         { name: 'Wellness Center', description: 'Health services and counseling support' }
-//     ];
-
-//     return (
-//         <div className="min-h-screen bg-white">
-
-//             {/* Hero Section */}
-//             <section className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white py-24 px-4 sm:px-6 lg:px-8">
-//                 <div className="absolute inset-0 bg-black/20"></div>
-//                 <div className="relative max-w-7xl mx-auto text-center">
-//                     <div className="inline-flex items-center justify-center w-20 h-20 bg-white/10 rounded-full mb-8 backdrop-blur-sm">
-//                         <GraduationCap className="w-10 h-10" />
-//                     </div>
-//                     <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
-//                         Westfield Academy
-//                     </h1>
-//                     <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto leading-relaxed">
-//                         Nurturing minds, building character, and shaping the leaders of tomorrow since 1999
-//                     </p>
-//                     <div className="flex flex-wrap justify-center gap-4 text-sm md:text-base">
-//                         <span className="bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">K-12 Education</span>
-//                         <span className="bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">International Curriculum</span>
-//                         <span className="bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">Award-Winning Programs</span>
-//                     </div>
-//                 </div>
-//             </section>
-
-//             {/* Stats Section */}
-//             <section className="py-16 bg-gray-50">
-//                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-//                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-//                         {stats.map((stat, index) => {
-//                             const Icon = stat.icon;
-//                             return (
-//                                 <div key={index} className="text-center group">
-//                                     <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 text-white rounded-full mb-4 group-hover:bg-blue-700 transition-colors duration-300">
-//                                         <Icon className="w-8 h-8" />
-//                                     </div>
-//                                     <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">{stat.value}</div>
-//                                     <div className="text-gray-600 font-medium">{stat.label}</div>
-//                                 </div>
-//                             );
-//                         })}
-//                     </div>
-//                 </div>
-//             </section>
-
-//             {/* History Section */}
-//             <section className="py-20 px-4 sm:px-6 lg:px-8">
-//                 <div className="max-w-7xl mx-auto">
-//                     <div className="grid lg:grid-cols-2 gap-16 items-center">
-//                         <div>
-//                             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">Our Story</h2>
-//                             <div className="space-y-6 text-lg text-gray-700 leading-relaxed">
-//                                 <p>
-//                                     Founded in 1999 by visionary educators Dr. Sarah Mitchell and Dr. James Chen,
-//                                     Westfield Academy began as a small progressive school with just 150 students and
-//                                     a dream to revolutionize education.
-//                                 </p>
-//                                 <p>
-//                                     Over 25 years, we've grown into a premier educational institution serving over
-//                                     2,500 students from diverse backgrounds. Our innovative approach combines rigorous
-//                                     academics with character development, preparing students not just for college,
-//                                     but for life.
-//                                 </p>
-//                                 <p>
-//                                     Today, Westfield Academy is recognized internationally for its excellence in
-//                                     STEM education, arts programs, and commitment to sustainability. Our graduates
-//                                     attend top universities worldwide and become leaders in their chosen fields.
-//                                 </p>
-//                             </div>
-//                         </div>
-//                         <div className="relative">
-//                             <div className="bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl p-8 h-96 flex items-center justify-center">
-//                                 <div className="text-center">
-//                                     <Building className="w-20 h-20 text-blue-600 mx-auto mb-4" />
-//                                     <p className="text-gray-600 text-lg">Campus Image Placeholder</p>
-//                                     <p className="text-sm text-gray-500 mt-2">Beautiful 50-acre campus</p>
-//                                 </div>
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </div>
-//             </section>
-
-//             {/* Mission & Vision */}
-//             <section className="py-20 px-4 sm:px-6 lg:px-8">
-//                 <div className="max-w-7xl mx-auto">
-//                     <div className="text-center mb-16">
-//                         <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Our Mission & Vision</h2>
-//                         <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-//                             Committed to excellence in education and character development
-//                         </p>
-//                     </div>
-
-//                     <div className="grid md:grid-cols-2 gap-12 lg:gap-20">
-//                         <div className="bg-gradient-to-br from-blue-50 to-indigo-100 p-8 rounded-2xl">
-//                             <div className="flex items-center mb-6">
-//                                 <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mr-4">
-//                                     <Target className="w-6 h-6 text-white" />
-//                                 </div>
-//                                 <h3 className="text-2xl font-bold text-gray-900">Our Mission</h3>
-//                             </div>
-//                             <p className="text-gray-700 text-lg leading-relaxed">
-//                                 To provide exceptional education that empowers students to become confident, creative, and
-//                                 caring individuals who contribute positively to their communities and the world.
-//                             </p>
-//                         </div>
-
-//                         <div className="bg-gradient-to-br from-green-50 to-teal-100 p-8 rounded-2xl">
-//                             <div className="flex items-center mb-6">
-//                                 <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mr-4">
-//                                     <Star className="w-6 h-6 text-white" />
-//                                 </div>
-//                                 <h3 className="text-2xl font-bold text-gray-900">Our Vision</h3>
-//                             </div>
-//                             <p className="text-gray-700 text-lg leading-relaxed">
-//                                 To be a leading educational institution recognized for academic excellence, innovative teaching,
-//                                 and nurturing an inclusive community where every student thrives.
-//                             </p>
-//                         </div>
-//                     </div>
-//                 </div>
-//             </section>
-
-//             {/* Core Values */}
-//             <section className="py-20 bg-gray-50 px-4 sm:px-6 lg:px-8">
-//                 <div className="max-w-7xl mx-auto">
-//                     <div className="text-center mb-16">
-//                         <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Our Core Values</h2>
-//                         <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-//                             The principles that guide everything we do
-//                         </p>
-//                     </div>
-
-//                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-//                         {values.map((value, index) => {
-//                             const Icon = value.icon;
-//                             return (
-//                                 <div key={index} className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
-//                                     <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mb-6">
-//                                         <Icon className="w-7 h-7 text-white" />
-//                                     </div>
-//                                     <h3 className="text-xl font-bold text-gray-900 mb-4">{value.title}</h3>
-//                                     <p className="text-gray-600 leading-relaxed">{value.description}</p>
-//                                 </div>
-//                             );
-//                         })}
-//                     </div>
-//                 </div>
-//             </section>
-
-//             {/* Facilities */}
-//             <section className="py-20 bg-gray-50 px-4 sm:px-6 lg:px-8">
-//                 <div className="max-w-7xl mx-auto">
-//                     <div className="text-center mb-16">
-//                         <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">World-Class Facilities</h2>
-//                         <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-//                             State-of-the-art infrastructure designed for 21st-century learning
-//                         </p>
-//                     </div>
-
-//                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-//                         {facilities.map((facility, index) => (
-//                             <div key={index} className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
-//                                 <div className="flex items-start space-x-4">
-//                                     <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-//                                         <Building className="w-6 h-6 text-blue-600" />
-//                                     </div>
-//                                     <div>
-//                                         <h3 className="text-lg font-bold text-gray-900 mb-2">{facility.name}</h3>
-//                                         <p className="text-gray-600">{facility.description}</p>
-//                                     </div>
-//                                 </div>
-//                             </div>
-//                         ))}
-//                     </div>
-//                 </div>
-//             </section>
-
-//             {/* CTA Section */}
-//             <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-700 text-white px-4 sm:px-6 lg:px-8">
-//                 <div className="max-w-4xl mx-auto text-center">
-//                     <h2 className="text-4xl md:text-5xl font-bold mb-6">Join Our Community</h2>
-//                     <p className="text-xl mb-8 text-blue-100">
-//                         Discover how Westfield Academy can help your child reach their full potential
-//                     </p>
-//                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-//                         <button className="bg-white text-blue-600 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-colors duration-300 flex items-center justify-center">
-//                             <MapPin className="w-5 h-5 mr-2" />
-//                             Schedule a Tour
-//                         </button>
-//                         <button className="border-2 border-white text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-blue-600 transition-all duration-300">
-//                             Learn More
-//                         </button>
-//                     </div>
-//                 </div>
-//             </section>
-
-//             {/* Footer */}
-//             <footer className="bg-gray-900 text-gray-300 py-12 px-4 sm:px-6 lg:px-8">
-//                 <div className="max-w-7xl mx-auto text-center">
-//                     <div className="flex items-center justify-center mb-6">
-//                         <GraduationCap className="w-8 h-8 mr-3" />
-//                         <span className="text-2xl font-bold">Westfield Academy</span>
-//                     </div>
-//                     <p className="text-gray-400 mb-4">
-//                         123 Education Drive, Learning City, LC 12345 | Phone: (555) 123-4567
-//                     </p>
-//                     <p className="text-sm text-gray-500">
-//                         © 2024 Westfield Academy. All rights reserved.
-//                     </p>
-//                 </div>
-//             </footer>
-//         </div>
-//     );
-// }
-
-// export default AboutUs;

@@ -1,22 +1,103 @@
 @import "tailwindcss";
 
-/* Custom multi-line clamp */
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;   /* number of lines to show */
-  line-clamp: 3;           /* standard property for compatibility */
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+*, *::before, *::after {
+  font-family: 'Poppins', sans-serif;
 }
 
-/* Remove number input arrows for WhatsApp field */
-.no-spinner::-webkit-outer-spin-button,
-.no-spinner::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+html, body {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  overflow-x: hidden;
+  max-width: 100vw;
+  color: #1e293b;
 }
 
-.no-spinner {
-  appearance: textfield;      /* Standard property */
-  -moz-appearance: textfield; /* Firefox */
+/* ── Typography & Font Weight Baseline (Standardized from Homepage) ── */
+h1, h2, h3 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
+
+h4, h5, h6 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+p, li, blockquote {
+  font-weight: 400;
+}
+
+button {
+  font-weight: 600;
+}
+
+label {
+  font-weight: 500;
+}
+
+input, select, textarea {
+  font-weight: 400;
+}
+
+.font-cursive {
+  font-family: 'Caveat', 'Dancing Script', cursive !important;
+}
+
+/* Hide scrollbar for Chrome, Safari, Opera, Edge, Firefox */
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar,
+.hide-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.no-scrollbar,
+.scrollbar-none,
+.hide-scrollbar {
+  -ms-overflow-style: none !important;  /* IE and Edge */
+  scrollbar-width: none !important;  /* Firefox */
+}
+
+/* Thin modern scrollbar for scrollable course details */
+.custom-modal-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-modal-scroll::-webkit-scrollbar-track {
+  background: rgba(226, 232, 240, 0.5);
+  border-radius: 9999px;
+}
+.custom-modal-scroll::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.7);
+  border-radius: 9999px;
+}
+.custom-modal-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.9);
+}
+.custom-modal-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.7) rgba(226, 232, 240, 0.5);
+}
+
+/* ── Continuous Horizontal Marquee Animation ── */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 35s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+ 
