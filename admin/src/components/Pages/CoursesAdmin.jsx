@@ -25,7 +25,19 @@ import {
   Sparkles,
   RefreshCw,
   MoreVertical,
-  ExternalLink
+  ExternalLink,
+  BookOpen,
+  DollarSign,
+  Layers,
+  GraduationCap,
+  Image as ImageIcon,
+  Star,
+  Calendar,
+  BadgePercent,
+  Briefcase,
+  Tag,
+  ArrowRight,
+  ArrowLeft
 } from "lucide-react";
 
 // Default placeholder images matching the exact lab/workstation theme in screenshots
@@ -37,6 +49,15 @@ const DEFAULT_IMAGES = [
   "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80", // Digital marketing classroom
   "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80", // AI machine learning
   "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80", // Cloud computing
+];
+
+const PRESET_BANNERS = [
+  { label: "UI/UX & Web", url: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80" },
+  { label: "MERN Stack", url: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" },
+  { label: "Graphic Design", url: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80" },
+  { label: "Python & AI", url: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80" },
+  { label: "Digital Marketing", url: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80" },
+  { label: "Cloud & Cyber", url: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80" },
 ];
 
 const INSTRUCTORS_POOL = [
@@ -80,6 +101,7 @@ export default function CoursesAdmin({
 
   // Modals
   const [showCourseModal, setShowCourseModal] = useState(false);
+  const [modalTab, setModalTab] = useState("basic"); // "basic", "academics", "faculty", "curriculum"
   const [editingCourse, setEditingCourse] = useState(null);
   const [viewingCourse, setViewingCourse] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -213,10 +235,9 @@ export default function CoursesAdmin({
     fetchCourses();
   }, []);
 
-  // Compute live statistics for top 5 KPI cards strictly for current program type
   const relevantCourses = useMemo(() => {
-    if (programTypeFilter === "all" || programTypeFilter === "course") {
-      return courses.filter((c) => (c.programType || "course") === "course");
+    if (programTypeFilter === "all") {
+      return courses;
     }
     return courses.filter((c) => (c.programType || "course") === programTypeFilter);
   }, [courses, programTypeFilter]);
@@ -415,6 +436,7 @@ export default function CoursesAdmin({
   const openAddModal = () => {
     setEditingCourse(null);
     setCourseForm(defaultForm);
+    setModalTab("basic");
     setShowCourseModal(true);
   };
 
@@ -450,12 +472,18 @@ export default function CoursesAdmin({
       suitableFor: course.suitableFor || "",
       delivery: course.delivery || "On-Site / Online / Hybrid",
     });
+    setModalTab("basic");
     setShowCourseModal(true);
   };
 
   // Save Add/Edit Form
   const handleSaveCourse = async (e) => {
     e.preventDefault();
+    if (!courseForm.title || !courseForm.title.trim()) {
+      setModalTab('basic');
+      showNotice('error', 'Please provide a Course Title in the Basic Info tab.');
+      return;
+    }
     setSaving(true);
     try {
       const skillsArray = courseForm.skills
@@ -622,25 +650,29 @@ export default function CoursesAdmin({
       {/* Main Content Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 space-y-6">
 
-        {/* Top Header Row with Title and Action Buttons */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        {/* Top Header Row with Title, Badge and Action Buttons */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-white via-indigo-50/20 to-purple-50/20 p-5 rounded-3xl border border-slate-200/80 shadow-xs">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100/80 text-[11px] font-bold text-indigo-700 mb-1.5 shadow-xs">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-600 animate-pulse" />
+              <span>Unified Academic & Training Directory</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
               {pageTitle || (
                 programTypeFilter === "corporate" ? "Corporate AI & Enterprise Training" :
                 programTypeFilter === "university" ? "University Degree Programs" :
                 programTypeFilter === "liveproject" ? "Live Project Capstone Programs" :
                 programTypeFilter === "course" ? "Professional & Technical Courses" :
-                "Academic Offerings & Programs"
+                "Courses & Educational Programs"
               )}
             </h1>
-            <p className="text-sm text-gray-500 mt-0.5">
+            <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-2xl">
               {pageSubtitle || (
                 programTypeFilter === "corporate" ? "Manage B2B Generative AI & corporate workforce training modules." :
                 programTypeFilter === "university" ? "Manage UGC Entitled distance & online degree programs." :
                 programTypeFilter === "liveproject" ? "Manage industry-ready full-stack and backend live capstones." :
                 programTypeFilter === "course" ? "Manage software, design, marketing, data, and hardware skill courses." :
-                "Manage professional, technical, university, corporate, and live capstone courses."
+                "Central management for all 22+ professional courses, live project capstones, corporate tracks & university degrees."
               )}
             </p>
           </div>
@@ -649,21 +681,21 @@ export default function CoursesAdmin({
             <button
               onClick={handleSeedCourses}
               title="Sync or Reset courses with MongoDB"
-              className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 shadow-sm transition-all"
+              className="inline-flex items-center gap-2 px-3.5 py-2.5 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 shadow-xs transition-all cursor-pointer"
             >
-              <Upload className="w-3.5 h-3.5 text-gray-500 rotate-180" />
-              Import Courses
+              <Upload className="w-3.5 h-3.5 text-slate-500 rotate-180" />
+              Sync Catalog
             </button>
             <button
               onClick={() => handleExportCSV(false)}
-              className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 shadow-sm transition-all"
+              className="inline-flex items-center gap-2 px-3.5 py-2.5 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 shadow-xs transition-all cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5 text-gray-500" />
-              Export
+              <Download className="w-3.5 h-3.5 text-slate-500" />
+              Export CSV
             </button>
             <button
               onClick={openAddModal}
-              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-[#6d28d9] hover:bg-[#5b21b6] rounded-xl shadow-sm transition-all"
+              className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-xl shadow-md shadow-indigo-600/25 transition-all cursor-pointer active:scale-95"
             >
               <Plus className="w-4 h-4" />
               Add New Course
@@ -671,109 +703,112 @@ export default function CoursesAdmin({
           </div>
         </div>
 
-        {/* 5 KPI Metric Cards Row */}
+        {/* 5 Colorful KPI Metric Cards Row */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
-          {/* Total Courses */}
-          <div className="bg-white rounded-2xl p-4 border border-gray-200/90 shadow-sm flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-indigo-50 text-[#6d28d9] flex items-center justify-center shrink-0">
+          {/* Total Offerings */}
+          <div className="bg-gradient-to-br from-white via-indigo-50/30 to-purple-50/20 rounded-2xl p-4 border border-indigo-100 shadow-xs hover:shadow-md hover:border-indigo-300 transition-all flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/20">
               <Monitor className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-500">Total Courses</p>
+              <p className="text-xs font-semibold text-slate-500">Total Offerings</p>
               <div className="flex items-baseline gap-2 mt-0.5">
-                <span className="text-2xl font-bold text-gray-900">{stats.total}</span>
-                <span className="text-[11px] font-semibold text-emerald-600">+12%</span>
+                <span className="text-2xl font-black text-slate-900">{stats.total}</span>
+                <span className="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">All Tracks</span>
               </div>
             </div>
           </div>
 
           {/* Published */}
-          <div className="bg-white rounded-2xl p-4 border border-gray-200/90 shadow-sm flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+          <div className="bg-gradient-to-br from-white via-emerald-50/30 to-teal-50/20 rounded-2xl p-4 border border-emerald-100 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/20">
               <Check className="w-5 h-5 stroke-[2.5]" />
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-500">Published</p>
+              <p className="text-xs font-semibold text-slate-500">Live & Active</p>
               <div className="flex items-baseline gap-2 mt-0.5">
-                <span className="text-2xl font-bold text-gray-900">{stats.published}</span>
-                <span className="text-[11px] font-semibold text-emerald-600">+2 this month</span>
+                <span className="text-2xl font-black text-slate-900">{stats.published}</span>
+                <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Published</span>
               </div>
             </div>
           </div>
 
           {/* Draft */}
-          <div className="bg-white rounded-2xl p-4 border border-gray-200/90 shadow-sm flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+          <div className="bg-gradient-to-br from-white via-amber-50/30 to-orange-50/20 rounded-2xl p-4 border border-amber-100 shadow-xs hover:shadow-md hover:border-amber-300 transition-all flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-amber-500/20">
               <Edit3 className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-500">Draft</p>
+              <p className="text-xs font-semibold text-slate-500">Draft Courses</p>
               <div className="flex items-baseline gap-2 mt-0.5">
-                <span className="text-2xl font-bold text-gray-900">{stats.draft}</span>
-                <span className="text-[11px] font-medium text-amber-600">Needs review</span>
+                <span className="text-2xl font-black text-slate-900">{stats.draft}</span>
+                <span className="text-[11px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">In Review</span>
               </div>
             </div>
           </div>
 
           {/* Active Admissions */}
-          <div className="bg-white rounded-2xl p-4 border border-gray-200/90 shadow-sm flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-purple-50 text-[#7c3aed] flex items-center justify-center shrink-0">
+          <div className="bg-gradient-to-br from-white via-sky-50/30 to-blue-50/20 rounded-2xl p-4 border border-sky-100 shadow-xs hover:shadow-md hover:border-sky-300 transition-all flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-500 to-cyan-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/20">
               <Users className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-500">Active Admissions</p>
+              <p className="text-xs font-semibold text-slate-500">Admissions Open</p>
               <div className="flex items-baseline gap-2 mt-0.5">
-                <span className="text-2xl font-bold text-gray-900">{stats.admissions}</span>
-                <span className="text-[11px] font-semibold text-emerald-600">+9.4%</span>
+                <span className="text-2xl font-black text-slate-900">{stats.admissions}</span>
+                <span className="text-[11px] font-bold text-sky-600 bg-sky-50 px-1.5 py-0.5 rounded">Enrolling</span>
               </div>
             </div>
           </div>
 
           {/* Archived */}
-          <div className="bg-white rounded-2xl p-4 border border-gray-200/90 shadow-sm flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center shrink-0">
+          <div className="bg-gradient-to-br from-white via-slate-50 to-zinc-100/50 rounded-2xl p-4 border border-slate-200 shadow-xs hover:shadow-md hover:border-slate-300 transition-all flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-slate-600 to-zinc-700 text-white flex items-center justify-center shrink-0 shadow-md shadow-slate-500/20">
               <FolderArchive className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-500">Archived</p>
+              <p className="text-xs font-semibold text-slate-500">Archived</p>
               <div className="flex items-baseline gap-2 mt-0.5">
-                <span className="text-2xl font-bold text-gray-900">{stats.archived}</span>
-                <span className="text-[11px] font-medium text-gray-400">No change</span>
+                <span className="text-2xl font-black text-slate-900">{stats.archived}</span>
+                <span className="text-[11px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">Stored</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Program Offering Segmented Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+        {/* Program Offering Segmented Tabs with Colorful Badges */}
+        <div className="flex items-center gap-2.5 overflow-x-auto pb-1 scrollbar-none">
           {[
-            { id: "all", label: "All Offerings", count: courses.length, icon: "🌟" },
-            { id: "course", label: "Standard Courses", count: courses.filter(c => (!c.programType || c.programType === "course")).length, icon: "🎓" },
-            { id: "corporate", label: "Corporate & AI", count: courses.filter(c => c.programType === "corporate").length, icon: "🏢" },
-            { id: "university", label: "University Degrees", count: courses.filter(c => c.programType === "university").length, icon: "🏛️" },
-            { id: "liveproject", label: "Live Project Capstone", count: courses.filter(c => c.programType === "liveproject").length, icon: "💻" },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => {
-                setProgramTypeFilter(tab.id);
-                setCurrentPage(1);
-              }}
-              className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap shadow-xs ${
-                programTypeFilter === tab.id
-                  ? "bg-[#6d28d9] text-white shadow-purple-200"
-                  : "bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:text-gray-900"
-              }`}
-            >
-              <span>{tab.icon}</span>
-              <span>{tab.label}</span>
-              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                programTypeFilter === tab.id ? "bg-white/20 text-white" : "bg-gray-100 text-gray-600"
-              }`}>
-                {tab.count}
-              </span>
-            </button>
-          ))}
+            { id: "all", label: "All Offerings", count: courses.length, icon: "🌟", grad: "from-indigo-600 via-purple-600 to-pink-600 shadow-indigo-500/25" },
+            { id: "course", label: "Standard Courses", count: courses.filter(c => (!c.programType || c.programType === "course")).length, icon: "🎓", grad: "from-blue-600 to-indigo-600 shadow-blue-500/25" },
+            { id: "corporate", label: "Corporate & AI", count: courses.filter(c => c.programType === "corporate").length, icon: "🏢", grad: "from-purple-600 to-fuchsia-600 shadow-purple-500/25" },
+            { id: "university", label: "University Degrees", count: courses.filter(c => c.programType === "university").length, icon: "🏛️", grad: "from-amber-500 to-orange-600 shadow-amber-500/25" },
+            { id: "liveproject", label: "Live Project Capstone", count: courses.filter(c => c.programType === "liveproject").length, icon: "💻", grad: "from-emerald-600 to-teal-600 shadow-emerald-500/25" },
+          ].map((tab) => {
+            const isCurrent = programTypeFilter === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  setProgramTypeFilter(tab.id);
+                  setCurrentPage(1);
+                }}
+                className={`px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
+                  isCurrent
+                    ? `bg-gradient-to-r ${tab.grad} text-white shadow-md`
+                    : "bg-white text-slate-700 border border-slate-200/90 hover:bg-slate-50 hover:border-slate-300 shadow-xs"
+                }`}
+              >
+                <span className="text-sm">{tab.icon}</span>
+                <span>{tab.label}</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold transition-all ${
+                  isCurrent ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
+                }`}>
+                  {tab.count}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Controls & Filter Bar */}
@@ -1027,49 +1062,61 @@ export default function CoursesAdmin({
           </div>
         ) : viewMode === "grid" ? (
           /* ========================================================================= */
-          /* GRID VIEW (Screenshot 1)                                                  */
-          /* ========================================================================= */
+          /* GRID VIEW */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {paginatedCourses.map((course) => {
               const statusInfo = getStatusBadge(course.status);
               return (
                 <div
                   key={course._id}
-                  className="bg-white rounded-2xl border border-gray-200/90 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group"
+                  className="bg-white rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 overflow-hidden flex flex-col justify-between group"
                 >
                   <div>
+                    {/* Top Accent Ribbon */}
+                    <div
+                      className={`h-1.5 w-full ${
+                        course.programType === "corporate"
+                          ? "bg-gradient-to-r from-purple-500 via-fuchsia-500 to-pink-500"
+                          : course.programType === "university"
+                          ? "bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500"
+                          : course.programType === "liveproject"
+                          ? "bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500"
+                          : "bg-gradient-to-r from-blue-500 via-indigo-600 to-violet-600"
+                      }`}
+                    />
+
                     {/* Top Image with Status Overlay */}
-                    <div className="relative h-44 w-full overflow-hidden bg-gray-100">
+                    <div className="relative h-44 w-full overflow-hidden bg-slate-100">
                       <img
                         src={course.image || DEFAULT_IMAGES[0]}
                         alt={course.title}
                         onError={(e) => {
                           e.target.src = DEFAULT_IMAGES[0];
                         }}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       {/* Status Badge Overlaid on Top-Left */}
                       <div className="absolute top-3 left-3">
                         <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold backdrop-blur-md shadow-sm ${statusInfo.bg} ${statusInfo.text} border border-white/40`}
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold backdrop-blur-md shadow-sm ${statusInfo.bg} ${statusInfo.text} border border-white/50`}
                         >
                           <span className={`w-2 h-2 rounded-full ${statusInfo.dot}`} />
                           {statusInfo.label}
                         </span>
                       </div>
 
-                      {/* Priority # and Set Top button Overlaid on Top-Right */}
+                      {/* Priority # Overlaid on Top-Right */}
                       <div className="absolute top-3 right-3 flex items-center gap-1.5">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleSetPriority(course._id, 1);
                           }}
-                          title={course.order === 1 ? "Rank #1 (Highest Priority on website)" : "Click to promote to Rank #1"}
+                          title={course.order === 1 ? "Rank #1 (Top of Catalog)" : "Click to pin to Rank #1"}
                           className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold backdrop-blur-md shadow-sm transition-all border ${
                             course.order === 1
                               ? "bg-amber-500 text-white border-amber-300"
-                              : "bg-white/95 text-gray-700 hover:bg-amber-50 hover:text-amber-800 border-gray-200"
+                              : "bg-white/95 text-slate-700 hover:bg-amber-50 hover:text-amber-800 border-slate-200"
                           }`}
                         >
                           ⭐ #{course.order ?? 99} {course.order === 1 ? "TOP" : "Set #1"}
@@ -1078,30 +1125,47 @@ export default function CoursesAdmin({
                     </div>
 
                     {/* Card Body */}
-                    <div className="p-4 space-y-3">
-                      {/* Category Badge & Program Tag */}
-                      <div className="flex items-center justify-between gap-2">
-                        <span
-                          className={`inline-block text-[11px] font-semibold px-2.5 py-0.5 rounded-md ${getCategoryBadgeClass(
-                            course.categoryName
-                          )}`}
-                        >
-                          {course.categoryName}
-                        </span>
-                        {course.badge && (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 uppercase">
-                            {course.badge}
+                    <div className="p-5 space-y-3">
+                      {/* Category & Program Tag & Fees */}
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span
+                            className={`inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-lg ${getCategoryBadgeClass(
+                              course.categoryName
+                            )}`}
+                          >
+                            {course.categoryName}
+                          </span>
+                          <span
+                            className={`inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-md border ${
+                              course.programType === "corporate"
+                                ? "bg-purple-50 text-purple-700 border-purple-200"
+                                : course.programType === "university"
+                                ? "bg-amber-50 text-amber-800 border-amber-200"
+                                : course.programType === "liveproject"
+                                ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                                : "bg-blue-50 text-blue-700 border-blue-200"
+                            }`}
+                          >
+                            {course.programType === "corporate" ? "🏢 Corporate" :
+                             course.programType === "university" ? "🏛️ Degree" :
+                             course.programType === "liveproject" ? "💻 Capstone" : "🎓 Course"}
+                          </span>
+                        </div>
+                        {course.fees && (
+                          <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/80">
+                            {course.fees}
                           </span>
                         )}
                       </div>
 
                       {/* Course Title */}
-                      <h3 className="text-base font-bold text-gray-900 tracking-tight line-clamp-1 group-hover:text-[#6d28d9] transition-colors">
+                      <h3 className="text-base font-extrabold text-slate-900 tracking-tight line-clamp-1 group-hover:text-indigo-600 transition-colors">
                         {course.title}
                       </h3>
 
                       {/* Description Snippet */}
-                      <p className="text-xs text-gray-500 line-clamp-2 min-h-[32px] leading-relaxed">
+                      <p className="text-xs text-slate-500 line-clamp-2 min-h-[32px] leading-relaxed">
                         {course.description}
                       </p>
 
@@ -1111,57 +1175,57 @@ export default function CoursesAdmin({
                           course.skills.slice(0, 3).map((tag, idx) => (
                             <span
                               key={idx}
-                              className="bg-gray-50 text-gray-600 border border-gray-200 text-[10px] font-medium px-2 py-0.5 rounded"
+                              className="bg-slate-50 text-slate-600 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-md"
                             >
                               {tag}
                             </span>
                           ))}
                         {course.skills && course.skills.length > 3 && (
-                          <span className="text-[10px] text-gray-400 self-center">
-                            +{course.skills.length - 3}
+                          <span className="text-[10px] font-semibold text-slate-400 self-center">
+                            +{course.skills.length - 3} more
                           </span>
                         )}
                       </div>
 
                       {/* Meta Information Line */}
-                      <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500 font-medium">
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5 text-gray-400" />
+                      <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
+                        <div className="flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5 text-indigo-500" />
                           <span>{course.duration || "6 Months"}</span>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Award className="w-3.5 h-3.5 text-gray-400" />
-                          <span>{course.certification || "Certificate"}</span>
+                        <div className="flex items-center gap-1.5">
+                          <Award className="w-3.5 h-3.5 text-purple-500" />
+                          <span className="truncate max-w-[110px]">{course.certification || "Certified"}</span>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Users className="w-3.5 h-3.5 text-gray-400" />
-                          <span>{course.enrollments || 96}</span>
+                        <div className="flex items-center gap-1.5">
+                          <Users className="w-3.5 h-3.5 text-emerald-500" />
+                          <span>{course.enrollments || 96} enrolled</span>
                         </div>
                       </div>
                     </div>
                   </div>
 
                   {/* Card Bottom Row: Admissions Badge + View/Edit Buttons */}
-                  <div className="px-4 py-3 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between gap-2">
+                  <div className="px-5 py-3.5 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between gap-2">
                     <span
-                      className={`inline-block text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${getAdmissionsBadgeClass(
+                      className={`inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-full ${getAdmissionsBadgeClass(
                         course.admissions
                       )}`}
                     >
                       {course.admissions}
                     </span>
 
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-2">
                       <button
                         onClick={() => setViewingCourse(course)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 shadow-xs transition-all"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-100 shadow-xs transition-all cursor-pointer"
                       >
-                        <Eye className="w-3.5 h-3.5 text-gray-500" />
+                        <Eye className="w-3.5 h-3.5 text-slate-500" />
                         View
                       </button>
                       <button
                         onClick={() => openEditModal(course)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#6d28d9] hover:bg-[#5b21b6] shadow-xs transition-all"
+                        className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-xs transition-all cursor-pointer"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                         Edit
@@ -1192,7 +1256,7 @@ export default function CoursesAdmin({
                     <th className="py-3.5 px-4 font-bold text-gray-700">COURSE</th>
                     <th className="py-3.5 px-4 font-bold text-gray-700">RANK</th>
                     <th className="py-3.5 px-4 font-bold text-gray-700">CATEGORY</th>
-                    <th className="py-3.5 px-4 font-bold text-gray-700">COURSE TYPE</th>
+                    <th className="py-3.5 px-4 font-bold text-gray-700">TRACK / PROGRAM</th>
                     <th className="py-3.5 px-4 font-bold text-gray-700">DURATION</th>
                     <th className="py-3.5 px-4 font-bold text-gray-700">MODE</th>
                     <th className="py-3.5 px-4 font-bold text-gray-700">INSTRUCTOR</th>
@@ -1279,7 +1343,7 @@ export default function CoursesAdmin({
 
                         {/* Course Type */}
                         <td className="py-3.5 px-4 whitespace-nowrap text-gray-600 font-medium">
-                          {course.type || "Professional"}
+                          course.programType === "corporate" ? "🏢 Corporate" : course.programType === "university" ? "🏛️ University" : course.programType === "liveproject" ? "💻 Capstone" : "🎓 Course"
                         </td>
 
                         {/* Duration */}
@@ -1422,141 +1486,112 @@ export default function CoursesAdmin({
       </div>
 
       {/* ========================================================================= */}
-      {/* MODAL: Add / Edit Course                                                  */}
+      {/* MODAL: Add / Edit Course (Organized, Clean & Colorful Multi-Section Form) */}
       {/* ========================================================================= */}
       {showCourseModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-gray-100 overflow-hidden animate-fade-in my-8">
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-purple-50 to-white">
-              <div>
-                <h3 className="text-lg font-bold text-gray-900">
-                  {editingCourse ? "Edit Course Details" : "Add New Course"}
-                </h3>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  Update course syllabus, status, admission phase, and metadata in MongoDB.
-                </p>
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-4xl w-full shadow-2xl border border-slate-200/90 overflow-hidden animate-fade-in my-6 flex flex-col max-h-[92vh]">
+            
+            {/* Modal Header */}
+            <div className="p-5 px-6 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shrink-0">
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500 via-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25 shrink-0">
+                  <GraduationCap className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base sm:text-lg font-black tracking-tight text-white">
+                      {editingCourse ? "Edit Course & Program Details" : "Create New Course or Offering"}
+                    </h3>
+                    <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-indigo-500/30 text-indigo-200 border border-indigo-400/30">
+                      {courseForm.programType === "corporate" ? "🏢 Corporate" :
+                       courseForm.programType === "university" ? "🏛️ University" :
+                       courseForm.programType === "liveproject" ? "💻 Capstone" : "🎓 Standard"}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-300 mt-0.5">
+                    Save to MongoDB catalog • Zero backend adjustments required
+                  </p>
+                </div>
               </div>
               <button
+                type="button"
                 onClick={() => setShowCourseModal(false)}
-                className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-800"
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-all cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveCourse} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Step / Section Navigation Tabs */}
+            <div className="flex items-center gap-1.5 p-2 px-6 bg-slate-100/80 border-b border-slate-200 overflow-x-auto scrollbar-none shrink-0">
+              {[
+                { id: "basic", label: "1. Basic Info", icon: BookOpen, color: "text-indigo-600" },
+                { id: "academics", label: "2. Fees & Schedule", icon: DollarSign, color: "text-emerald-600" },
+                { id: "faculty", label: "3. Trainer & Status", icon: Users, color: "text-amber-600" },
+                { id: "curriculum", label: "4. Curriculum & Media", icon: Layers, color: "text-purple-600" },
+              ].map((tab) => {
+                const isActive = modalTab === tab.id;
+                const Icon = tab.icon;
+                return (
+                  <button
+                    type="button"
+                    key={tab.id}
+                    onClick={() => setModalTab(tab.id)}
+                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                      isActive
+                        ? "bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/80"
+                        : "text-slate-500 hover:text-slate-800 hover:bg-white/60"
+                    }`}
+                  >
+                    <Icon className={`w-3.5 h-3.5 ${isActive ? tab.color : "text-slate-400"}`} />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Form Body */}
+            <form onSubmit={handleSaveCourse} className="flex-1 overflow-y-auto p-6 space-y-5">
+              
+              {/* ========================================================= */}
+              {/* TAB 1: BASIC DETAILS                                      */}
+              {/* ========================================================= */}
+              <div className={modalTab === "basic" ? "grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in" : "hidden"}>
                 {/* Title */}
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
                     Course / Program Title *
                   </label>
                   <input
                     type="text"
-                    required
                     value={courseForm.title}
                     onChange={(e) => setCourseForm({ ...courseForm, title: e.target.value })}
-                    placeholder="e.g. Artificial Intelligence & Generative AI"
-                    className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none"
+                    placeholder="e.g. Master in Generative AI & Deep Learning"
+                    className="w-full px-4 py-2.5 text-sm bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition-all font-semibold text-slate-800"
                   />
                 </div>
 
                 {/* Program Offering Type */}
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
-                    Program Offering Type *
+                  <label className="block text-xs font-bold text-indigo-700 mb-1.5">
+                    Program Offering Track *
                   </label>
                   <select
                     value={courseForm.programType}
                     onChange={(e) => setCourseForm({ ...courseForm, programType: e.target.value })}
-                    className="w-full px-3.5 py-2 text-sm border border-purple-200 bg-purple-50/50 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none font-semibold text-[#6d28d9]"
+                    className="w-full px-4 py-2.5 text-sm border border-indigo-200 bg-indigo-50/50 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none font-bold text-indigo-800 cursor-pointer"
                   >
-                    <option value="course">Standard Course (Skill / Vocational / Tech)</option>
-                    <option value="corporate">Corporate AI & Generative AI Program</option>
-                    <option value="university">University Distance Degree (UGC Entitled)</option>
-                    <option value="liveproject">Live Project Capstone (Industry Ready)</option>
+                    <option value="course">🎓 Standard Course (Skill / Vocational / Tech)</option>
+                    <option value="corporate">🏢 Corporate AI & Generative AI Program</option>
+                    <option value="university">🏛️ University Distance Degree (UGC Entitled)</option>
+                    <option value="liveproject">💻 Live Project Capstone (Industry Ready)</option>
                   </select>
                 </div>
 
-                {/* Priority Order Number */}
+                {/* Category Name */}
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
-                    Priority / Top Order # (1 = Top of Website) *
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={courseForm.order}
-                    onChange={(e) => setCourseForm({ ...courseForm, order: Number(e.target.value) || 1 })}
-                    placeholder="1"
-                    className="w-full px-3.5 py-2 text-sm border border-amber-300 bg-amber-50/40 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none font-bold text-amber-900"
-                  />
-                  <p className="text-[10px] text-gray-400 mt-0.5">Order #1 will display at the very top of the section.</p>
-                </div>
-
-                {/* Badge Tag */}
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
-                    Badge Tag (e.g. ENTERPRISE, UGC Entitled, Live Project)
-                  </label>
-                  <input
-                    type="text"
-                    value={courseForm.badge}
-                    onChange={(e) => setCourseForm({ ...courseForm, badge: e.target.value })}
-                    placeholder="ENTERPRISE / POPULAR / UGC Entitled / Live Project"
-                    className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none"
-                  />
-                </div>
-
-                {/* Delivery Format */}
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
-                    Delivery Format / Mode
-                  </label>
-                  <input
-                    type="text"
-                    value={courseForm.delivery}
-                    onChange={(e) => setCourseForm({ ...courseForm, delivery: e.target.value })}
-                    placeholder="e.g. Online & Distance / B2B & Teams / Live Capstone"
-                    className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none"
-                  />
-                </div>
-
-                {/* Contextual: University Degrees */}
-                {courseForm.programType === "university" && (
-                  <div className="md:col-span-2">
-                    <label className="block text-xs font-bold text-[#6d28d9] mb-1">
-                      University Degrees / Streams Pills (comma separated)
-                    </label>
-                    <input
-                      type="text"
-                      value={courseForm.degrees}
-                      onChange={(e) => setCourseForm({ ...courseForm, degrees: e.target.value })}
-                      placeholder="e.g. BBA, MBA, PGDBM, Executive Business"
-                      className="w-full px-3.5 py-2 text-sm border border-purple-300 bg-purple-50/40 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none font-medium"
-                    />
-                  </div>
-                )}
-
-                {/* Contextual: Corporate Suitable For */}
-                {courseForm.programType === "corporate" && (
-                  <div className="md:col-span-2">
-                    <label className="block text-xs font-bold text-[#6d28d9] mb-1">
-                      Suitable For Teams / Audience
-                    </label>
-                    <input
-                      type="text"
-                      value={courseForm.suitableFor}
-                      onChange={(e) => setCourseForm({ ...courseForm, suitableFor: e.target.value })}
-                      placeholder="e.g. Management, HR, Sales, Marketing, Finance, IT"
-                      className="w-full px-3.5 py-2 text-sm border border-purple-300 bg-purple-50/40 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none font-medium"
-                    />
-                  </div>
-                )}
-
-                {/* Category */}
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
                     Category Name
                   </label>
                   <input
@@ -1565,7 +1600,7 @@ export default function CoursesAdmin({
                     value={courseForm.categoryName}
                     onChange={(e) => setCourseForm({ ...courseForm, categoryName: e.target.value })}
                     placeholder="e.g. Software & Web or AI & Generative AI"
-                    className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none bg-white font-medium"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white font-medium text-slate-800"
                   />
                   <datalist id="categoryOptionsList">
                     <option value="AI & Generative AI" />
@@ -1578,7 +1613,6 @@ export default function CoursesAdmin({
                     <option value="Science Disciplines" />
                     <option value="Education & Teaching" />
                     <option value="Healthcare & Allied Studies" />
-                    <option value="Other Academic & Professional" />
                     <option value="Design & Media" />
                     <option value="Software & Web" />
                     <option value="Digital Marketing" />
@@ -1588,15 +1622,143 @@ export default function CoursesAdmin({
                   </datalist>
                 </div>
 
+                {/* Priority Order Number */}
+                <div>
+                  <label className="block text-xs font-bold text-amber-800 mb-1.5">
+                    Priority / Pin Order # (1 = Highest Top of Catalog) *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="1"
+                      value={courseForm.order}
+                      onChange={(e) => setCourseForm({ ...courseForm, order: Number(e.target.value) || 1 })}
+                      placeholder="1"
+                      className="w-full px-4 py-2.5 text-sm border border-amber-300 bg-amber-50/40 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none font-extrabold text-amber-900"
+                    />
+                    <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-amber-600">
+                      Rank #{courseForm.order}
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-amber-700 font-medium mt-1">Courses with order #1 appear first on the portal.</p>
+                </div>
+
+                {/* Badge Tag */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Badge Tag (e.g. POPULAR, ENTERPRISE, UGC Entitled)
+                  </label>
+                  <input
+                    type="text"
+                    value={courseForm.badge}
+                    onChange={(e) => setCourseForm({ ...courseForm, badge: e.target.value })}
+                    placeholder="POPULAR / UGC Entitled / Live Project"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800"
+                  />
+                </div>
+
+                {/* Delivery Format */}
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Delivery Format / Mode Label
+                  </label>
+                  <input
+                    type="text"
+                    value={courseForm.delivery}
+                    onChange={(e) => setCourseForm({ ...courseForm, delivery: e.target.value })}
+                    placeholder="e.g. On-Site / Online / Hybrid / Corporate Cohort"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800"
+                  />
+                </div>
+
+                {/* Contextual: University Degrees */}
+                {courseForm.programType === "university" && (
+                  <div className="md:col-span-2 p-3.5 rounded-2xl bg-amber-50/60 border border-amber-200">
+                    <label className="block text-xs font-bold text-amber-900 mb-1">
+                      🏛️ University Degrees / Streams (comma separated)
+                    </label>
+                    <input
+                      type="text"
+                      value={courseForm.degrees}
+                      onChange={(e) => setCourseForm({ ...courseForm, degrees: e.target.value })}
+                      placeholder="e.g. BBA, MBA, PGDBM, Executive Business"
+                      className="w-full px-3.5 py-2 text-sm border border-amber-300 bg-white rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none font-semibold text-slate-800"
+                    />
+                  </div>
+                )}
+
+                {/* Contextual: Corporate Suitable For */}
+                {courseForm.programType === "corporate" && (
+                  <div className="md:col-span-2 p-3.5 rounded-2xl bg-purple-50/60 border border-purple-200">
+                    <label className="block text-xs font-bold text-purple-900 mb-1">
+                      🏢 Suitable For Teams / Audience (Corporate Training)
+                    </label>
+                    <input
+                      type="text"
+                      value={courseForm.suitableFor}
+                      onChange={(e) => setCourseForm({ ...courseForm, suitableFor: e.target.value })}
+                      placeholder="e.g. Management, HR, Sales, Marketing, IT Teams"
+                      className="w-full px-3.5 py-2 text-sm border border-purple-300 bg-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:outline-none font-semibold text-slate-800"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* ========================================================= */}
+              {/* TAB 2: FEES & SCHEDULE                                   */}
+              {/* ========================================================= */}
+              <div className={modalTab === "academics" ? "grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in" : "hidden"}>
+                {/* Total Fee */}
+                <div>
+                  <label className="block text-xs font-bold text-emerald-800 mb-1.5">
+                    Total Course Fee (Display string)
+                  </label>
+                  <input
+                    type="text"
+                    value={courseForm.fees}
+                    onChange={(e) => setCourseForm({ ...courseForm, fees: e.target.value })}
+                    placeholder="e.g. ₹ 45,000/-"
+                    className="w-full px-4 py-2.5 text-sm border border-emerald-200 bg-emerald-50/30 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold text-emerald-900"
+                  />
+                </div>
+
+                {/* Scholarship */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Scholarship / Discount Offered
+                  </label>
+                  <input
+                    type="text"
+                    value={courseForm.scholarship}
+                    onChange={(e) => setCourseForm({ ...courseForm, scholarship: e.target.value })}
+                    placeholder="e.g. Up to 50%"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800"
+                  />
+                </div>
+
+                {/* Duration */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Course Duration
+                  </label>
+                  <input
+                    type="text"
+                    value={courseForm.duration}
+                    onChange={(e) => setCourseForm({ ...courseForm, duration: e.target.value })}
+                    placeholder="e.g. 3–4 Months or 6 Months"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800"
+                  />
+                </div>
+
                 {/* Course Type */}
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
                     Course Type
                   </label>
                   <select
                     value={courseForm.type}
                     onChange={(e) => setCourseForm({ ...courseForm, type: e.target.value })}
-                    className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none bg-white"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white text-slate-800 cursor-pointer"
                   >
                     <option value="Professional">Professional</option>
                     <option value="Technical">Technical</option>
@@ -1605,35 +1767,74 @@ export default function CoursesAdmin({
                   </select>
                 </div>
 
-                {/* Duration */}
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Duration</label>
-                  <input
-                    type="text"
-                    value={courseForm.duration}
-                    onChange={(e) => setCourseForm({ ...courseForm, duration: e.target.value })}
-                    placeholder="e.g. 6 Months"
-                    className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none"
-                  />
-                </div>
-
                 {/* Mode */}
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Learning Mode</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Learning Mode
+                  </label>
                   <select
                     value={courseForm.mode}
                     onChange={(e) => setCourseForm({ ...courseForm, mode: e.target.value })}
-                    className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none bg-white"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white text-slate-800 cursor-pointer"
                   >
-                    <option value="Hybrid">Hybrid</option>
-                    <option value="Classroom">Classroom</option>
-                    <option value="Online">Online</option>
+                    <option value="Hybrid">Hybrid (Classroom + Online)</option>
+                    <option value="Classroom">Classroom Only</option>
+                    <option value="Online">Online Interactive</option>
                   </select>
                 </div>
 
+                {/* Batch Schedule */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Batch Schedule
+                  </label>
+                  <input
+                    type="text"
+                    value={courseForm.batchSchedule}
+                    onChange={(e) => setCourseForm({ ...courseForm, batchSchedule: e.target.value })}
+                    placeholder="e.g. Weekday & Weekend Batches"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800"
+                  />
+                </div>
+
+                {/* Eligibility */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Eligibility Requirement
+                  </label>
+                  <input
+                    type="text"
+                    value={courseForm.eligibility}
+                    onChange={(e) => setCourseForm({ ...courseForm, eligibility: e.target.value })}
+                    placeholder="e.g. 10th / 12th / Any Stream / Working Professionals"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800"
+                  />
+                </div>
+
+                {/* Certification */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Certification Title
+                  </label>
+                  <input
+                    type="text"
+                    value={courseForm.certification}
+                    onChange={(e) => setCourseForm({ ...courseForm, certification: e.target.value })}
+                    placeholder="e.g. Certificate in Professional Web Designer"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800"
+                  />
+                </div>
+              </div>
+
+              {/* ========================================================= */}
+              {/* TAB 3: FACULTY & STATUS                                   */}
+              {/* ========================================================= */}
+              <div className={modalTab === "faculty" ? "grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in" : "hidden"}>
                 {/* Instructor Name */}
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Instructor Name</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Assigned Instructor / Lead Faculty
+                  </label>
                   <input
                     type="text"
                     value={courseForm.instructorName}
@@ -1644,210 +1845,237 @@ export default function CoursesAdmin({
                       setCourseForm({ ...courseForm, instructorName: name, instructorAvatar: avatar });
                     }}
                     placeholder="e.g. Neha Kapoor"
-                    className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800 font-semibold"
                   />
                 </div>
 
-                {/* Enrollments */}
+                {/* Active Enrollments */}
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Active Enrollments</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Active Enrollments Count
+                  </label>
                   <input
                     type="number"
                     value={courseForm.enrollments}
                     onChange={(e) => setCourseForm({ ...courseForm, enrollments: e.target.value })}
-                    className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800 font-bold"
                   />
                 </div>
 
-                {/* Status */}
+                {/* Publish Status */}
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Publish Status</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Publish Status
+                  </label>
                   <select
                     value={courseForm.status}
                     onChange={(e) => setCourseForm({ ...courseForm, status: e.target.value })}
-                    className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none bg-white"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white text-slate-800 font-semibold cursor-pointer"
                   >
-                    <option value="Published">Published</option>
-                    <option value="Draft">Draft</option>
-                    <option value="Coming Soon">Coming Soon</option>
-                    <option value="Archived">Archived</option>
+                    <option value="Published">🟢 Published (Live on Portal)</option>
+                    <option value="Draft">🟡 Draft (Hidden / Under Review)</option>
+                    <option value="Coming Soon">🟣 Coming Soon</option>
+                    <option value="Archived">⚪ Archived</option>
                   </select>
                 </div>
 
                 {/* Admissions */}
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Admissions State</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Admissions State
+                  </label>
                   <select
                     value={courseForm.admissions}
                     onChange={(e) => setCourseForm({ ...courseForm, admissions: e.target.value })}
-                    className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none bg-white"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white text-slate-800 font-semibold cursor-pointer"
                   >
-                    <option value="Active Admissions">Active Admissions</option>
-                    <option value="Upcoming">Upcoming</option>
-                    <option value="Closed">Closed</option>
+                    <option value="Active Admissions">Active Admissions (Open)</option>
+                    <option value="Upcoming">Upcoming Batch</option>
+                    <option value="Closed">Admissions Closed</option>
                   </select>
                 </div>
+              </div>
 
-                {/* Total Fee */}
+              {/* ========================================================= */}
+              {/* TAB 4: CURRICULUM, MEDIA & DESCRIPTION                    */}
+              {/* ========================================================= */}
+              <div className={modalTab === "curriculum" ? "space-y-4 animate-fade-in" : "hidden"}>
+                {/* Skills */}
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Total Course Fee</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Key Skills & Tool Tags (comma-separated)
+                  </label>
                   <input
                     type="text"
-                    value={courseForm.fees}
-                    onChange={(e) => setCourseForm({ ...courseForm, fees: e.target.value })}
-                    placeholder="e.g. ₹ 45,000/-"
-                    className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none"
+                    value={courseForm.skills}
+                    onChange={(e) => setCourseForm({ ...courseForm, skills: e.target.value })}
+                    placeholder="e.g. React.js, Node.js, Express, MongoDB, Tailwind CSS"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800"
                   />
                 </div>
 
-                {/* Scholarship */}
+                {/* Course Highlights */}
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Scholarship / Discount</label>
-                  <input
-                    type="text"
-                    value={courseForm.scholarship}
-                    onChange={(e) => setCourseForm({ ...courseForm, scholarship: e.target.value })}
-                    placeholder="e.g. Up to 50%"
-                    className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none"
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Course Highlights / Syllabus Bullet Points (1 per line)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={courseForm.features}
+                    onChange={(e) => setCourseForm({ ...courseForm, features: e.target.value })}
+                    placeholder="Interactive Full-Stack Lab Projects&#10;Industry Mentor Guidance & Code Reviews&#10;100% Placement Preparation & Mock Interviews"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800 font-mono text-xs"
                   />
                 </div>
 
-                {/* Eligibility */}
+                {/* Career Roles */}
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Eligibility</label>
-                  <input
-                    type="text"
-                    value={courseForm.eligibility}
-                    onChange={(e) => setCourseForm({ ...courseForm, eligibility: e.target.value })}
-                    placeholder="e.g. 10th / 12th / Any Stream"
-                    className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none"
-                  />
-                </div>
-
-                {/* Certification */}
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Certification Title</label>
-                  <input
-                    type="text"
-                    value={courseForm.certification}
-                    onChange={(e) => setCourseForm({ ...courseForm, certification: e.target.value })}
-                    placeholder="e.g. Certificate in Professional Web Designer"
-                    className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none"
-                  />
-                </div>
-
-                {/* Batch Schedule */}
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Batch Schedule</label>
-                  <input
-                    type="text"
-                    value={courseForm.batchSchedule}
-                    onChange={(e) => setCourseForm({ ...courseForm, batchSchedule: e.target.value })}
-                    placeholder="e.g. Weekday & Weekend Batches"
-                    className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none"
-                  />
-                </div>
-
-                {/* Career Focus / Roles */}
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
                     Career Opportunities / Job Roles (comma-separated)
                   </label>
                   <input
                     type="text"
                     value={courseForm.careerAreas}
                     onChange={(e) => setCourseForm({ ...courseForm, careerAreas: e.target.value })}
-                    placeholder="e.g. Web Designer, Frontend Specialist, WordPress Developer"
-                    className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none"
+                    placeholder="e.g. Full Stack Developer, Software Engineer, Backend Architect"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800"
                   />
                 </div>
 
-                {/* Course Highlights / Features */}
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
-                    Course Highlights (1 per line)
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={courseForm.features}
-                    onChange={(e) => setCourseForm({ ...courseForm, features: e.target.value })}
-                    placeholder="HTML5 & Modern CSS3 Responsive Layouts&#10;Core JavaScript, DOM Events & WordPress&#10;CSS Flexbox & CSS Grid Mastery"
-                    className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none"
-                  />
-                </div>
+                {/* Cover Image URL with Presets and Preview */}
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-xs font-bold text-slate-800">
+                      Cover Banner Image URL
+                    </label>
+                    <span className="text-[11px] text-slate-500">Unsplash or Cloudinary URL</span>
+                  </div>
 
-                {/* Skills (Comma separated) */}
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
-                    Key Skills / Tool Tags (comma-separated)
-                  </label>
-                  <input
-                    type="text"
-                    value={courseForm.skills}
-                    onChange={(e) => setCourseForm({ ...courseForm, skills: e.target.value })}
-                    placeholder="e.g. Figma, Photoshop, Wireframing, UX Research"
-                    className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none"
-                  />
-                </div>
-
-                {/* Image URL */}
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
-                    Cover Image URL (Optional)
-                  </label>
                   <input
                     type="text"
                     value={courseForm.image}
                     onChange={(e) => setCourseForm({ ...courseForm, image: e.target.value })}
                     placeholder="https://images.unsplash.com/photo-..."
-                    className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none"
+                    className="w-full px-4 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800"
                   />
+
+                  {/* Preset chips */}
+                  <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                    <span className="text-[10px] font-bold text-slate-400">Quick Presets:</span>
+                    {PRESET_BANNERS.map((preset, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setCourseForm({ ...courseForm, image: preset.url })}
+                        className={`text-[10px] font-bold px-2 py-1 rounded-lg border transition-all cursor-pointer ${
+                          courseForm.image === preset.url
+                            ? "bg-indigo-600 text-white border-indigo-600 shadow-xs"
+                            : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
+                        }`}
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Live preview */}
+                  {courseForm.image && (
+                    <div className="mt-2 flex items-center gap-3">
+                      <div className="relative w-28 h-16 rounded-xl overflow-hidden border border-slate-300 shadow-xs shrink-0">
+                        <img
+                          src={courseForm.image}
+                          alt="Thumbnail preview"
+                          className="w-full h-full object-cover"
+                          onError={(e) => { e.target.src = DEFAULT_IMAGES[0]; }}
+                        />
+                      </div>
+                      <p className="text-[11px] text-slate-500 leading-snug">
+                        Live thumbnail configured. Card will display this preview across website catalog.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Description */}
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
-                    Short Description / Summary
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Short Description / Curriculum Summary
                   </label>
                   <textarea
-                    rows={3}
+                    rows={2}
                     value={courseForm.description}
                     onChange={(e) => setCourseForm({ ...courseForm, description: e.target.value })}
-                    placeholder="Research, interfaces and digital product experiences..."
-                    className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6d28d9] focus:outline-none"
+                    placeholder="Hands-on training covering modern technologies and career-oriented project development..."
+                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800"
                   />
                 </div>
 
-                {/* Featured / Popular checkbox */}
-                <div className="md:col-span-2 flex items-center gap-2 pt-1">
+                {/* Popular Toggle */}
+                <div className="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-200 flex items-center gap-3">
                   <input
                     type="checkbox"
                     id="popularCheckbox"
                     checked={courseForm.popular}
                     onChange={(e) => setCourseForm({ ...courseForm, popular: e.target.checked })}
-                    className="w-4 h-4 text-[#6d28d9] rounded border-gray-300 focus:ring-[#6d28d9]"
+                    className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer"
                   />
-                  <label htmlFor="popularCheckbox" className="text-xs font-bold text-gray-700 cursor-pointer">
-                    Display as "★ POPULAR" featured course on website homepage
+                  <label htmlFor="popularCheckbox" className="text-xs font-bold text-amber-950 cursor-pointer">
+                    Display with "★ POPULAR" featured ribbon on main website homepage
                   </label>
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-gray-100 flex items-center justify-end gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setShowCourseModal(false)}
-                  className="px-4 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="px-5 py-2 text-xs font-semibold text-white bg-[#6d28d9] hover:bg-[#5b21b6] rounded-xl shadow-sm disabled:opacity-50"
-                >
-                  {saving ? "Saving to Database..." : editingCourse ? "Update Course" : "Create Course"}
-                </button>
+              {/* Modal Footer Controls */}
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3 shrink-0">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowCourseModal(false)}
+                    className="px-4 py-2 text-xs font-bold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-100 transition-all cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  {modalTab !== "basic" && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (modalTab === "curriculum") setModalTab("faculty");
+                        else if (modalTab === "faculty") setModalTab("academics");
+                        else if (modalTab === "academics") setModalTab("basic");
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-100 transition-all cursor-pointer"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                      Back
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {modalTab !== "curriculum" ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (modalTab === "basic") setModalTab("academics");
+                        else if (modalTab === "academics") setModalTab("faculty");
+                        else if (modalTab === "faculty") setModalTab("curriculum");
+                      }}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-xl hover:bg-indigo-100 transition-all cursor-pointer"
+                    >
+                      <span>Next Step</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  ) : null}
+
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="inline-flex items-center gap-2 px-5 py-2 text-xs font-extrabold text-white bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-xl shadow-md shadow-indigo-600/25 transition-all cursor-pointer disabled:opacity-50 active:scale-95"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    {saving ? "Saving to Database..." : editingCourse ? "Save & Update Course" : "Create New Course"}
+                  </button>
+                </div>
               </div>
             </form>
           </div>

@@ -13,24 +13,17 @@ import {
   Menu,
   ChevronDown,
   ExternalLink,
-  Sparkles,
-  Award,
-  FileText,
-  HelpCircle,
-  Briefcase,
-  Code2,
-  Building2,
-  Landmark,
   Newspaper,
   MessageSquare,
-  Sliders
+  Sliders,
+  Share2,
+  Globe
 } from "lucide-react";
 
 import DashboardHome from "../Pages/DashboardHome";
 import CoursesAdmin from "../Pages/CoursesAdmin";
-import PlacementAdmin from "../Pages/PlacementAdmin";
 import LeadsAdmin from "../Pages/LeadsAdmin";
-import StaffAlumniAdmin from "../Pages/StaffAlumniAdmin";
+import SiteSettingsAdmin from "../Pages/SiteSettingsAdmin";
 import AdminUsersManagement from "../Pages/AdminUsersManagement";
 import NewsArticlesManagement from "../Pages/NewsArticlesManagement";
 import Testimonial from "../Pages/Testimonial";
@@ -63,8 +56,13 @@ const AdminPanel = () => {
           role: parsed.role === "staff" ? "Faculty Staff" : "Super Admin",
         });
       }
-    } catch {}
-  }, [navigate]);
+      if (activeTab === "staff") {
+        setActiveTab("dashboard");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [navigate, activeTab]);
 
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
@@ -80,28 +78,14 @@ const AdminPanel = () => {
     },
     {
       id: "courses",
-      label: "Regular Courses",
+      label: "Courses & Programs",
       icon: GraduationCap,
     },
     {
-      id: "placement",
-      label: "Placement & Support",
-      icon: Briefcase,
-    },
-    {
-      id: "liveproject",
-      label: "Live Projects",
-      icon: Code2,
-    },
-    {
-      id: "corporate",
-      label: "Corporate & AI",
-      icon: Building2,
-    },
-    {
-      id: "university",
-      label: "University Degrees",
-      icon: Landmark,
+      id: "testimonials",
+      label: "Student Testimonials",
+      icon: MessageSquare,
+      badge: "LIVE",
     },
     {
       id: "leads",
@@ -109,10 +93,11 @@ const AdminPanel = () => {
       icon: ClipboardList,
     },
     {
-      id: "staff",
-      label: "Staff & Alumni",
-      icon: Users,
+      id: "social-settings",
+      label: "Website & Blogs CMS",
+      icon: Globe,
     },
+
     {
       id: "admins",
       label: "Admin Accounts",
@@ -203,6 +188,17 @@ const AdminPanel = () => {
                           </span>
                         )}
                       </div>
+                      {!sidebarCollapsed && item.badge && (
+                        <span
+                          className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-full tracking-wider transition ${
+                            isActive
+                              ? "bg-white/20 text-white"
+                              : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                          }`}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
                     </button>
                   );
                 })}
@@ -314,7 +310,7 @@ const AdminPanel = () => {
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5" />
             <input
               type="text"
-              placeholder="Search anything... (courses, leads, staff)"
+              placeholder="Search anything... (courses, leads, announcements)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-slate-100/80 border border-slate-200/80 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
@@ -373,38 +369,16 @@ const AdminPanel = () => {
           )}
           {activeTab === "courses" && (
             <CoursesAdmin
-              initialProgramType="course"
-              pageTitle="Regular Skill & Vocational Courses"
-              pageSubtitle="Manage 22 professional software, design, marketing, data, and hardware courses."
-            />
-          )}
-          {activeTab === "placement" && <PlacementAdmin />}
-          {activeTab === "liveproject" && (
-            <CoursesAdmin
-              initialProgramType="liveproject"
-              pageTitle="Live Project Capstone Programs"
-              pageSubtitle="Manage 7 industry-ready live software engineering capstones."
-            />
-          )}
-          {activeTab === "corporate" && (
-            <CoursesAdmin
-              initialProgramType="corporate"
-              pageTitle="Corporate AI & Enterprise Training"
-              pageSubtitle="Manage 8 B2B Generative AI & corporate workforce training modules."
-            />
-          )}
-          {activeTab === "university" && (
-            <CoursesAdmin
-              initialProgramType="university"
-              pageTitle="University Distance Degree Programs"
-              pageSubtitle="Manage 8 UGC Entitled distance & online degree programs."
+              initialProgramType="all"
+              pageTitle="Courses & Programs Management"
+              pageSubtitle="Manage regular courses, live project capstones, corporate training, and university degrees in one unified workspace."
             />
           )}
           {activeTab === "leads" && <LeadsAdmin />}
+          {activeTab === "social-settings" && <SiteSettingsAdmin />}
           {activeTab === "news" && <NewsArticlesManagement />}
           {activeTab === "testimonials" && <Testimonial />}
           {activeTab === "footer" && <FooterAdmin />}
-          {activeTab === "staff" && <StaffAlumniAdmin />}
           {activeTab === "admins" && <AdminUsersManagement />}
         </main>
       </div>

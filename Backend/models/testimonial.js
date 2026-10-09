@@ -3,8 +3,9 @@ import mongoose from "mongoose";
 const testimonialSchema = new mongoose.Schema(
   {
     profileImage: {
-      type: String, // URL of profile picture
-      required: false, // optional (in case you don’t want image)
+      type: String, // URL or filename of profile picture
+      required: false,
+      default: "",
     },
     name: {
       type: String,
@@ -17,16 +18,27 @@ const testimonialSchema = new mongoose.Schema(
       trim: true,
     },
     message: {
-      type: String, // The testimonial text
+      type: String,
       required: true,
       trim: true,
     },
+    rating: {
+      type: Number,
+      default: 5,
+      min: 1,
+      max: 5,
+    },
+    displayOrder: {
+      type: Number,
+      default: 0,
+    },
+    visible: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
-    timestamps: {
-      createdAt: true,
-      updatedAt: false, // testimonials usually don’t need frequent edits
-    },
+    timestamps: true,
   }
 );
 

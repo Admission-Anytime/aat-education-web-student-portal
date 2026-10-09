@@ -13,6 +13,8 @@ import {
     Instagram,
     Youtube,
     Linkedin,
+    Twitter,
+    MessageCircle,
     ArrowRight,
     LogIn,
     LogOut,
@@ -27,7 +29,15 @@ import {
     Calculator,
     Settings,
     Languages,
-    Sparkles
+    Sparkles,
+    Globe,
+    Smartphone,
+    BarChart3,
+    Shield,
+    Zap,
+    Video,
+    ShoppingCart,
+    Compass
 } from 'lucide-react';
 
 export const courseNavCategories = [
@@ -173,6 +183,127 @@ export const courseNavCategories = [
     }
 ];
 
+// All 22 Professional Courses arranged across 4 balanced columns for the 22-Card MegaMenu
+export const coursesCardsColumns = [
+    {
+        colId: 'col-1',
+        sections: [
+            {
+                id: 'software',
+                title: 'Software & Web Dev',
+                icon: Code,
+                iconColor: 'text-blue-600',
+                iconBg: 'bg-blue-100/70',
+                courses: [
+                    { name: 'Full Stack Development', sub: 'MERN, Python & APIs', to: '/it-stack-development', icon: Code, badge: 'Popular' },
+                    { name: 'Web Designing', sub: 'HTML5, CSS3, JS & React', to: '/web-development', icon: Globe },
+                    { name: 'Mobile App Dev', sub: 'Android, Flutter & Native', to: '/app-development', icon: Smartphone },
+                    { name: 'Python & Backend', sub: 'Django, FastAPI & DB', to: '/python-programming', icon: Code },
+                ]
+            },
+            {
+                id: 'shortterm',
+                title: 'Professional Skills',
+                icon: Sparkles,
+                iconColor: 'text-teal-600',
+                iconBg: 'bg-teal-100/70',
+                courses: [
+                    { name: 'Short-Term Bootcamp', sub: 'Career & Interview Prep', to: '/Courses', state: { category: 'shortterm' }, icon: Sparkles, badge: 'Fast-Track' },
+                ]
+            }
+        ]
+    },
+    {
+        colId: 'col-2',
+        sections: [
+            {
+                id: 'ai-data',
+                title: 'AI, Data & Cloud',
+                icon: Cpu,
+                iconColor: 'text-purple-600',
+                iconBg: 'bg-purple-100/70',
+                courses: [
+                    { name: 'AI & Generative AI', sub: 'LLMs, Prompts & Tools', to: '/Courses', state: { category: 'ai-data' }, icon: Cpu, badge: 'Trending' },
+                    { name: 'Data Science & BI', sub: 'Python, SQL & Power BI', to: '/Courses', state: { category: 'ai-data' }, icon: BarChart3 },
+                    { name: 'Cyber Security', sub: 'Ethical Hacking & Defense', to: '/Courses', state: { category: 'ai-data' }, icon: Shield },
+                    { name: 'Cloud & DevOps', sub: 'AWS, Azure, Docker & CI/CD', to: '/Courses', state: { category: 'ai-data' }, icon: Zap },
+                ]
+            },
+            {
+                id: 'marketing',
+                title: 'Marketing & E-Com',
+                icon: Megaphone,
+                iconColor: 'text-amber-600',
+                iconBg: 'bg-amber-100/70',
+                courses: [
+                    { name: 'Digital Marketing', sub: 'SEO, Google & Meta Ads', to: '/digital-marketing', icon: Megaphone, badge: 'Career' },
+                    { name: 'E-Commerce Business', sub: 'Shopify, Amazon & Store Scale', to: '/Courses', state: { category: 'marketing' }, icon: ShoppingCart },
+                ]
+            }
+        ]
+    },
+    {
+        colId: 'col-3',
+        sections: [
+            {
+                id: 'design',
+                title: 'Design & Media',
+                icon: Palette,
+                iconColor: 'text-rose-600',
+                iconBg: 'bg-rose-100/70',
+                courses: [
+                    { name: 'UI/UX Design', sub: 'Figma, Wireframes & UX', to: '/ui-ux-design', icon: Palette, badge: 'Hot' },
+                    { name: 'Graphic Design', sub: 'Photoshop, Illustrator & Brand', to: '/Courses', state: { category: 'design' }, icon: Palette },
+                    { name: 'Video Editing', sub: 'Premiere Pro, VFX & Reels', to: '/Courses', state: { category: 'design' }, icon: Video },
+                ]
+            },
+            {
+                id: 'business',
+                title: 'Accounting & Finance',
+                icon: Calculator,
+                iconColor: 'text-emerald-600',
+                iconBg: 'bg-emerald-100/70',
+                courses: [
+                    { name: 'Accounting & GST', sub: 'TallyPrime, Tax & Payroll', to: '/tally-accounting', icon: Calculator, badge: 'Job-Ready' },
+                    { name: 'Advanced Excel & Office', sub: 'Dashboards, MIS & AI Tools', to: '/Courses', state: { category: 'business' }, icon: Briefcase },
+                ]
+            }
+        ]
+    },
+    {
+        colId: 'col-4',
+        sections: [
+            {
+                id: 'technical',
+                title: 'Technical & CAD',
+                icon: Settings,
+                iconColor: 'text-cyan-600',
+                iconBg: 'bg-cyan-100/70',
+                courses: [
+                    { name: 'AutoCAD 2D/3D', sub: 'Civil, Mechanical & Arch CAD', to: '/Courses', state: { category: 'technical' }, icon: Compass },
+                    { name: 'Hardware & Networking', sub: 'PC Assembly & Troubleshooting', to: '/Courses', state: { category: 'technical' }, icon: Settings },
+                ]
+            },
+            {
+                id: 'languages',
+                title: 'Languages & Test Prep',
+                icon: Languages,
+                iconColor: 'text-indigo-600',
+                iconBg: 'bg-indigo-100/70',
+                courses: [
+                    { name: 'IELTS Preparation', sub: 'Band 7+ Prep & Mock Tests', to: '/Courses', state: { category: 'languages' }, icon: Award },
+                    { name: 'PTE Academic', sub: 'AI Scoring & Mock Practice', to: '/Courses', state: { category: 'languages' }, icon: Languages },
+                    { name: 'German Language', sub: 'A1–B2 CEFR Goethe Prep', to: '/Courses', state: { category: 'languages' }, icon: Languages },
+                    { name: 'French Language', sub: 'DELF & Canada Visa Prep', to: '/Courses', state: { category: 'languages' }, icon: Languages },
+                ]
+            }
+        ]
+    }
+];
+
+export const courseFlyoutData = coursesCardsColumns;
+export const coursesMegaMenuColumns = coursesCardsColumns;
+
 const navItems = [
     {
         label: 'Courses',
@@ -233,6 +364,29 @@ const navItems = [
     },
 ];
 
+const defaultSiteSettings = {
+    socialLinks: {
+        facebook: 'https://facebook.com',
+        instagram: 'https://instagram.com',
+        youtube: 'https://youtube.com',
+        linkedin: 'https://linkedin.com',
+        twitter: '',
+        whatsapp: ''
+    },
+    topBar: {
+        enabled: true,
+        sinceYear: '2002',
+        sinceText: '22+ Years of Excellence',
+        admissionsText: 'Admissions Open 2026-27 — New Batches Available',
+        tagline: 'Learn • Build • Grow',
+        placementText: '100% Placement Support • 500+ Corporate Hiring Partners',
+        liveProjectText: '🚀 Live Industry Projects & Practical Mentorship',
+        counsellingText: '🎯 Free Career Counselling & Guidance Daily',
+        phone: '+91-9311050670',
+        email: 'info@aayushinstitute.com'
+    }
+};
+
 const Header = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [openDropdown, setOpenDropdown] = useState(null);
@@ -241,6 +395,46 @@ const Header = () => {
     const [hoveredCourseCat, setHoveredCourseCat] = useState('software');
     const [openMobileCourseCat, setOpenMobileCourseCat] = useState(null);
     const location = useLocation();
+
+    // Dynamic Site Settings (Social Handles + Top Bar)
+    const [siteSettings, setSiteSettings] = useState(() => {
+        try {
+            const cached = localStorage.getItem('site_settings');
+            return cached ? { ...defaultSiteSettings, ...JSON.parse(cached) } : defaultSiteSettings;
+        } catch {
+            return defaultSiteSettings;
+        }
+    });
+
+    useEffect(() => {
+        let isMounted = true;
+        const fetchSettings = async () => {
+            try {
+                const res = await fetch('/api/site-settings');
+                if (res.ok) {
+                    const data = await res.json();
+                    const settingsObj = data?.data || data;
+                    if ((settingsObj?.socialLinks || settingsObj?.topBar) && isMounted) {
+                        setSiteSettings(settingsObj);
+                        localStorage.setItem('site_settings', JSON.stringify(settingsObj));
+                    }
+                }
+            } catch {
+                // Keep default settings
+            }
+        };
+
+        fetchSettings();
+
+        const handleSync = () => fetchSettings();
+        window.addEventListener('siteSettingsUpdated', handleSync);
+        window.addEventListener('storage', handleSync);
+        return () => {
+            isMounted = false;
+            window.removeEventListener('siteSettingsUpdated', handleSync);
+            window.removeEventListener('storage', handleSync);
+        };
+    }, []);
 
     // Helper to sanitize auto-generated mock names & mock enrollments
     const sanitizeUser = (rawUser) => {
@@ -361,9 +555,6 @@ const Header = () => {
         if (target === 'news' || target === 'news&updates' || target === 'news-updates') {
             return path.includes('news');
         }
-        if (target === 'staff' || target === 'faculty') {
-            return path.includes('staff') || path.includes('faculty');
-        }
         if (target === 'contact' || target === 'contactus') {
             return path === 'contact' || path === 'contactus' || path.startsWith('contact');
         }
@@ -373,149 +564,206 @@ const Header = () => {
     return (
         <header className="sticky top-0 z-50 w-full max-w-full shadow-xs bg-white overflow-x-clip">
             {/* ── 1. Top Bar: Continuous Auto-Sliding Marquee (All Text & Announcements) ── */}
-            <div className="bg-[#00488f] text-white relative overflow-hidden select-none border-b border-blue-900/30">
-                <div className="max-w-[1440px] mx-auto px-3 sm:px-6 flex items-center justify-between gap-2 h-7 sm:h-8">
-                    
-                    {/* Continuous Auto-Sliding Ticker (Full Width / Left to Right Continuous) */}
-                    <div className="flex-1 overflow-hidden relative h-full flex items-center min-w-0">
-                        <div className="animate-marquee flex items-center gap-6 sm:gap-8 whitespace-nowrap">
-                            {[0, 1].map((copyIdx) => (
-                                <React.Fragment key={copyIdx}>
-                                    {/* 1. Tagline */}
-                                    <div className="flex items-center gap-1.5 text-white/90 font-medium tracking-wide text-[11px] sm:text-xs">
-                                        <span>Learn</span>
-                                        <span className="text-amber-400 font-bold text-[9px]">•</span>
-                                        <span>Build</span>
-                                        <span className="text-amber-400 font-bold text-[9px]">•</span>
-                                        <span>Grow</span>
-                                    </div>
+            {siteSettings?.topBar?.enabled !== false && (
+                <div className="bg-[#00488f] text-white relative overflow-hidden select-none border-b border-blue-900/30">
+                    <div className="max-w-[1440px] mx-auto px-3 sm:px-6 flex items-center justify-between gap-2 h-7 sm:h-8">
+                        
+                        {/* Continuous Auto-Sliding Ticker (Full Width / Left to Right Continuous) */}
+                        <div className="flex-1 overflow-hidden relative h-full flex items-center min-w-0">
+                            <div className="animate-marquee flex items-center gap-6 sm:gap-8 whitespace-nowrap">
+                                {[0, 1].map((copyIdx) => (
+                                    <React.Fragment key={copyIdx}>
+                                        {/* 1. Tagline */}
+                                        {siteSettings.topBar?.tagline && (
+                                            <>
+                                                <div className="flex items-center gap-1.5 text-white/90 font-medium tracking-wide text-[11px] sm:text-xs">
+                                                    {siteSettings.topBar.tagline.split('•').map((item, i, arr) => (
+                                                        <React.Fragment key={i}>
+                                                            <span>{item.trim()}</span>
+                                                            {i < arr.length - 1 && <span className="text-amber-400 font-bold text-[9px]">•</span>}
+                                                        </React.Fragment>
+                                                    ))}
+                                                </div>
+                                                <span className="text-white/30 text-xs">•</span>
+                                            </>
+                                        )}
 
-                                    <span className="text-white/30 text-xs">•</span>
+                                        {/* 2. Since Badge */}
+                                        <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-400/20 via-yellow-400/15 to-amber-500/20 border border-amber-300/40 shadow-xs backdrop-blur-xs">
+                                            <Sparkles className="w-2.5 h-2.5 text-amber-300 flex-shrink-0 animate-pulse" />
+                                            <span className="text-amber-300 font-bold italic text-[11px] sm:text-xs tracking-wide font-serif">
+                                                Since {siteSettings.topBar?.sinceYear || '2002'}
+                                            </span>
+                                            <span className="text-amber-100/90 font-medium text-[10px] sm:text-[11px] tracking-wide">
+                                                • {siteSettings.topBar?.sinceText || '22+ Years of Excellence'}
+                                            </span>
+                                        </div>
 
-                                    {/* 2. Since 2002 Badge */}
-                                    <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-400/20 via-yellow-400/15 to-amber-500/20 border border-amber-300/40 shadow-xs backdrop-blur-xs">
-                                        <Sparkles className="w-2.5 h-2.5 text-amber-300 flex-shrink-0 animate-pulse" />
-                                        <span className="text-amber-300 font-bold italic text-[11px] sm:text-xs tracking-wide font-serif">
-                                            Since 2002
-                                        </span>
-                                        <span className="text-amber-100/90 font-medium text-[10px] sm:text-[11px] tracking-wide">
-                                            • 22+ Years of Excellence
-                                        </span>
-                                    </div>
+                                        <span className="text-white/30 text-xs">•</span>
 
-                                    <span className="text-white/30 text-xs">•</span>
+                                        {/* 3. Admissions Open */}
+                                        {siteSettings.topBar?.admissionsText && (
+                                            <>
+                                                <span className="inline-flex items-center gap-1.5 bg-emerald-400/20 border border-emerald-300/40 text-emerald-300 text-[10.5px] sm:text-xs font-semibold px-2.5 py-0.5 rounded-full shadow-xs">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping flex-shrink-0" />
+                                                    {siteSettings.topBar.admissionsText}
+                                                </span>
+                                                <span className="text-white/30 text-xs">•</span>
+                                            </>
+                                        )}
 
-                                    {/* 3. Admissions Open */}
-                                    <span className="inline-flex items-center gap-1.5 bg-emerald-400/20 border border-emerald-300/40 text-emerald-300 text-[10.5px] sm:text-xs font-semibold px-2.5 py-0.5 rounded-full shadow-xs">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping flex-shrink-0" />
-                                        Admissions Open 2026-27 — New Batches Available
-                                    </span>
+                                        {/* 4. Placement Support */}
+                                        {siteSettings.topBar?.placementText && (
+                                            <>
+                                                <span className="inline-flex items-center gap-1.5 bg-amber-400/20 border border-amber-300/40 text-amber-300 text-[10.5px] sm:text-xs font-semibold px-2.5 py-0.5 rounded-full shadow-xs">
+                                                    <Briefcase className="w-3 h-3 text-amber-300 flex-shrink-0" />
+                                                    {siteSettings.topBar.placementText}
+                                                </span>
+                                                <span className="text-white/30 text-xs">•</span>
+                                            </>
+                                        )}
 
-                                    <span className="text-white/30 text-xs">•</span>
+                                        {/* 5. Live Projects */}
+                                        {siteSettings.topBar?.liveProjectText && (
+                                            <>
+                                                <span className="inline-flex items-center gap-1.5 text-sky-200 text-[11px] sm:text-xs font-medium">
+                                                    {siteSettings.topBar.liveProjectText}
+                                                </span>
+                                                <span className="text-white/30 text-xs">•</span>
+                                            </>
+                                        )}
 
-                                    {/* 4. Placement Support */}
-                                    <span className="inline-flex items-center gap-1.5 bg-amber-400/20 border border-amber-300/40 text-amber-300 text-[10.5px] sm:text-xs font-semibold px-2.5 py-0.5 rounded-full shadow-xs">
-                                        <Briefcase className="w-3 h-3 text-amber-300 flex-shrink-0" />
-                                        100% Placement Support • 500+ Corporate Hiring Partners
-                                    </span>
+                                        {/* 6. Phone Contact */}
+                                        {siteSettings.topBar?.phone && (
+                                            <>
+                                                <a
+                                                    href={`tel:${siteSettings.topBar.phone.replace(/[^0-9+]/g, '')}`}
+                                                    className="inline-flex items-center gap-1.5 text-white hover:text-amber-300 font-semibold text-[11px] sm:text-xs transition-colors"
+                                                >
+                                                    <Phone className="w-2.5 h-2.5 text-amber-400 flex-shrink-0" />
+                                                    Call: {siteSettings.topBar.phone}
+                                                </a>
+                                                <span className="text-white/30 text-xs">•</span>
+                                            </>
+                                        )}
 
-                                    <span className="text-white/30 text-xs">•</span>
+                                        {/* 7. Email Contact */}
+                                        {siteSettings.topBar?.email && (
+                                            <>
+                                                <a
+                                                    href={`mailto:${siteSettings.topBar.email}`}
+                                                    className="inline-flex items-center gap-1.5 text-white hover:text-amber-300 font-medium text-[11px] sm:text-xs transition-colors"
+                                                >
+                                                    <Mail className="w-2.5 h-2.5 text-amber-400 flex-shrink-0" />
+                                                    {siteSettings.topBar.email}
+                                                </a>
+                                                <span className="text-white/30 text-xs">•</span>
+                                            </>
+                                        )}
 
-                                    {/* 5. Live Projects */}
-                                    <span className="inline-flex items-center gap-1.5 text-sky-200 text-[11px] sm:text-xs font-medium">
-                                        🚀 Live Industry Projects &amp; Practical Mentorship
-                                    </span>
+                                        {/* 8. Free Career Counselling */}
+                                        {siteSettings.topBar?.counsellingText && (
+                                            <span className="inline-flex items-center gap-1 text-sky-200 text-[11px] sm:text-xs font-medium">
+                                                {siteSettings.topBar.counsellingText}
+                                            </span>
+                                        )}
 
-                                    <span className="text-white/30 text-xs">•</span>
-
-                                    {/* 6. Phone Contact */}
-                                    <a
-                                        href="tel:+918800817447"
-                                        className="inline-flex items-center gap-1.5 text-white hover:text-amber-300 font-semibold text-[11px] sm:text-xs transition-colors"
-                                    >
-                                        <Phone className="w-2.5 h-2.5 text-amber-400 flex-shrink-0" />
-                                        Call: +91-8800817447
-                                    </a>
-
-                                    <span className="text-white/30 text-xs">•</span>
-
-                                    {/* 7. Email Contact */}
-                                    <a
-                                        href="mailto:info@aayushinstitute.com"
-                                        className="inline-flex items-center gap-1.5 text-white hover:text-amber-300 font-medium text-[11px] sm:text-xs transition-colors"
-                                    >
-                                        <Mail className="w-2.5 h-2.5 text-amber-400 flex-shrink-0" />
-                                        info@aayushinstitute.com
-                                    </a>
-
-                                    <span className="text-white/30 text-xs">•</span>
-
-                                    {/* 8. Free Career Counselling */}
-                                    <span className="inline-flex items-center gap-1 text-sky-200 text-[11px] sm:text-xs font-medium">
-                                        🎯 Free Career Counselling &amp; Guidance Daily
-                                    </span>
-
-                                    <span className="text-white/30 text-xs mr-2">•</span>
-                                </React.Fragment>
-                            ))}
+                                        <span className="text-white/30 text-xs mr-2">•</span>
+                                    </React.Fragment>
+                                ))}
+                            </div>
                         </div>
+
+                        {/* Right: Pinned Social Icons (Dynamic handles from siteSettings) */}
+                        <div className="hidden sm:flex items-center gap-1.5 pl-3 bg-[#00488f] shadow-[-12px_0_16px_#00488f] relative z-20 flex-shrink-0 border-l border-white/15">
+                            {/* Facebook */}
+                            {siteSettings.socialLinks?.facebook && (
+                                <a
+                                    href={siteSettings.socialLinks.facebook}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    aria-label="Facebook"
+                                    title="Facebook"
+                                    className="w-5.5 h-5.5 rounded-md bg-[#1877f2] hover:bg-[#166fe5] text-white flex items-center justify-center shadow-xs transition-transform hover:scale-110"
+                                >
+                                    <Facebook className="w-3 h-3 fill-current" />
+                                </a>
+                            )}
+
+                            {/* Instagram */}
+                            {siteSettings.socialLinks?.instagram && (
+                                <a
+                                    href={siteSettings.socialLinks.instagram}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    aria-label="Instagram"
+                                    title="Instagram"
+                                    className="w-5.5 h-5.5 rounded-md bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] text-white flex items-center justify-center shadow-xs transition-transform hover:scale-110"
+                                >
+                                    <Instagram className="w-3 h-3 stroke-[2.2]" />
+                                </a>
+                            )}
+
+                            {/* YouTube */}
+                            {siteSettings.socialLinks?.youtube && (
+                                <a
+                                    href={siteSettings.socialLinks.youtube}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    aria-label="YouTube"
+                                    title="YouTube"
+                                    className="w-5.5 h-5.5 rounded-md bg-[#ff0000] hover:bg-[#e60000] text-white flex items-center justify-center shadow-xs transition-transform hover:scale-110"
+                                >
+                                    <Youtube className="w-3.5 h-3.5 stroke-[2]" />
+                                </a>
+                            )}
+
+                            {/* LinkedIn */}
+                            {siteSettings.socialLinks?.linkedin && (
+                                <a
+                                    href={siteSettings.socialLinks.linkedin}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    aria-label="LinkedIn"
+                                    title="LinkedIn"
+                                    className="w-5.5 h-5.5 rounded-md bg-[#0a66c2] hover:bg-[#084e96] text-white flex items-center justify-center shadow-xs transition-transform hover:scale-110"
+                                >
+                                    <Linkedin className="w-3 h-3 fill-current" />
+                                </a>
+                            )}
+
+                            {/* Twitter / X */}
+                            {siteSettings.socialLinks?.twitter && (
+                                <a
+                                    href={siteSettings.socialLinks.twitter}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    aria-label="Twitter / X"
+                                    title="Twitter / X"
+                                    className="w-5.5 h-5.5 rounded-md bg-black hover:bg-neutral-800 text-white flex items-center justify-center shadow-xs transition-transform hover:scale-110"
+                                >
+                                    <Twitter className="w-3 h-3 fill-current" />
+                                </a>
+                            )}
+
+                            {/* WhatsApp */}
+                            {siteSettings.socialLinks?.whatsapp && (
+                                <a
+                                    href={siteSettings.socialLinks.whatsapp}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    aria-label="WhatsApp"
+                                    title="WhatsApp"
+                                    className="w-5.5 h-5.5 rounded-md bg-[#25D366] hover:bg-[#20ba59] text-white flex items-center justify-center shadow-xs transition-transform hover:scale-110"
+                                >
+                                    <MessageCircle className="w-3 h-3 fill-current" />
+                                </a>
+                            )}
+                        </div>
+
                     </div>
-
-                    {/* Right: Pinned Social Icons (Always accessible, high z-index with background gradient) */}
-                    <div className="hidden sm:flex items-center gap-1.5 pl-3 bg-[#00488f] shadow-[-12px_0_16px_#00488f] relative z-20 flex-shrink-0 border-l border-white/15">
-                        {/* Facebook */}
-                        <a
-                            href="https://facebook.com"
-                            target="_blank"
-                            rel="noreferrer"
-                            aria-label="Facebook"
-                            title="Facebook"
-                            className="w-5.5 h-5.5 rounded-md bg-[#1877f2] hover:bg-[#166fe5] text-white flex items-center justify-center shadow-xs transition-transform hover:scale-110"
-                        >
-                            <Facebook className="w-3 h-3 fill-current" />
-                        </a>
-
-                        {/* Instagram */}
-                        <a
-                            href="https://instagram.com"
-                            target="_blank"
-                            rel="noreferrer"
-                            aria-label="Instagram"
-                            title="Instagram"
-                            className="w-5.5 h-5.5 rounded-md bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] text-white flex items-center justify-center shadow-xs transition-transform hover:scale-110"
-                        >
-                            <Instagram className="w-3 h-3 stroke-[2.2]" />
-                        </a>
-
-                        {/* YouTube */}
-                        <a
-                            href="https://youtube.com"
-                            target="_blank"
-                            rel="noreferrer"
-                            aria-label="YouTube"
-                            title="YouTube"
-                            className="w-5.5 h-5.5 rounded-md bg-[#ff0000] hover:bg-[#e60000] text-white flex items-center justify-center shadow-xs transition-transform hover:scale-110"
-                        >
-                            <svg viewBox="0 0 24 24" className="w-3 h-3 fill-white" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                            </svg>
-                        </a>
-
-                        {/* LinkedIn */}
-                        <a
-                            href="https://linkedin.com"
-                            target="_blank"
-                            rel="noreferrer"
-                            aria-label="LinkedIn"
-                            title="LinkedIn"
-                            className="w-5.5 h-5.5 rounded-md bg-[#0a66c2] hover:bg-[#084e96] text-white flex items-center justify-center shadow-xs transition-transform hover:scale-110"
-                        >
-                            <Linkedin className="w-3 h-3 fill-current" />
-                        </a>
-                    </div>
-
                 </div>
-            </div>
+            )}
 
             {/* ── 2. Main Navigation Bar: Responsive Layout ── */}
             <div className="bg-white border-b border-gray-100 shadow-xs relative z-40">
@@ -560,26 +808,154 @@ const Header = () => {
                                         />
                                     </NavLink>
 
-                                    {/* Desktop Dropdowns - compact vertical list matching Corporate Course */}
-                                    <div className="hidden group-hover:block absolute top-full left-0 bg-white rounded-lg shadow-xl border border-gray-100 min-w-[230px] py-1.5 transition-all duration-150 z-50">
-                                        {item.dropdown.map((sub) => {
-                                            const isSubActive = active && sub.state?.category && location.state?.category === sub.state?.category;
-                                            return (
-                                                <NavLink
-                                                    key={sub.label}
-                                                    to={sub.to}
-                                                    state={sub.state}
-                                                    className={`block px-4 py-2 text-xs font-medium transition-colors ${
-                                                        isSubActive
-                                                            ? 'bg-blue-50 text-[#0055ff] font-bold border-l-2 border-[#0055ff]'
-                                                            : 'text-gray-700 hover:bg-blue-50 hover:text-[#004b93]'
-                                                    }`}
-                                                >
-                                                    {sub.label}
-                                                </NavLink>
-                                            );
-                                        })}
-                                    </div>
+                                    {/* Desktop Dropdowns */}
+                                    {item.label === 'Courses' ? (
+                                        <div className="hidden group-hover:block absolute top-full left-0 pt-2 z-50">
+                                            <div className="w-[940px] xl:w-[980px] max-w-[calc(100vw-140px)] bg-white rounded-2xl shadow-[0_24px_60px_-12px_rgba(0,35,90,0.20),0_0_0_1px_rgba(0,35,90,0.06)] border border-slate-100 overflow-hidden animate-in fade-in-50 duration-150">
+                                                {/* 1. Header Bar */}
+                                                <div className="px-5 py-3 bg-gradient-to-r from-blue-50/90 via-indigo-50/40 to-white border-b border-slate-100 flex items-center justify-between">
+                                                    <div className="flex items-center gap-2.5">
+                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#0055ff] text-white shadow-xs">
+                                                            <Sparkles className="w-3 h-3 text-amber-300" />
+                                                            Total 22 Certified Courses
+                                                        </span>
+                                                        <span className="text-[12px] font-medium text-slate-600 hidden md:inline">
+                                                            Industry-recognized curricula with 100% placement support
+                                                        </span>
+                                                    </div>
+                                                    <NavLink
+                                                        to="/Courses"
+                                                        className="text-xs font-bold text-[#0055ff] hover:text-[#003cb3] flex items-center gap-1 group/all transition-colors"
+                                                    >
+                                                        <span>View Full Catalog</span>
+                                                        <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover/all:translate-x-0.5" />
+                                                    </NavLink>
+                                                </div>
+
+                                                {/* 2. 4-Column Grid displaying all 22 Cards simultaneously */}
+                                                <div className="p-4 grid grid-cols-4 gap-4 bg-white">
+                                                    {coursesCardsColumns.map((col) => (
+                                                        <div key={col.colId} className="flex flex-col gap-3.5">
+                                                            {col.sections.map((sec) => (
+                                                                <div key={sec.id} className="flex flex-col">
+                                                                    {/* Section Header */}
+                                                                    <div className="flex items-center gap-1.5 pb-1 mb-1.5 border-b border-slate-100">
+                                                                        <div className={`p-1 rounded-md ${sec.iconBg} ${sec.iconColor} flex-shrink-0`}>
+                                                                            <sec.icon className="w-3 h-3" />
+                                                                        </div>
+                                                                        <h4 className="text-[10.5px] font-bold text-slate-800 tracking-wider uppercase truncate">
+                                                                            {sec.title}
+                                                                        </h4>
+                                                                    </div>
+
+                                                                    {/* Cards inside Section */}
+                                                                    <div className="flex flex-col gap-1.5">
+                                                                        {sec.courses.map((course) => {
+                                                                            const CourseIcon = course.icon;
+                                                                            const isCourseActive = active && (
+                                                                                (course.to !== '/Courses' && location.pathname === course.to) ||
+                                                                                (course.state?.category && location.state?.category === course.state?.category)
+                                                                            );
+                                                                            return (
+                                                                                <NavLink
+                                                                                    key={course.name}
+                                                                                    to={course.to}
+                                                                                    state={course.state}
+                                                                                    className={`group/card flex items-center gap-2 p-1.5 px-2 rounded-xl border transition-all duration-150 cursor-pointer ${
+                                                                                        isCourseActive
+                                                                                            ? 'bg-blue-50/90 border-[#0055ff]/40 shadow-xs'
+                                                                                            : 'bg-slate-50/60 hover:bg-white border-slate-100/90 hover:border-blue-200 hover:shadow-[0_4px_12px_rgba(0,60,180,0.08)] hover:-translate-y-0.5'
+                                                                                    }`}
+                                                                                >
+                                                                                    {/* Icon Container */}
+                                                                                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors shadow-xs ${
+                                                                                        isCourseActive
+                                                                                            ? 'bg-[#0055ff] text-white'
+                                                                                            : `${sec.iconBg} ${sec.iconColor} group-hover/card:bg-[#0055ff] group-hover/card:text-white`
+                                                                                    }`}>
+                                                                                        <CourseIcon className="w-3.5 h-3.5" />
+                                                                                    </div>
+
+                                                                                    {/* Content */}
+                                                                                    <div className="min-w-0 flex-1">
+                                                                                        <div className="flex items-center justify-between gap-1">
+                                                                                            <h5 className={`text-[11.5px] font-semibold truncate transition-colors leading-tight ${
+                                                                                                isCourseActive
+                                                                                                    ? 'text-[#0055ff]'
+                                                                                                    : 'text-slate-800 group-hover/card:text-[#0055ff]'
+                                                                                            }`}>
+                                                                                                {course.name}
+                                                                                            </h5>
+                                                                                            {course.badge && (
+                                                                                                <span className="text-[7.5px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-[#0055ff] flex-shrink-0 leading-none">
+                                                                                                    {course.badge}
+                                                                                                </span>
+                                                                                            )}
+                                                                                        </div>
+                                                                                        <p className="text-[9.5px] text-slate-400 group-hover/card:text-slate-500 truncate mt-0.5 leading-none">
+                                                                                            {course.sub}
+                                                                                        </p>
+                                                                                    </div>
+                                                                                </NavLink>
+                                                                            );
+                                                                        })}
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    ))}
+                                                </div>
+
+                                                {/* 3. Footer Bar */}
+                                                <div className="px-5 py-2.5 bg-slate-50/90 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600">
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="inline-flex items-center gap-1.5 font-medium">
+                                                            <Award className="w-3.5 h-3.5 text-[#0055ff]" />
+                                                            Govt. &amp; ISO Certified
+                                                        </span>
+                                                        <span className="text-slate-300">•</span>
+                                                        <span className="inline-flex items-center gap-1.5 font-medium">
+                                                            <Briefcase className="w-3.5 h-3.5 text-emerald-600" />
+                                                            100% Placement Support
+                                                        </span>
+                                                        <span className="text-slate-300">•</span>
+                                                        <span className="inline-flex items-center gap-1.5 font-medium">
+                                                            <GraduationCap className="w-3.5 h-3.5 text-purple-600" />
+                                                            Live Real-World Projects
+                                                        </span>
+                                                    </div>
+                                                    <a
+                                                        href="tel:+919311050670"
+                                                        className="font-semibold text-slate-700 hover:text-[#0055ff] inline-flex items-center gap-1.5 transition-colors"
+                                                    >
+                                                        <Phone className="w-3 h-3 text-[#0055ff]" />
+                                                        <span>Helpline: +91-9311050670</span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        /* Desktop Dropdowns - compact vertical list matching Corporate Course & others */
+                                        <div className="hidden group-hover:block absolute top-full left-0 bg-white rounded-lg shadow-xl border border-gray-100 min-w-[230px] py-1.5 transition-all duration-150 z-50">
+                                            {item.dropdown.map((sub) => {
+                                                const isSubActive = active && sub.state?.category && location.state?.category === sub.state?.category;
+                                                return (
+                                                    <NavLink
+                                                        key={sub.label}
+                                                        to={sub.to}
+                                                        state={sub.state}
+                                                        className={`block px-4 py-2 text-xs font-medium transition-colors ${
+                                                            isSubActive
+                                                                ? 'bg-blue-50 text-[#0055ff] font-bold border-l-2 border-[#0055ff]'
+                                                                : 'text-gray-700 hover:bg-blue-50 hover:text-[#004b93]'
+                                                        }`}
+                                                    >
+                                                        {sub.label}
+                                                    </NavLink>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}
@@ -603,24 +979,6 @@ const Header = () => {
                             </NavLink>
                         </div>
 
-                        {/* Faculty & Mentors Link */}
-                        <div className="relative py-1">
-                            <NavLink
-                                to="/staff"
-                                className={`flex items-center font-semibold text-[11px] xl:text-[11.5px] px-2 xl:px-2.5 py-1.5 rounded-md transition-all whitespace-nowrap cursor-pointer ${
-                                    isRouteActive('staff')
-                                        ? 'text-[#0055ff] font-bold bg-blue-50/70 shadow-xs'
-                                        : 'text-[#004b93] hover:text-[#003163] hover:bg-slate-50'
-                                }`}
-                            >
-                                <span className="relative inline-block pb-0.5">
-                                    Faculty
-                                    {isRouteActive('staff') && (
-                                        <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#0055ff] rounded-full shadow-xs" />
-                                    )}
-                                </span>
-                            </NavLink>
-                        </div>
                     </nav>
 
                     {/* Right Controls: Tablet Quick Actions, Login Button, and Hamburger */}
@@ -963,20 +1321,6 @@ const Header = () => {
                                     </NavLink>
                                 </div>
 
-                                <div className="pt-1">
-                                    <NavLink
-                                        to="/staff"
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className={`flex items-center justify-between w-full text-[13.5px] font-semibold py-2 px-2.5 rounded-xl transition-colors ${
-                                            location.pathname.toLowerCase().includes('staff') || location.pathname.toLowerCase().includes('faculty')
-                                                ? 'text-[#0055ff] font-bold bg-blue-50/80 border-l-3 border-[#0055ff]'
-                                                : 'text-[#003366] hover:text-[#0055ff]'
-                                        }`}
-                                    >
-                                        <span>Our Faculty</span>
-                                        <ChevronRight className="w-4 h-4 text-slate-400" />
-                                    </NavLink>
-                                </div>
 
                                 <div className="pt-1">
                                     <NavLink
@@ -1056,16 +1400,50 @@ const Header = () => {
                                     </NavLink>
                                 </div>
 
-                                {/* Direct Contact */}
-                                <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs text-slate-600">
-                                    <a href="tel:+918800817447" className="flex items-center gap-1.5 font-medium text-[#00488f] hover:underline">
-                                        <Phone className="w-3.5 h-3.5" />
-                                        <span>+91-8800817447</span>
-                                    </a>
-                                    <a href="mailto:info@aayushinstitute.com" className="flex items-center gap-1.5 font-medium text-[#00488f] hover:underline">
-                                        <Mail className="w-3.5 h-3.5" />
-                                        <span>Email Us</span>
-                                    </a>
+                                {/* Direct Contact & Social */}
+                                <div className="pt-2 border-t border-slate-200/60 space-y-2">
+                                    <div className="flex items-center justify-between text-xs text-slate-600">
+                                        <a href={`tel:${(siteSettings.topBar?.phone || '+919311050670').replace(/[^0-9+]/g, '')}`} className="flex items-center gap-1.5 font-medium text-[#00488f] hover:underline">
+                                            <Phone className="w-3.5 h-3.5" />
+                                            <span>{siteSettings.topBar?.phone || '+91-9311050670'}</span>
+                                        </a>
+                                        <a href={`mailto:${siteSettings.topBar?.email || 'info@aayushinstitute.com'}`} className="flex items-center gap-1.5 font-medium text-[#00488f] hover:underline">
+                                            <Mail className="w-3.5 h-3.5" />
+                                            <span>Email Us</span>
+                                        </a>
+                                    </div>
+                                    <div className="flex items-center justify-center gap-2 pt-1">
+                                        {siteSettings.socialLinks?.facebook && (
+                                            <a href={siteSettings.socialLinks.facebook} target="_blank" rel="noreferrer" className="w-6 h-6 rounded-md bg-[#1877f2] text-white flex items-center justify-center shadow-xs">
+                                                <Facebook className="w-3 h-3 fill-current" />
+                                            </a>
+                                        )}
+                                        {siteSettings.socialLinks?.instagram && (
+                                            <a href={siteSettings.socialLinks.instagram} target="_blank" rel="noreferrer" className="w-6 h-6 rounded-md bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] text-white flex items-center justify-center shadow-xs">
+                                                <Instagram className="w-3 h-3 stroke-[2.2]" />
+                                            </a>
+                                        )}
+                                        {siteSettings.socialLinks?.youtube && (
+                                            <a href={siteSettings.socialLinks.youtube} target="_blank" rel="noreferrer" className="w-6 h-6 rounded-md bg-[#ff0000] text-white flex items-center justify-center shadow-xs">
+                                                <Youtube className="w-3.5 h-3.5 stroke-[2]" />
+                                            </a>
+                                        )}
+                                        {siteSettings.socialLinks?.linkedin && (
+                                            <a href={siteSettings.socialLinks.linkedin} target="_blank" rel="noreferrer" className="w-6 h-6 rounded-md bg-[#0a66c2] text-white flex items-center justify-center shadow-xs">
+                                                <Linkedin className="w-3 h-3 fill-current" />
+                                            </a>
+                                        )}
+                                        {siteSettings.socialLinks?.twitter && (
+                                            <a href={siteSettings.socialLinks.twitter} target="_blank" rel="noreferrer" className="w-6 h-6 rounded-md bg-black text-white flex items-center justify-center shadow-xs">
+                                                <Twitter className="w-3 h-3 fill-current" />
+                                            </a>
+                                        )}
+                                        {siteSettings.socialLinks?.whatsapp && (
+                                            <a href={siteSettings.socialLinks.whatsapp} target="_blank" rel="noreferrer" className="w-6 h-6 rounded-md bg-[#25D366] text-white flex items-center justify-center shadow-xs">
+                                                <MessageCircle className="w-3 h-3 fill-current" />
+                                            </a>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         )}

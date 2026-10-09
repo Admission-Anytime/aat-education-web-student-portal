@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, NavLink } from 'react-router-dom';
 import {
     Clock,
@@ -1204,63 +1204,9 @@ const Courses = () => {
     });
     const [isDbLoaded, setIsDbLoaded] = useState(false);
 
-    // Staff Authentication & Mode Detection
-    const [currentUser, setCurrentUser] = useState(() => {
-        try {
-            return JSON.parse(localStorage.getItem('aayush_user') || 'null');
-        } catch {
-            return null;
-        }
-    });
+    // Staff mode disabled
+    const isStaff = false;
 
-    const [isStaffQuickUnlocked, setIsStaffQuickUnlocked] = useState(() => {
-        return sessionStorage.getItem('aayush_staff_quick_unlocked') === 'true';
-    });
-
-    const isStaff = currentUser?.role === 'staff' || currentUser?.role === 'admin' || isStaffQuickUnlocked;
-
-    useEffect(() => {
-        const syncAuth = () => {
-            try {
-                const u = JSON.parse(localStorage.getItem('aayush_user') || 'null');
-                setCurrentUser(u);
-            } catch {
-                setCurrentUser(null);
-            }
-        };
-        window.addEventListener('authChange', syncAuth);
-        window.addEventListener('storage', syncAuth);
-        return () => {
-            window.removeEventListener('authChange', syncAuth);
-            window.removeEventListener('storage', syncAuth);
-        };
-    }, []);
-
-    // Staff Security PIN Gate (Secret PIN: 2580)
-    const STAFF_SECRET_PIN = '2580';
-    const [showStaffUnlockModal, setShowStaffUnlockModal] = useState(false);
-    const [staffPinInput, setStaffPinInput] = useState('');
-    const [staffPinError, setStaffPinError] = useState('');
-
-    const handleStaffUnlockSubmit = (e) => {
-        e?.preventDefault();
-        if (staffPinInput.trim() === STAFF_SECRET_PIN) {
-            sessionStorage.setItem('aayush_staff_quick_unlocked', 'true');
-            setIsStaffQuickUnlocked(true);
-            setShowStaffUnlockModal(false);
-            setStaffPinInput('');
-            setStaffPinError('');
-            showToast('Staff Access Granted: Course editing and publishing enabled!', 'success');
-        } else {
-            setStaffPinError('Incorrect 4-digit PIN. Authorized faculty and staff only.');
-        }
-    };
-
-    const handleStaffLock = () => {
-        sessionStorage.removeItem('aayush_staff_quick_unlocked');
-        setIsStaffQuickUnlocked(false);
-        showToast('Faculty editing mode locked.', 'info');
-    };
 
     // Course Edit State & Handlers
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -1987,22 +1933,75 @@ const Courses = () => {
     );
 
     // QR Code Widget matching reference image
-    const QRCodeWidget = () => (
-        <div className="relative w-44 h-44 sm:w-48 sm:h-48 bg-white rounded-2xl p-2.5 border-[2.5px] border-[#22c55e] shadow-xs flex items-center justify-center mx-auto">
-            <img
-                src="/whatsapp_qr.png"
-                alt="WhatsApp QR Code"
-                className="w-full h-full object-contain"
-            />
-            <div className="absolute w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-md border-2 border-white pointer-events-none">
-                <WhatsAppIcon className="w-5 h-5" />
+    const QRCodeWidget = ({ qrSrc, waNumber = "919311050670" }) => {
+        const defaultImg = qrSrc || "/whatsapp_qr.png";
+        const cleanNumber = String(waNumber).replace(/[^0-9]/g, '') || '919311050670';
+        const fallbackQr = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`https://wa.me/${cleanNumber}`)}`;
+
+        return (
+            <div className="relative w-24 h-24 sm:w-28 sm:h-28 lg:w-28 lg:h-28 xl:w-32 xl:h-32 2xl:w-36 2xl:h-36 bg-white rounded-xl sm:rounded-2xl p-1.5 sm:p-2 border-[2px] sm:border-[2.5px] border-[#22c55e] shadow-xs flex items-center justify-center mx-auto transition-all">
+                <img
+                    src={defaultImg}
+                    alt="WhatsApp QR Code"
+                    className="w-full h-full object-contain"
+                    onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = fallbackQr;
+                    }}
+                />
+                <div className="absolute w-5 h-5 sm:w-6 sm:h-6 2xl:w-7 2xl:h-7 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-md border-2 border-white pointer-events-none">
+                    <WhatsAppIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 2xl:w-4 2xl:h-4" />
+                </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     // Full Course Showcase Poster (Matches exact layout of reference image)
-    const CourseDetailsPoster = ({ course, isModal = false, onClose }) => {
+    const CourseDetailsPoster = ({ course, isModal = false, onClose, onSelectCourse }) => {
         if (!course) return null;
+
+        const [otherCourses, setOtherCourses] = useState([]);
+        const [loadingOtherCourses, setLoadingOtherCourses] = useState(false);
+        const [enquirySettings, setEnquirySettings] = useState(null);
+
+        useEffect(() => {
+            let isMounted = true;
+            const fetchCourses = async () => {
+                try {
+                    setLoadingOtherCourses(true);
+                    const res = await fetch('/api/courses');
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (isMounted && Array.isArray(data)) {
+                            setOtherCourses(data.filter(c => c.visible !== false));
+                        }
+                    }
+                } catch (err) {
+                    console.warn('Failed to load other courses in modal:', err);
+                } finally {
+                    if (isMounted) setLoadingOtherCourses(false);
+                }
+            };
+
+            const fetchEnquirySettings = async () => {
+                try {
+                    const res = await fetch('/api/site-settings');
+                    if (res.ok) {
+                        const data = await res.json();
+                        const settings = data?.data?.modalWhatsAppEnquiry || data?.modalWhatsAppEnquiry;
+                        if (isMounted && settings) {
+                            setEnquirySettings(settings);
+                        }
+                    }
+                } catch (err) {
+                    console.warn('Failed to load modal WhatsApp settings:', err);
+                }
+            };
+
+            fetchCourses();
+            fetchEnquirySettings();
+            return () => { isMounted = false; };
+        }, []);
 
         const highlightItems = [];
         if (course.id === 1 || course.name.toLowerCase().includes('artificial intelligence')) {
@@ -2054,12 +2053,52 @@ const Courses = () => {
             return '₹ 45,000/- (Inclusive of all taxes)';
         };
 
-        const waLink = `https://wa.me/918800817447?text=${encodeURIComponent(`Hi, I would like to inquire about the ${course.name} course.`)}`;
+        const dynamicWaRaw = enquirySettings?.whatsappNumber || course?.whatsappNumber || "919311050670";
+        const dynamicWaClean = String(dynamicWaRaw).replace(/[^0-9]/g, '') || "919311050670";
+        const waLink = `https://wa.me/${dynamicWaClean}?text=${encodeURIComponent(`Hi, I would like to inquire about the ${course.name} course.`)}`;
+
+        const titlePrefix = enquirySettings?.titlePrefix || "Quick Enquiry on";
+        const titleHighlight = enquirySettings?.titleHighlight || "WhatsApp";
+        const subtitle = enquirySettings?.subtitle || "Get instant details about:";
+        const checklistItems = (Array.isArray(enquirySettings?.checklist) && enquirySettings.checklist.length > 0)
+            ? enquirySettings.checklist
+            : [
+                "Course Details",
+                "Total Fee",
+                "Scholarship / Discounts",
+                "Admission Process",
+                "Batch Timings",
+                "Online / Classroom Mode",
+                "Syllabus",
+                "Career Guidance"
+            ];
+        const qrImageSrc = enquirySettings?.qrImage || course?.qrCodeImage || "/whatsapp_qr.png";
+        const buttonText = enquirySettings?.buttonText || "Chat on WhatsApp";
+        const counsellorNote = enquirySettings?.counsellorNote || "Or click the button to chat directly with our counsellor.";
+
+        const courseBadgeNumber = (() => {
+            if (typeof course.order === 'number' && !isNaN(course.order) && course.order > 0 && course.order < 100) {
+                return String(course.order).padStart(2, '0');
+            }
+            if (typeof course.displayOrder === 'number' && !isNaN(course.displayOrder) && course.displayOrder > 0 && course.displayOrder < 100) {
+                return String(course.displayOrder).padStart(2, '0');
+            }
+            const num = Number(course.id);
+            if (!isNaN(num) && num > 0 && num < 1000) {
+                return String(num).padStart(2, '0');
+            }
+            return '01';
+        })();
+
+        const filteredCourses = otherCourses.filter(c => 
+            String(c._id || c.id) !== String(course?._id || course?.id) &&
+            (c.name || c.title || '').toLowerCase() !== (course.name || course.title || '').toLowerCase()
+        );
 
         return (
-            <div className={`w-full bg-[#f4f8fc] rounded-3xl p-3.5 sm:p-4 md:p-5 text-slate-800 border border-slate-200/80 shadow-2xl relative ${isModal ? 'xl:h-full xl:flex xl:flex-col xl:overflow-hidden' : 'space-y-4 sm:space-y-5'}`}>
+            <div className="w-full bg-[#f4f8fc] rounded-3xl p-3.5 sm:p-5 md:p-6 text-slate-800 relative">
                 {/* Top Action buttons when in modal */}
-                <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-40 flex items-center gap-2">
+                <div className="sticky top-2 right-2 sm:top-3 sm:right-3 z-50 ml-auto -mb-9 flex items-center gap-2">
                     {isStaff && (
                         <div className="flex items-center gap-1.5">
                             <button
@@ -2090,33 +2129,39 @@ const Courses = () => {
                     {isModal && onClose && (
                         <button
                             onClick={onClose}
-                            className="w-8 h-8 rounded-full bg-white/95 hover:bg-white text-slate-600 hover:text-slate-900 shadow-md flex items-center justify-center transition-all cursor-pointer border border-slate-200"
+                            className="w-9 h-9 rounded-full bg-white/95 hover:bg-white text-slate-700 hover:text-slate-900 shadow-lg flex items-center justify-center transition-all cursor-pointer border border-slate-200/90 hover:scale-105 active:scale-95"
                             aria-label="Close modal"
                         >
-                            <X className="w-4 h-4" />
+                            <X className="w-4.5 h-4.5 stroke-[2.5]" />
                         </button>
                     )}
                 </div>
 
-                {/* ── MAIN CONTENT GRID: Left 9 Cols (Scrollable) + Right 3 Cols (Fixed WhatsApp) ── */}
-                <div className={`grid grid-cols-1 xl:grid-cols-12 gap-3.5 sm:gap-4 items-start ${isModal ? 'xl:flex-1 xl:min-h-0 xl:overflow-hidden' : ''}`}>
+                {/* ── MAIN CONTENT GRID: Left (LG 7 / XL 8) + Right (LG 5 / XL 4) ── */}
+                {/* ── MAIN CONTENT GRID: Mobile/Tablet full flow, Desktop (XL 8 / XL 4) ── */}
+                <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 sm:gap-6 xl:gap-7 items-start">
                     
-                    {/* ──── LEFT SECTION (9 Columns on XL) - SCROLLABLE ──── */}
-                    <div className={`xl:col-span-9 flex flex-col gap-3.5 sm:gap-4 ${isModal ? 'xl:h-full xl:overflow-y-auto xl:pr-3 custom-modal-scroll' : ''}`}>
+                    {/* ──── LEFT / MAIN CONTENT SECTION ──── */}
+                    <div className="xl:col-span-8 2xl:col-span-8 flex flex-col gap-5 sm:gap-6">
                         
                         {/* ── 1. TOP HERO SECTION ── */}
-                        <div 
-                            className="relative overflow-hidden rounded-2xl border border-blue-200/70 p-4 sm:p-5 md:p-6 flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 min-h-[210px] md:min-h-[235px] bg-[#d6ecff] bg-cover bg-no-repeat"
-                            style={{ 
-                                backgroundImage: "url('/course_card_girl.jpg')",
-                                backgroundPosition: "right center" 
-                            }}
-                        >
-                            <div className="max-w-md lg:max-w-lg z-10 bg-white/60 md:bg-transparent backdrop-blur-[2px] md:backdrop-blur-none p-3 sm:p-3.5 md:p-0 rounded-2xl">
+                        <div className="relative overflow-hidden rounded-2xl border border-blue-200/70 p-4 sm:p-6 md:p-7 flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 min-h-[170px] md:min-h-[235px] bg-gradient-to-br from-[#ebf5ff] via-[#d6ecff] to-[#c7e5ff]">
+                            {/* Desktop & Tablet: Background Hero Image contained strictly on right side */}
+                            <div 
+                                className="hidden md:block absolute inset-0 bg-no-repeat pointer-events-none"
+                                style={{ 
+                                    backgroundImage: "url('/course_card_girl.jpg')",
+                                    backgroundPosition: "right center",
+                                    backgroundSize: "contain"
+                                }}
+                            />
+
+                            {/* Left Text Block: Capped at 55% so text NEVER collides with the girl/robot */}
+                            <div className="w-full md:max-w-[55%] lg:max-w-[55%] xl:max-w-[56%] z-10 p-0 rounded-2xl relative">
                                 {/* Course Number + Badge */}
-                                <div className="flex items-center gap-2 mb-2">
-                                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#0a2540] text-white flex items-center justify-center font-bold text-xs sm:text-sm shadow-md flex-shrink-0">
-                                        {String(course.id).padStart(2, '0')}
+                                <div className="flex items-center gap-2 mb-2 sm:mb-2.5">
+                                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[#0a2540] text-white flex items-center justify-center font-bold text-xs sm:text-sm shadow-md flex-shrink-0 overflow-hidden">
+                                        {courseBadgeNumber}
                                     </div>
                                     <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 text-[#0066ff] text-[10.5px] sm:text-[11px] font-medium tracking-wide border border-blue-200/80 shadow-2xs">
                                         <Rocket className="w-3.5 h-3.5 text-[#0066ff]" />
@@ -2125,69 +2170,80 @@ const Courses = () => {
                                 </div>
 
                                 {/* Main Title */}
-                                <h2 className="text-xl sm:text-2xl md:text-[25px] lg:text-[26px] font-bold text-[#0a2540] tracking-tight leading-tight mb-1.5">
+                                <h2 className="text-xl sm:text-2xl md:text-[23px] lg:text-[26px] font-bold text-[#0a2540] tracking-tight leading-tight mb-1.5 sm:mb-2">
                                     {course.name}
                                 </h2>
 
                                 {/* Description */}
-                                <p className="text-slate-600 text-[11px] sm:text-xs md:text-[12.5px] leading-relaxed mb-3 font-normal max-w-md">
+                                <p className="text-slate-600 text-[11px] sm:text-xs md:text-[12px] lg:text-[12.5px] leading-relaxed mb-3 sm:mb-3.5 font-normal max-w-md">
                                     {course.details || course.oneLiner}
                                 </p>
 
-                                {/* 3 Circular Feature Badges */}
-                                <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-[10.5px] font-medium text-[#0a2540]">
-                                    <div className="flex items-center gap-1.5">
-                                        <div className="w-6 h-6 rounded-lg bg-[#0066ff] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
-                                            <BookOpen className="w-3.5 h-3.5" />
+                                {/* 3 Circular Feature Badges with clean spacing */}
+                                <div className="flex flex-wrap md:flex-nowrap items-stretch gap-1.5 sm:gap-2 text-[9.5px] sm:text-[10px] md:text-[10.5px] font-medium text-[#0a2540] pt-2.5 pb-1 border-t border-blue-200/60 mt-2">
+                                    <div className="flex-1 min-w-[85px] flex items-center gap-1.5 bg-white/95 md:bg-white/85 px-2 py-1.5 rounded-xl border border-blue-100 shadow-2xs">
+                                        <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg bg-[#0066ff] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
+                                            <BookOpen className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
                                         </div>
-                                        <span className="leading-tight text-[10.5px]">Industry<br />Relevant Curriculum</span>
+                                        <span className="leading-tight line-clamp-2">Industry Curriculum</span>
                                     </div>
-                                    <div className="flex items-center gap-1.5">
-                                        <div className="w-6 h-6 rounded-lg bg-[#0066ff] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
-                                            <Code className="w-3.5 h-3.5" />
+                                    <div className="flex-1 min-w-[85px] flex items-center gap-1.5 bg-white/95 md:bg-white/85 px-2 py-1.5 rounded-xl border border-blue-100 shadow-2xs">
+                                        <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg bg-[#0066ff] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
+                                            <Code className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
                                         </div>
-                                        <span className="leading-tight text-[10.5px]">Hands-on<br />Projects</span>
+                                        <span className="leading-tight line-clamp-2">Hands-on Projects</span>
                                     </div>
-                                    <div className="flex items-center gap-1.5">
-                                        <div className="w-6 h-6 rounded-lg bg-[#0066ff] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
-                                            <Users className="w-3.5 h-3.5" />
+                                    <div className="flex-1 min-w-[85px] flex items-center gap-1.5 bg-white/95 md:bg-white/85 px-2 py-1.5 rounded-xl border border-blue-100 shadow-2xs">
+                                        <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg bg-[#0066ff] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
+                                            <Users className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
                                         </div>
-                                        <span className="leading-tight text-[10.5px]">Expert<br />Trainers</span>
+                                        <span className="leading-tight line-clamp-2">Expert Trainers</span>
                                     </div>
                                 </div>
-                            </div>
+                        </div>
 
-                            {/* Right spacer for Desktop: background image fills this area */}
-                            <div className="hidden md:block flex-shrink-0 w-64 lg:w-88 h-40 lg:h-48 pointer-events-none" />
+                        {/* Mobile Course Graphic Banner: Balanced Artwork without Blank Gaps */}
+                        <div className="md:hidden w-full flex justify-center my-3 sm:my-4 z-10">
+                            <div className="w-full max-w-[340px] sm:max-w-sm overflow-hidden rounded-2xl border border-white/90 shadow-md bg-white/95 p-1.5 sm:p-2">
+                                <img
+                                    src="/course_card_girl_mobile.png"
+                                    alt={course.name}
+                                    className="w-full h-auto aspect-[4/3] sm:aspect-[16/10] object-cover object-center rounded-xl"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Right spacer for Desktop: background image fills this area */}
+                        <div className="hidden md:block flex-shrink-0 w-64 lg:w-88 h-40 lg:h-48 pointer-events-none" />
                         </div>
 
                         {/* ── 2. TWO EQUAL SUB-COLUMNS: Highlights+Syllabus & Course Info+Internship ── */}
-                        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4 items-stretch">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 items-stretch">
                             
-                            {/* ── Sub-Column 1: Course Highlights (top) & Syllabus (bottom) (6 cols) ── */}
-                            <div className="md:col-span-6 flex flex-col gap-3 sm:gap-3.5">
+                            {/* ── Sub-Column 1: Course Highlights (top) & Syllabus (bottom) ── */}
+                            <div className="flex flex-col gap-4 sm:gap-5">
                                 
                                 {/* Course Highlights Card */}
                                 <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 shadow-xs flex flex-col justify-between">
                                     <div>
                                         {/* Header - Blue Gradient Pill Badge */}
                                         <div className="mb-2.5">
-                                            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#0055cc] to-[#0077ff] text-white shadow-md">
-                                                <Star className="w-3.5 h-3.5 fill-current" />
+                                            <div className="inline-flex items-center gap-1.5 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-gradient-to-r from-[#0055cc] to-[#0077ff] text-white shadow-md">
+                                                <Star className="w-3 sm:w-3.5 h-3 sm:h-3.5 fill-current" />
                                                 <span className="text-xs sm:text-sm font-semibold tracking-tight">Course Highlights</span>
                                             </div>
                                         </div>
 
                                         {/* 2-column Grid of 8 circular icons */}
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                        <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
                                             {finalHighlights.map((hl, hIdx) => {
                                                 const colStyle = highlightColors[hIdx % highlightColors.length];
                                                 return (
-                                                    <div key={hIdx} className="flex items-center gap-2 p-1 rounded-lg hover:bg-slate-50 transition-colors">
-                                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 shadow-2xs ${colStyle.bg}`}>
+                                                    <div key={hIdx} className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-lg bg-slate-50/70 border border-slate-100/90 hover:bg-slate-100 transition-colors">
+                                                        <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center flex-shrink-0 shadow-2xs ${colStyle.bg}`}>
                                                             {colStyle.icon}
                                                         </div>
-                                                        <span className="text-[11px] font-medium text-[#0a2540] leading-snug">
+                                                        <span className="text-[10px] sm:text-[11.5px] font-medium text-[#0a2540] leading-snug line-clamp-2" title={hl}>
                                                             {hl}
                                                         </span>
                                                     </div>
@@ -2233,10 +2289,10 @@ const Courses = () => {
                                         </div>
                                     </div>
 
-                                    {/* Download Button - Solid Dark Blue */}
+                                    {/* Download Button - Responsive on Mobile */}
                                     <NavLink
                                         to={course.path ? course.path : "/ContactUs"}
-                                        className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0a2540] hover:bg-[#0d3055] text-white text-xs font-semibold shadow-md transition-all w-fit mt-1"
+                                        className="w-full sm:w-fit inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0a2540] hover:bg-[#0d3055] text-white text-xs font-semibold shadow-md transition-all mt-1"
                                     >
                                         <Download className="w-3.5 h-3.5" />
                                         <span>Download Syllabus (PDF)</span>
@@ -2245,11 +2301,11 @@ const Courses = () => {
                                 </div>
                             </div>
 
-                            {/* ── Sub-Column 2: Course Information & Internship + Why Choose Us (6 cols) ── */}
-                            <div className="md:col-span-6 flex flex-col gap-2.5 sm:gap-3">
+                            {/* ── Sub-Column 2: Course Information & Internship + Why Choose Us ── */}
+                            <div className="flex flex-col gap-4 sm:gap-5">
                                 
                                 {/* Course Information Card */}
-                                <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+                                <div className="bg-white rounded-2xl p-4 sm:p-4.5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
                                     <div>
                                         {/* Header */}
                                         <div className="flex items-center gap-2 mb-2">
@@ -2376,7 +2432,7 @@ const Courses = () => {
                                     </div>
 
                                     {/* Sub-Cards: Mandatory Internship & Why Choose Us (Side-by-side) */}
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-[10px] mt-2.5">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5 text-[10px] mt-3.5 sm:mt-4">
                                         {/* Mandatory Internship */}
                                         <div className="bg-[#fffef7] p-2.5 sm:p-3 rounded-2xl border-2 border-[#fde047]/90 shadow-2xs flex flex-col justify-between overflow-hidden">
                                             <div>
@@ -2385,7 +2441,7 @@ const Courses = () => {
                                                     <div className="w-4 h-4 rounded bg-gradient-to-b from-[#fbbf24] to-[#f59e0b] text-[#0a2540] flex items-center justify-center shadow-xs flex-shrink-0">
                                                         <Briefcase className="w-2.5 h-2.5 fill-[#0a2540] text-[#0a2540]" />
                                                     </div>
-                                                    <span className="font-semibold text-[10.5px] sm:text-[11px]">Mandatory Internship</span>
+                                                    <span className="font-semibold text-[10px] sm:text-[10.5px] whitespace-nowrap">Mandatory Internship</span>
                                                 </div>
 
                                                 {/* White Container with 2 Lines (Stacked) and OR divider */}
@@ -2459,8 +2515,8 @@ const Courses = () => {
 
                         {/* ── 3. CAREER FOCUS SECTION (Full Width of Left 9 Cols) ── */}
                         {course.careerAreas && (
-                            <div className="bg-white rounded-2xl p-3 sm:p-3.5 border border-slate-200/80 shadow-xs">
-                                <div className="flex items-center gap-2 mb-1.5">
+                            <div className="bg-white rounded-2xl p-4 sm:p-4.5 border border-slate-200/80 shadow-xs">
+                                <div className="flex items-center gap-2 mb-2">
                                     <div className="w-6 h-6 rounded-lg bg-blue-50 text-[#0066ff] flex items-center justify-center flex-shrink-0">
                                         <Compass className="w-3 h-3" />
                                     </div>
@@ -2469,7 +2525,7 @@ const Courses = () => {
                                         <p className="text-[10px] text-slate-500 leading-snug font-normal">After completing this course, you can explore opportunities in:</p>
                                     </div>
                                 </div>
-                                <div className="flex flex-wrap gap-1 sm:gap-1.5">
+                                <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                     {course.careerAreas.split(',').map((role, rIdx) => (
                                         <span key={rIdx} className="px-2.5 py-0.5 rounded-full bg-[#eef5ff] text-[#0055cc] text-[10.5px] font-medium border border-blue-200/80 hover:bg-blue-100 transition-colors">
                                             {role.trim()}
@@ -2480,9 +2536,9 @@ const Courses = () => {
                         )}
 
                         {/* ── 4. BOTTOM FULL-WIDTH NAVY BANNER ── */}
-                        <div className="bg-[#002d62] text-white rounded-2xl p-3 sm:p-3.5 flex flex-col lg:flex-row items-center justify-between gap-2.5 sm:gap-3 shadow-md flex-shrink-0">
+                        <div className="bg-[#002d62] text-white rounded-2xl p-4 sm:p-4.5 flex flex-col md:flex-row items-center justify-between gap-3.5 sm:gap-4 shadow-md flex-shrink-0">
                             {/* Left: AI/Brain Target + Tagline */}
-                            <div className="flex items-center gap-2.5 text-center lg:text-left">
+                            <div className="flex items-center gap-2.5 text-center md:text-left">
                                 <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center flex-shrink-0 text-white shadow-xs">
                                     <Cpu className="w-4 h-4 text-sky-400" />
                                 </div>
@@ -2535,91 +2591,109 @@ const Courses = () => {
                         </div>
                     </div>
 
-                    {/* ──── RIGHT SECTION: QUICK ENQUIRY ON WHATSAPP (3 Columns on XL) - FIXED / NON-SCROLLING ──── */}
-                    <div className="xl:col-span-3 flex flex-col justify-start xl:sticky xl:top-0 flex-shrink-0">
-                        <div className="bg-[#f8fdfb] rounded-3xl p-4 sm:p-5 border-2 border-[#86efac] shadow-sm flex flex-col">
-                            {/* Header */}
-                            <div className="flex items-center gap-3 mb-2.5">
-                                <div className="w-12 h-12 rounded-full bg-[#25D366] text-white flex items-center justify-center flex-shrink-0 shadow-md">
-                                    <WhatsAppIcon className="w-7 h-7" />
-                                </div>
-                                <div>
-                                    <h3 className="text-base sm:text-lg font-medium text-[#0a2540] leading-tight tracking-tight">Quick Enquiry on</h3>
-                                    <span className="text-xl sm:text-2xl font-bold text-[#0b8a4b] leading-tight block">WhatsApp</span>
-                                </div>
-                            </div>
-
-                            {/* Subtitle */}
-                            <p className="text-sm font-medium text-[#0a2540] mt-1 mb-2.5">
-                                Get instant details about:
-                            </p>
-
-                            {/* Checklist */}
-                            <div className="space-y-2 mb-3.5">
-                                {[
-                                    "Course Details",
-                                    "Total Fee",
-                                    "Scholarship / Discounts",
-                                    "Admission Process",
-                                    "Batch Timings",
-                                    "Online / Classroom Mode",
-                                    "Syllabus",
-                                    "Career Guidance"
-                                ].map((item, iIdx) => (
-                                    <div key={iIdx} className="flex items-center gap-2 text-[13px]">
-                                        <Check className="w-4 h-4 text-[#059669] stroke-[3.5] flex-shrink-0" />
-                                        <span className="font-medium text-[#0a2540]">{item}</span>
+                    {/* ──── RIGHT SECTION: QUICK ENQUIRY ON WHATSAPP (Ultra-Responsive & Portrait Proportioned) ──── */}
+                    <div className="xl:col-span-4 2xl:col-span-4 flex flex-col justify-start w-full max-w-[310px] sm:max-w-[325px] xl:max-w-[335px] mx-auto self-start">
+                        <div className="bg-[#f8fdfb] rounded-3xl p-5 sm:p-6 border-2 border-[#86efac] shadow-sm flex flex-col justify-between min-h-[560px] sm:min-h-[590px]">
+                            <div className="flex flex-col gap-4 sm:gap-5">
+                                {/* Header & Checklist */}
+                                <div className="flex flex-col">
+                                    {/* Header */}
+                                    <div className="flex items-center gap-2.5 mb-2.5">
+                                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#25D366] text-white flex items-center justify-center flex-shrink-0 shadow-md">
+                                            <WhatsAppIcon className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
+                                        </div>
+                                        <div className="flex items-baseline flex-wrap gap-1 leading-tight">
+                                            <h3 className="text-xs sm:text-sm font-semibold text-[#0a2540] tracking-tight whitespace-nowrap">{titlePrefix}</h3>
+                                            <span className="text-sm sm:text-base font-bold text-[#0b8a4b] whitespace-nowrap">{titleHighlight}</span>
+                                        </div>
                                     </div>
-                                ))}
-                            </div>
 
-                            {/* QR Code Widget - Desktop only (users on phone cannot scan their own screen) */}
-                            <div className="hidden xl:flex my-1.5 justify-center">
-                                <QRCodeWidget />
-                            </div>
+                                    {/* Subtitle */}
+                                    <p className="text-[11px] sm:text-xs font-semibold text-slate-700 mt-1 mb-2.5 leading-tight">
+                                        {subtitle}
+                                    </p>
 
-                            {/* Big Green WhatsApp Button */}
-                            <div className="mt-3">
-                                <a
-                                    href={waLink}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-[#00b050] to-[#009b44] hover:from-[#009b44] hover:to-[#00853a] text-white font-semibold text-sm sm:text-base shadow-md shadow-emerald-600/30 hover:shadow-lg transition-all"
-                                >
-                                    <WhatsAppIcon className="w-5 h-5 flex-shrink-0" />
-                                    <span>Chat on WhatsApp</span>
-                                    <ChevronRight className="w-5 h-5 stroke-[3] flex-shrink-0" />
-                                </a>
-                            </div>
-
-                            {/* Bottom Counselor Note with WhatsApp icon */}
-                            <div className="flex items-start justify-center gap-2 mt-2.5 text-center">
-                                <div className="w-4 h-4 rounded-full bg-[#25D366] text-white flex items-center justify-center flex-shrink-0 mt-0.5 shadow-2xs">
-                                    <WhatsAppIcon className="w-2.5 h-2.5" />
+                                    {/* Checklist */}
+                                    <div className="grid grid-cols-2 gap-x-2 gap-y-2 sm:gap-y-2.5 mb-1">
+                                        {checklistItems.map((item, iIdx) => (
+                                            <div key={iIdx} className="flex items-center gap-1 text-[10px] sm:text-[11px] min-w-0">
+                                                <Check className="w-3 h-3 text-[#059669] stroke-[3] flex-shrink-0" />
+                                                <span className="font-medium text-[#0a2540] leading-tight truncate whitespace-nowrap" title={item}>{item}</span>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
-                                <p className="text-[11px] font-normal text-[#1e3a5f] text-left leading-tight">
-                                    Or click the button to chat directly<br />with our counsellor.
-                                </p>
+
+                                {/* QR Code + Button + Note */}
+                                <div className="w-full flex flex-col items-center justify-center pt-2">
+                                    {/* QR Code Widget (Admin Managed) */}
+                                    <div className="my-2 flex flex-col items-center justify-center">
+                                        <div className="p-2 bg-white rounded-2xl border border-emerald-200/90 shadow-2xs">
+                                            <QRCodeWidget qrSrc={qrImageSrc} waNumber={dynamicWaClean} />
+                                        </div>
+                                        <span className="text-[10px] text-slate-500 font-medium mt-1.5 whitespace-nowrap">Scan QR or tap button below</span>
+                                    </div>
+
+                                    {/* Big Green WhatsApp Button */}
+                                    <div className="mt-2.5 w-full">
+                                        <a
+                                            href={waLink}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="w-full flex items-center justify-center gap-2 py-3 sm:py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#00b050] to-[#009b44] hover:from-[#009b44] hover:to-[#00853a] text-white font-semibold text-xs sm:text-[13px] shadow-md shadow-emerald-600/30 hover:shadow-lg transition-all active:scale-[0.98] whitespace-nowrap"
+                                        >
+                                            <WhatsAppIcon className="w-4.5 h-4.5 flex-shrink-0" />
+                                            <span className="truncate">{buttonText}</span>
+                                            <ChevronRight className="w-4 h-4 stroke-[3] flex-shrink-0" />
+                                        </a>
+                                    </div>
+
+                                    {/* Bottom Counselor Note with WhatsApp icon */}
+                                    <div className="flex items-center justify-center gap-1.5 mt-2.5 text-center">
+                                        <div className="w-3.5 h-3.5 rounded-full bg-[#25D366] text-white flex items-center justify-center flex-shrink-0 shadow-2xs">
+                                            <WhatsAppIcon className="w-2 h-2" />
+                                        </div>
+                                        <p className="text-[9.5px] sm:text-[10px] font-normal text-[#1e3a5f] text-center leading-tight whitespace-nowrap truncate">
+                                            {counsellorNote}
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        );
-    };
 
-    // Modal Component
-    const CourseModal = () => {
-        if (!isModalOpen || !selectedCourse) return null;
+        </div>
+    );
+};
 
-        return (
-            <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 z-50 animate-fadeIn">
-                <div className="max-w-7xl w-full max-h-[96vh] xl:h-[92vh] overflow-y-auto xl:overflow-hidden rounded-3xl flex flex-col no-scrollbar">
-                    <CourseDetailsPoster course={selectedCourse} isModal={true} onClose={closeModal} />
-                </div>
+// Modal Component
+const CourseModal = () => {
+    const courseModalScrollRef = useRef(null);
+    if (!isModalOpen || !selectedCourse) return null;
+
+    return (
+        <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-0 sm:p-3 md:p-5 z-[10000] animate-fadeIn" onClick={closeModal}>
+            <div 
+                ref={courseModalScrollRef}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full sm:w-[95vw] lg:w-[92vw] xl:w-[90vw] h-full sm:h-[92vh] max-w-[1440px] max-h-none sm:max-h-[92vh] overflow-y-auto rounded-none sm:rounded-3xl flex flex-col bg-[#f4f8fc] shadow-2xl relative border-0 sm:border sm:border-white/20 custom-modal-scroll pb-16 sm:pb-6"
+            >
+                <CourseDetailsPoster 
+                    course={selectedCourse} 
+                    isModal={true} 
+                    onClose={closeModal} 
+                    onSelectCourse={(newC) => {
+                        setSelectedCourse(newC);
+                        if (courseModalScrollRef.current) {
+                            courseModalScrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                    }}
+                />
             </div>
-        );
-    };
+        </div>
+    );
+};
 
     return (
         <div className="min-h-screen bg-[#f4f8fc]">
@@ -2770,63 +2844,7 @@ const Courses = () => {
             {/* ── 2. CATEGORY TABS & MAIN COURSES SECTION ── */}
             <div id="courses-catalog" className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10 py-5 sm:py-6">
                 
-                {/* Staff Management Control Banner (Visible when logged in or PIN unlocked) */}
-                {isStaff ? (
-                    <div className="mb-6 -mt-2 bg-gradient-to-r from-purple-950 via-indigo-950 to-slate-900 border border-purple-500/40 rounded-2xl p-3.5 sm:p-4 text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3 relative overflow-hidden animate-in fade-in duration-300">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-                        <div className="flex items-center gap-3 relative z-10 w-full sm:w-auto">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-purple-500/30 flex-shrink-0">
-                                <ShieldCheck className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <div className="flex items-center gap-2 flex-wrap">
-                                    <span className="font-bold text-xs sm:text-sm text-white">Staff Management Mode</span>
-                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                        {currentUser?.name ? `Faculty: ${currentUser.name}` : 'Staff Authorized'}
-                                    </span>
-                                </div>
-                                <p className="text-[11px] text-purple-200/80 leading-tight mt-0.5">
-                                    Staff controls active: Click "Staff Edit" to update or "Delete" to remove any course from the live catalog. You can also add new courses.
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-2 relative z-10 w-full sm:w-auto justify-end flex-wrap">
-                            <button
-                                type="button"
-                                onClick={async () => {
-                                    if (window.confirm('Reset/Restore all default courses to the catalog?')) {
-                                        await courseApi.seedDefault();
-                                        showToast('All default courses and subjects restored successfully!', 'success');
-                                    }
-                                }}
-                                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs border border-white/20 transition-all cursor-pointer"
-                                title="Restore all default courses if any were deleted"
-                            >
-                                <RefreshCw className="w-3.5 h-3.5" />
-                                <span>Restore Defaults</span>
-                            </button>
-                            <button
-                                type="button"
-                                onClick={openAddModal}
-                                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-emerald-500/25 transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
-                            >
-                                <Plus className="w-4 h-4 stroke-[2.5]" />
-                                <span>Add New Course</span>
-                            </button>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="mb-4 -mt-2 flex justify-end">
-                        <button
-                            type="button"
-                            onClick={() => setShowStaffUnlockModal(true)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-purple-50 text-slate-700 hover:text-purple-700 border border-slate-200 hover:border-purple-300 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all cursor-pointer"
-                        >
-                            <Lock className="w-3.5 h-3.5 text-purple-600" />
-                            <span>Faculty / Staff Access (Edit &amp; Add Courses)</span>
-                        </button>
-                    </div>
-                )}
+
 
                 {/* Floating pill menu with dynamic colorful active states */}
                 <div 
@@ -3441,11 +3459,11 @@ const Courses = () => {
                             Connect with Counsellor
                         </NavLink>
                         <a
-                            href="tel:+918800817447"
+                            href="tel:+919311050670"
                             className="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-[#00285e] font-bold text-xs sm:text-sm px-4 sm:px-5 py-2.5 sm:py-3 rounded-full shadow-lg transition-all duration-200 hover:scale-105 active:scale-95 whitespace-nowrap flex items-center justify-center gap-2 cursor-pointer text-center"
                         >
                             <PhoneCall className="w-3.5 h-3.5" />
-                            <span>+91-8800817447</span>
+                            <span>+91-9311050670</span>
                         </a>
                     </div>
                 </div>
@@ -3454,74 +3472,7 @@ const Courses = () => {
             {/* Course Details Modal */}
             <CourseModal />
 
-            {/* ===== STAFF PIN ACCESS MODAL ===== */}
-            {showStaffUnlockModal && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" style={{ backdropFilter: 'blur(12px)', background: 'rgba(0,0,0,0.65)' }}>
-                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-7 relative border border-purple-100 animate-in fade-in zoom-in-95 duration-200">
-                        {/* Close */}
-                        <button
-                            type="button"
-                            onClick={() => { setShowStaffUnlockModal(false); setStaffPinError(''); setStaffPinInput(''); }}
-                            className="absolute top-4 right-4 w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer"
-                        >
-                            <X className="w-4 h-4 text-slate-500" />
-                        </button>
 
-                        {/* Icon & Heading */}
-                        <div className="flex flex-col items-center text-center mb-6">
-                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center shadow-lg shadow-purple-500/25 mb-3">
-                                <ShieldCheck className="w-7 h-7 text-white" />
-                            </div>
-                            <h3 className="text-lg font-bold text-[#00285e]">Faculty Verification</h3>
-                            <p className="text-xs text-slate-500 mt-1 max-w-[240px] leading-relaxed">
-                                Enter the 4-digit staff PIN to unlock course editing and publishing powers.
-                            </p>
-                        </div>
-
-                        {/* Form */}
-                        <form onSubmit={handleStaffUnlockSubmit} className="space-y-4">
-                            <div className="relative">
-                                <input
-                                    type="password"
-                                    maxLength={4}
-                                    autoFocus
-                                    value={staffPinInput}
-                                    onChange={(e) => { setStaffPinInput(e.target.value.replace(/\D/g, '')); setStaffPinError(''); }}
-                                    placeholder="••••"
-                                    className={`w-full py-3 text-center text-2xl font-bold tracking-[0.5em] rounded-xl border-2 outline-none transition-all ${
-                                        staffPinError ? 'border-rose-400 bg-rose-50/50 text-rose-700' : 'border-purple-200 bg-purple-50/60 focus:bg-white focus:border-purple-500 text-purple-800'
-                                    }`}
-                                />
-                            </div>
-
-                            {staffPinError && (
-                                <div className="flex items-center justify-center gap-1.5 text-rose-600 text-xs font-medium">
-                                    <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
-                                    <span>{staffPinError}</span>
-                                </div>
-                            )}
-
-                            <button
-                                type="submit"
-                                disabled={staffPinInput.length !== 4}
-                                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-sm shadow-md shadow-purple-500/25 hover:from-purple-700 hover:to-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
-                            >
-                                <Unlock className="w-4 h-4" />
-                                <span>Unlock Faculty Mode</span>
-                            </button>
-
-                            <div className="pt-2 border-t border-slate-100 text-center">
-                                <NavLink
-                                    to="/login?type=staff"
-                                    className="text-[11px] font-semibold text-purple-600 hover:text-purple-800 hover:underline"
-                                >
-                                    Or Sign In with Staff Account &rarr;
-                                </NavLink>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
 
             {/* ===== EDIT COURSE MODAL (STAFF ONLY) ===== */}
             {isEditModalOpen && editingCourse && (

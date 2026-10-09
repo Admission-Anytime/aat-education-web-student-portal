@@ -75,7 +75,6 @@ const AdminPanel = () => {
             setDbLoading(false);
         }
     };
-
     useEffect(() => {
         loadDbData();
         const handleUpdates = () => loadDbData();
@@ -722,7 +721,7 @@ const AdminPanel = () => {
                         <div className="flex items-center space-x-3">
                             <Settings className="h-7 w-7 text-blue-600" />
                             <div>
-                                <h1 className="text-xl font-bold text-gray-900 leading-tight">Admin &amp; Faculty Panel</h1>
+                                <h1 className="text-xl font-bold text-gray-900 leading-tight">Admin Panel</h1>
                                 <p className="text-[11px] text-gray-500">Aayush Institute Management System</p>
                             </div>
                         </div>

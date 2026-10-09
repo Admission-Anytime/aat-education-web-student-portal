@@ -95,7 +95,7 @@ const ScrollToTop = () => {
             type="button"
             onClick={scrollToTopSmooth}
             aria-label="Scroll to top"
-            className={`fixed bottom-6 right-6 z-50 p-3 rounded-full bg-[#0055ff] hover:bg-[#0040cc] text-white shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center transform ${
+            className={`fixed bottom-36 md:bottom-24 right-4 md:right-6 z-[990] p-2.5 sm:p-3 rounded-full bg-[#0055ff] hover:bg-[#0040cc] text-white shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center transform ${
                 showScrollTop
                     ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
                     : 'opacity-0 translate-y-4 scale-90 pointer-events-none'

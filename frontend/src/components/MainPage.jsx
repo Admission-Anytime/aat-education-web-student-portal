@@ -9,7 +9,7 @@ import {
   Briefcase, CheckCircle2, ChevronRight, ChevronLeft, Check, X,
   Palette, Smartphone, Settings, Sparkles, Building2, Star, Rocket
 } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import CourseDetailsModal from './Common/CourseDetailsModal';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
@@ -839,7 +839,7 @@ const latestBlogs = [
     id: 101,
     image: "/blog_it_skills.jpg",
     tag: "Career Tips",
-    title: "Top IT Skills in 2025 That Can Boost Your Career",
+    title: "Top IT Skills in 2026 That Can Boost Your Career",
     date: "12 Sep 2025",
     readTime: "4 min read",
     author: "Tech Training Cell",
@@ -907,13 +907,88 @@ const latestBlogs = [
     ],
     relatedLink: "/Courses"
   },
+  {
+    id: 105,
+    image: "/blog_it_skills.jpg",
+    tag: "Web Development",
+    title: "Full Stack Roadmap 2026: Frontend, Backend & System Design",
+    date: "01 Oct 2025",
+    readTime: "5 min read",
+    author: "Full Stack Department",
+    excerpt: "Everything you need to know about mastering React 19, Node.js, databases, and modern cloud deployment in 2026.",
+    content: "Full-stack development continues to be the bedrock of modern software engineering. With the evolution of server components, TypeScript, and distributed microservices, engineers who can bridge the gap between user experience and reliable backend architecture command top tier compensation.",
+    highlights: [
+      "Modern React & Next.js architectures",
+      "PostgreSQL, MongoDB, and Redis caching",
+      "Dockerizing applications & cloud deployments",
+      "100% placement track with top tech firms"
+    ],
+    relatedLink: "/Courses"
+  },
+  {
+    id: 106,
+    image: "/blog_distance_edu.jpg",
+    tag: "Design & UX",
+    title: "Mastering UI/UX: From User Research to High-Converting Interfaces",
+    date: "28 Sep 2025",
+    readTime: "4 min read",
+    author: "Design Studio Lead",
+    excerpt: "Explore the core fundamentals of UX research, Figma design systems, and rapid prototyping that employers look for.",
+    content: "Exceptional digital products rely on human-centric design. Learning user journey mapping, wireframing, component-driven design systems in Figma, and usability testing enables aspiring designers to create intuitive, accessible, and delightful digital experiences.",
+    highlights: [
+      "Figma components, variants & auto-layout",
+      "User research & usability testing methods",
+      "Building production-ready design systems",
+      "Live portfolio creation & client feedback"
+    ],
+    relatedLink: "/Courses"
+  }
 ];
+
+const DEFAULT_HERO_SETTINGS = {
+  pillText: "Your Career • Our Commitment",
+  titleLine1: "Upgrade Your Skills",
+  titleLine2: "Build a Better Future",
+  subtitle: "Aayush Institute of Professional Studies – Your trusted partner in professional education, skill development and career growth.",
+  sloganLine1: "Learn",
+  sloganLine2: "Practice",
+  sloganLine3: "Get Placed",
+  bgImage: "/hero_downloaded_bg.png",
+  feature1: "Industry Aligned Courses",
+  feature2: "Live Projects & Training",
+  feature3: "Expert Faculty & Mentorship",
+  feature4: "100% Career Support",
+  primaryBtnText: "Explore Courses",
+  primaryBtnLink: "/Courses",
+  videoBtnText: "Watch Our Video",
+  videoUrl: "https://www.youtube.com",
+  counsellingTitle: "Free Career Counselling",
+  counsellingSubtitle: "Know the Right Course for You",
+  counsellingPoints: [
+    "Personalised Guidance",
+    "Course Comparison",
+    "Career Roadmap",
+    "100% Free Consultation"
+  ],
+  counsellingBtnText: "Book Your Counselling"
+};
+
+const resolveHeroImageUrl = (img) => {
+  if (!img) return "/hero_downloaded_bg.png";
+  if (img.startsWith("http://") || img.startsWith("https://") || img.startsWith("data:")) return img;
+  if (img.startsWith("/Uploads/")) return `http://localhost:4001${img}`;
+  if (img.startsWith("Uploads/")) return `http://localhost:4001/${img}`;
+  if (img.startsWith("/")) return img;
+  return `/${img}`;
+};
 
 // ─── Main Component ─────────────────────────────────────────────────────────
 
 export default function MainPage() {
+  const navigate = useNavigate();
   const [activeTestimonialIdx, setActiveTestimonialIdx] = useState(0);
   const [testimonialsList, setTestimonialsList] = useState(studentTestimonials);
+  const [heroSettings, setHeroSettings] = useState(DEFAULT_HERO_SETTINGS);
   const [counsellingForm, setCounsellingForm] = useState({
     name: '',
     mobile: '',
@@ -924,6 +999,218 @@ export default function MainPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isWhyChooseModalOpen, setIsWhyChooseModalOpen] = useState(false);
   const [selectedBlogModal, setSelectedBlogModal] = useState(null);
+  const [blogsList, setBlogsList] = useState(latestBlogs);
+  const [blogSlideIndex, setBlogSlideIndex] = useState(0);
+  const [isBlogPaused, setIsBlogPaused] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const blogScrollRef = useRef(null);
+  const blogModalContentRef = useRef(null);
+
+  // ── 1. Top Reading Scroll Progress ──
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalScroll = document.documentElement.scrollTop || document.body.scrollTop;
+      const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      if (windowHeight > 0) {
+        setScrollProgress((totalScroll / windowHeight) * 100);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // ── 2. Scroll Reveal Intersection Observer (100% Safe with Offline Fallback) ──
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+      document.querySelectorAll('.reveal-on-scroll, .reveal-fade, .reveal-scale').forEach((el) => {
+        el.classList.add('is-revealed');
+      });
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed');
+          }
+        });
+      },
+      {
+        threshold: 0.04,
+        rootMargin: '50px 0px 50px 0px'
+      }
+    );
+
+    const observeAll = () => {
+      const elements = document.querySelectorAll('.reveal-on-scroll, .reveal-fade, .reveal-scale');
+      elements.forEach((el) => observer.observe(el));
+    };
+
+    observeAll();
+    const t1 = setTimeout(observeAll, 150);
+    const t2 = setTimeout(observeAll, 600);
+
+    // Guaranteed fallback: ensures UI is always 100% visible even offline or on slow network
+    const safetyTimer = setTimeout(() => {
+      document.querySelectorAll('.reveal-on-scroll, .reveal-fade, .reveal-scale').forEach((el) => {
+        el.classList.add('is-revealed');
+      });
+    }, 1500);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(safetyTimer);
+      observer.disconnect();
+    };
+  }, []);
+
+  // Live fetch Hero section settings from MongoDB
+  const fetchHeroSettings = async () => {
+    try {
+      const res = await fetch('/api/site-settings');
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.heroSection) {
+          setHeroSettings((prev) => ({
+            ...prev,
+            ...data.heroSection,
+            counsellingPoints:
+              Array.isArray(data.heroSection.counsellingPoints) &&
+              data.heroSection.counsellingPoints.length > 0
+                ? data.heroSection.counsellingPoints
+                : prev.counsellingPoints,
+          }));
+        }
+      }
+    } catch (err) {
+      // Keep DEFAULT_HERO_SETTINGS fallback
+    }
+  };
+
+  // Fetch blogs dynamically from Backend API sorted by displayOrder (1, 2, 3...)
+  useEffect(() => {
+    let isMounted = true;
+    const fetchBlogsFromApi = async () => {
+      try {
+        const res = await fetch('/api/blogs');
+        if (res.ok) {
+          const data = await res.json();
+          if (isMounted && Array.isArray(data) && data.length > 0) {
+            const formatted = data
+              .filter((b) => b.status !== 'Draft')
+              .sort((a, b) => (Number(a.displayOrder) || 999) - (Number(b.displayOrder) || 999))
+              .map((b, idx) => ({
+                id: b._id || b.id || idx + 1,
+                _id: b._id,
+                displayOrder: b.displayOrder ?? idx + 1,
+                image: b.coverImage 
+                  ? (b.coverImage.startsWith('http') || b.coverImage.startsWith('/') 
+                      ? b.coverImage 
+                      : `http://localhost:4001/${b.coverImage}`)
+                  : '/corporate_ai.jpg',
+                tag: b.tag || b.category || 'Career',
+                title: b.title,
+                date: b.date || '2026',
+                readTime: b.readTime || '3 min read',
+                author: b.author || 'Academic Advisory',
+                excerpt: b.shortDescription || b.excerpt || '',
+                content: b.longDescription || b.content || '',
+                highlights: Array.isArray(b.highlights) && b.highlights.length > 0 ? b.highlights : [
+                  "Hands-on practical industry workflows",
+                  "Direct mentor feedback & code reviews",
+                  "Verified GitHub projects & portfolio",
+                  "100% placement guidance & interview prep"
+                ],
+                relatedLink: b.relatedLink || '/Courses',
+                status: b.status || 'Published'
+              }));
+            if (formatted.length > 0) {
+              setBlogsList(formatted);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Using static fallback blogs:', err);
+      }
+    };
+    fetchBlogsFromApi();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Auto-slide blogs on homepage every 3.5 seconds
+  useEffect(() => {
+    if (isBlogPaused || selectedBlogModal) return;
+    const timer = setInterval(() => {
+      if (!blogScrollRef.current) return;
+      const el = blogScrollRef.current;
+      const card = el.querySelector('[data-blog-card]');
+      const cardWidth = card ? card.offsetWidth : 300;
+      const gap = 16;
+      const step = cardWidth + gap;
+      const maxScroll = el.scrollWidth - el.clientWidth;
+
+      if (el.scrollLeft + step >= maxScroll - 15) {
+        el.scrollTo({ left: 0, behavior: 'smooth' });
+        setBlogSlideIndex(0);
+      } else {
+        el.scrollBy({ left: step, behavior: 'smooth' });
+        setBlogSlideIndex((prev) => prev + 1);
+      }
+    }, 3500);
+
+    return () => clearInterval(timer);
+  }, [isBlogPaused, selectedBlogModal]);
+
+  const handleNextBlogSlide = () => {
+    if (!blogScrollRef.current) return;
+    const el = blogScrollRef.current;
+    const card = el.querySelector('[data-blog-card]');
+    const cardWidth = card ? card.offsetWidth : 300;
+    const gap = 16;
+    const step = cardWidth + gap;
+    const maxScroll = el.scrollWidth - el.clientWidth;
+
+    if (el.scrollLeft + step >= maxScroll - 15) {
+      el.scrollTo({ left: 0, behavior: 'smooth' });
+      setBlogSlideIndex(0);
+    } else {
+      el.scrollBy({ left: step, behavior: 'smooth' });
+      setBlogSlideIndex((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevBlogSlide = () => {
+    if (!blogScrollRef.current) return;
+    const el = blogScrollRef.current;
+    const card = el.querySelector('[data-blog-card]');
+    const cardWidth = card ? card.offsetWidth : 300;
+    const gap = 16;
+    const step = cardWidth + gap;
+
+    if (el.scrollLeft - step <= 15) {
+      el.scrollTo({ left: 0, behavior: 'smooth' });
+      setBlogSlideIndex(0);
+    } else {
+      el.scrollBy({ left: -step, behavior: 'smooth' });
+      setBlogSlideIndex((prev) => Math.max(0, prev - 1));
+    }
+  };
+
+  // Close blog modal on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setSelectedBlogModal(null);
+    };
+    if (selectedBlogModal) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedBlogModal]);
+
   const [selectedCourseDetails, setSelectedCourseDetails] = useState(null);
   const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
 
@@ -1053,43 +1340,63 @@ export default function MainPage() {
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
-          const formatted = data.map((t, idx) => {
-            const fallback = studentTestimonials[idx % studentTestimonials.length];
+          const visibleOnly = data.filter((t) => t.visible !== false);
+          const formatted = (visibleOnly.length > 0 ? visibleOnly : data).map((t, idx) => {
+            const rawImg = t.profileImageUrl || t.avatar || t.profileImage || fallback.avatar || '/rahul_sharma_avatar.jpg';
+            let finalAvatar = rawImg;
+            if (rawImg.startsWith('http://') || rawImg.startsWith('https://') || rawImg.startsWith('data:') || rawImg.startsWith('blob:')) {
+              finalAvatar = rawImg;
+            } else if (rawImg.startsWith('/Uploads/') || rawImg.startsWith('Uploads/') || rawImg.startsWith('/uploads/') || rawImg.startsWith('uploads/')) {
+              const cleanPath = rawImg.startsWith('/') ? rawImg : `/${rawImg}`;
+              const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4001';
+              finalAvatar = `${backendUrl}${cleanPath}`;
+            } else {
+              finalAvatar = rawImg.startsWith('/') ? rawImg : `/${rawImg}`;
+            }
+
             return {
               _id: t._id,
               name: t.name || fallback.name,
               role: t.designation || fallback.role,
               quote: t.message || fallback.quote,
-              avatar: t.profileImageUrl || (t.profileImage ? `http://localhost:4001/Uploads/${t.profileImage}` : fallback.avatar)
+              rating: Number(t.rating) || 5,
+              avatar: finalAvatar,
             };
           });
-          setTestimonialsList(formatted);
+          if (formatted.length > 0) {
+            setTestimonialsList(formatted);
+          }
         }
       }
     } catch (err) {
-      // fallback
+      // offline fallback
     }
   };
 
   useEffect(() => {
     fetchDbCourses();
     fetchTestimonials();
+    fetchHeroSettings();
     const pollTimer = setInterval(() => {
       fetchDbCourses();
       fetchTestimonials();
+      fetchHeroSettings();
     }, 4000);
 
     const syncAll = () => {
       fetchDbCourses();
       fetchTestimonials();
+      fetchHeroSettings();
     };
     window.addEventListener('coursesUpdated', syncAll);
     window.addEventListener('testimonialsUpdated', syncAll);
+    window.addEventListener('siteSettingsUpdated', syncAll);
     window.addEventListener('storage', syncAll);
     return () => {
       clearInterval(pollTimer);
       window.removeEventListener('coursesUpdated', syncAll);
       window.removeEventListener('testimonialsUpdated', syncAll);
+      window.removeEventListener('siteSettingsUpdated', syncAll);
       window.removeEventListener('storage', syncAll);
     };
   }, []);
@@ -1210,13 +1517,16 @@ export default function MainPage() {
   return (
     <div className="font-sans bg-white text-gray-800 overflow-x-hidden">
 
+      {/* ── Top Scroll Reading Progress Indicator (Fixed 3.5px gradient bar) ── */}
+      <div className="scroll-progress-line" style={{ width: `${scrollProgress}%` }} />
+
       {/* ── 1. HERO SECTION (Seamless Responsive: Desktop, Tablet 3-Col, Mobile Stacked) ── */}
       <section className="relative overflow-hidden bg-[#e0effe] py-3 md:py-4 lg:py-5 border-b border-blue-100 min-h-[340px] md:min-h-[355px] lg:min-h-[375px] flex items-center">
         
         {/* Full-width Panoramic Background Image (Desktop & Tablet) */}
         <div className="absolute inset-0 z-0">
           <img
-            src="/hero_downloaded_bg.png"
+            src={resolveHeroImageUrl(heroSettings.bgImage)}
             alt="Hero Background"
             className="w-full h-full object-cover object-[58%_center] sm:object-[58%_center] md:object-[56%_center] lg:object-[56%_top] xl:object-[center_top] hidden md:block"
           />
@@ -1225,11 +1535,17 @@ export default function MainPage() {
         </div>
 
         {/* Floating Handwritten Slogan — Desktop Only (>= 1024px) where open sky space is available */}
-        <div className="absolute top-2 lg:top-2.5 left-[42%] xl:left-[45%] 2xl:left-[47%] hidden lg:block z-10 pointer-events-none text-left">
+        <div className="absolute top-2 lg:top-2.5 left-[42%] xl:left-[45%] 2xl:left-[47%] hidden lg:block z-10 pointer-events-none text-left animate-soft-float">
           <div className="rotate-[-5deg]">
-            <p className="font-semibold text-lg lg:text-xl xl:text-2xl text-[#1d4ed8] leading-tight drop-shadow-xs" style={{ fontFamily: "'Caveat', cursive, sans-serif" }}>Learn</p>
-            <p className="font-semibold text-lg lg:text-xl xl:text-2xl text-[#1d4ed8] leading-tight drop-shadow-xs pl-2" style={{ fontFamily: "'Caveat', cursive, sans-serif" }}>Practice</p>
-            <p className="font-semibold text-lg lg:text-xl xl:text-2xl text-[#1d4ed8] leading-tight drop-shadow-xs pl-4" style={{ fontFamily: "'Caveat', cursive, sans-serif" }}>Get Placed</p>
+            <p className="font-semibold text-lg lg:text-xl xl:text-2xl text-[#1d4ed8] leading-tight drop-shadow-xs" style={{ fontFamily: "'Caveat', cursive, sans-serif" }}>
+              {heroSettings.sloganLine1 || 'Learn'}
+            </p>
+            <p className="font-semibold text-lg lg:text-xl xl:text-2xl text-[#1d4ed8] leading-tight drop-shadow-xs pl-2" style={{ fontFamily: "'Caveat', cursive, sans-serif" }}>
+              {heroSettings.sloganLine2 || 'Practice'}
+            </p>
+            <p className="font-semibold text-lg lg:text-xl xl:text-2xl text-[#1d4ed8] leading-tight drop-shadow-xs pl-4" style={{ fontFamily: "'Caveat', cursive, sans-serif" }}>
+              {heroSettings.sloganLine3 || 'Get Placed'}
+            </p>
             <div className="w-16 lg:w-20 h-1.5 bg-[#fed000] rounded-full mt-0.5 ml-2 transform -rotate-2 shadow-xs"></div>
           </div>
         </div>
@@ -1239,32 +1555,32 @@ export default function MainPage() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-3 lg:gap-5">
 
             {/* Left Content Column (Proportionate on Tablet & Desktop) */}
-            <div className="w-full md:w-[45%] lg:w-[46%] xl:w-[48%] flex flex-col justify-center">
+            <div className="w-full md:w-[45%] lg:w-[46%] xl:w-[48%] flex flex-col justify-center reveal-on-scroll">
               
               {/* Top Badge */}
               <div className="mb-1 sm:mb-1.5">
                 <span className="inline-flex items-center gap-1.5 sm:gap-2 bg-[#dbeafc] text-[#003882] font-semibold text-[10.5px] sm:text-[11.5px] px-2.5 py-0.5 rounded-full shadow-xs">
-                  Your Career <span className="text-[#0062ff] font-bold">•</span> Our Commitment
+                  {heroSettings.pillText || 'Your Career • Our Commitment'}
                 </span>
               </div>
 
               {/* Main Headline */}
               <h1 className="text-2xl sm:text-3xl md:text-[23px] lg:text-[29px] xl:text-[36px] 2xl:text-[38px] font-bold text-[#00285e] leading-[1.12] tracking-tight mb-0.5">
-                Upgrade Your Skills
+                {heroSettings.titleLine1 || 'Upgrade Your Skills'}
               </h1>
               <h2 className="text-2xl sm:text-3xl md:text-[23px] lg:text-[29px] xl:text-[36px] 2xl:text-[38px] font-bold text-[#0062ff] leading-[1.12] tracking-tight mb-1.5 sm:mb-2">
-                Build a Better Future
+                {heroSettings.titleLine2 || 'Build a Better Future'}
               </h2>
 
               {/* Subtitle */}
               <p className="text-[#1e3a8a] text-xs sm:text-[12.5px] md:text-[11px] lg:text-[12px] xl:text-[13px] leading-relaxed mb-2.5 sm:mb-3 max-w-xl font-normal">
-                Aayush Institute of Professional Studies – Your trusted partner in professional education, skill development and career growth.
+                {heroSettings.subtitle || 'Aayush Institute of Professional Studies – Your trusted partner in professional education, skill development and career growth.'}
               </p>
 
               {/* Mobile Only: Dedicated Student Visual Card with 4 Features on Left Space */}
               <div className="block md:hidden my-3 relative rounded-2xl overflow-hidden shadow-md border-2 border-white h-[205px] w-full">
                 <img
-                  src="/hero_downloaded_bg.png"
+                  src={resolveHeroImageUrl(heroSettings.bgImage)}
                   alt="Aayush Institute Student"
                   className="w-full h-full object-cover object-[70%_25%]"
                 />
@@ -1273,7 +1589,7 @@ export default function MainPage() {
                 {/* Slogan Badge Top-Right */}
                 <div className="absolute top-2 right-2 bg-white/95 backdrop-blur-xs px-2.5 py-1 rounded-xl shadow-xs rotate-[-3deg] border border-blue-100 z-10">
                   <span className="font-semibold text-[11px] text-[#1d4ed8]" style={{ fontFamily: "'Caveat', cursive, sans-serif" }}>
-                    Learn • Practice • Get Placed
+                    {[heroSettings.sloganLine1, heroSettings.sloganLine2, heroSettings.sloganLine3].filter(Boolean).join(' • ') || 'Learn • Practice • Get Placed'}
                   </span>
                   <div className="w-12 h-1 bg-[#fed000] rounded-full mt-0.5"></div>
                 </div>
@@ -1288,7 +1604,7 @@ export default function MainPage() {
                       <circle cx="16" cy="16" r="1.5" fill="white" />
                     </svg>
                     <span className="text-[10px] font-semibold text-[#002b66] leading-[1.15] tracking-tight">
-                      Industry Aligned<br />Courses
+                      {heroSettings.feature1 || 'Industry Aligned Courses'}
                     </span>
                   </div>
 
@@ -1303,7 +1619,7 @@ export default function MainPage() {
                       <circle cx="16" cy="22" r="1.5" fill="white" />
                     </svg>
                     <span className="text-[10px] font-semibold text-[#002b66] leading-[1.15] tracking-tight">
-                      Live Projects<br />&amp; Training
+                      {heroSettings.feature2 || 'Live Projects & Training'}
                     </span>
                   </div>
 
@@ -1319,7 +1635,7 @@ export default function MainPage() {
                       <path d="M13.5 20.5C14.5 21.5 17.5 21.5 18.5 20.5" stroke="white" strokeWidth="1.2" strokeLinecap="round" />
                     </svg>
                     <span className="text-[10px] font-semibold text-[#002b66] leading-[1.15] tracking-tight">
-                      Expert Faculty<br />&amp; Mentorship
+                      {heroSettings.feature3 || 'Expert Faculty & Mentorship'}
                     </span>
                   </div>
 
@@ -1332,7 +1648,7 @@ export default function MainPage() {
                       <circle cx="23" cy="22.5" r="2.8" fill="white" />
                     </svg>
                     <span className="text-[10px] font-semibold text-[#002b66] leading-[1.15] tracking-tight">
-                      100% Career<br />Support
+                      {heroSettings.feature4 || '100% Career Support'}
                     </span>
                   </div>
                 </div>
@@ -1351,7 +1667,7 @@ export default function MainPage() {
                     <circle cx="16" cy="16" r="1.5" fill="white" />
                   </svg>
                   <span className="text-[10.5px] sm:text-[11.5px] md:text-[10px] lg:text-[11.5px] xl:text-[12px] font-medium text-[#002b66] leading-[1.2] tracking-tight">
-                    Industry Aligned<br />Courses
+                    {heroSettings.feature1 || 'Industry Aligned Courses'}
                   </span>
                 </div>
 
@@ -1372,7 +1688,7 @@ export default function MainPage() {
                     <circle cx="16" cy="22" r="1.5" fill="white" />
                   </svg>
                   <span className="text-[10.5px] sm:text-[11.5px] md:text-[10px] lg:text-[11.5px] xl:text-[12px] font-medium text-[#002b66] leading-[1.2] tracking-tight">
-                    Live Projects<br />&amp; Training
+                    {heroSettings.feature2 || 'Live Projects & Training'}
                   </span>
                 </div>
 
@@ -1394,7 +1710,7 @@ export default function MainPage() {
                     <path d="M13.5 20.5C14.5 21.5 17.5 21.5 18.5 20.5" stroke="white" strokeWidth="1.2" strokeLinecap="round" />
                   </svg>
                   <span className="text-[10.5px] sm:text-[11.5px] md:text-[10px] lg:text-[11.5px] xl:text-[12px] font-medium text-[#002b66] leading-[1.2] tracking-tight">
-                    Expert Faculty<br />&amp; Mentorship
+                    {heroSettings.feature3 || 'Expert Faculty & Mentorship'}
                   </span>
                 </div>
 
@@ -1413,7 +1729,7 @@ export default function MainPage() {
                     <circle cx="23" cy="22.5" r="2.8" fill="white" />
                   </svg>
                   <span className="text-[10.5px] sm:text-[11.5px] md:text-[10px] lg:text-[11.5px] xl:text-[12px] font-medium text-[#002b66] leading-[1.2] tracking-tight">
-                    100% Career<br />Support
+                    {heroSettings.feature4 || '100% Career Support'}
                   </span>
                 </div>
               </div>
@@ -1421,13 +1737,13 @@ export default function MainPage() {
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                 <NavLink
-                  to="/Courses"
+                  to={heroSettings.primaryBtnLink || "/Courses"}
                   className="bg-[#00285e] hover:bg-[#003882] text-white px-3.5 sm:px-5 md:px-3.5 lg:px-6 py-1.5 sm:py-2 md:py-1.5 lg:py-2.5 rounded-full font-medium text-xs md:text-[11px] lg:text-[13px] transition-all shadow-md flex items-center gap-1.5 md:gap-2 hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  Explore Courses <ArrowRight className="w-3.5 h-3.5 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4" />
+                  {heroSettings.primaryBtnText || 'Explore Courses'} <ArrowRight className="w-3.5 h-3.5 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4" />
                 </NavLink>
                 <button
-                  onClick={() => window.open('https://www.youtube.com', '_blank')}
+                  onClick={() => window.open(heroSettings.videoUrl || 'https://www.youtube.com', '_blank')}
                   className="bg-white border-2 border-[#0062ff] hover:bg-blue-50/80 text-[#00285e] px-3 sm:px-4 md:px-3 lg:px-5 py-1 sm:py-1.5 md:py-1 lg:py-2 rounded-full font-medium text-xs md:text-[11px] lg:text-[13px] transition-all shadow-xs flex items-center gap-1.5 md:gap-2 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                 >
                   <span className="w-3.5 h-3.5 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#0062ff] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
@@ -1435,13 +1751,13 @@ export default function MainPage() {
                       <path d="M8 5v14l11-7z" />
                     </svg>
                   </span>
-                  Watch Our Video
+                  {heroSettings.videoBtnText || 'Watch Our Video'}
                 </button>
               </div>
             </div>
 
             {/* Right Floating Card: Tablet & Desktop (md: and up, >= 768px) */}
-            <div className="hidden md:flex w-full md:w-[28%] lg:w-[26%] xl:w-[24%] justify-end flex-shrink-0">
+            <div className="hidden md:flex w-full md:w-[28%] lg:w-[26%] xl:w-[24%] justify-end flex-shrink-0 reveal-scale delay-150">
               <div className="bg-white rounded-2xl lg:rounded-3xl shadow-[0_15px_40px_-10px_rgba(0,40,94,0.25)] overflow-hidden border-[2px] lg:border-[2.5px] border-white ring-1 ring-blue-900/10 w-full max-w-[215px] lg:max-w-[245px] xl:max-w-[300px] min-h-[285px] lg:min-h-[310px] xl:min-h-[355px] flex flex-col justify-between transform hover:-translate-y-1 transition-all duration-300">
                 
                 {/* Yellow Header Banner */}
@@ -1451,10 +1767,10 @@ export default function MainPage() {
                   </div>
                   <div>
                     <h4 className="font-bold text-[#00285e] text-[13px] md:text-[13px] lg:text-[15px] xl:text-[19px] leading-tight tracking-tight">
-                      Free Career Counselling
+                      {heroSettings.counsellingTitle || 'Free Career Counselling'}
                     </h4>
                     <p className="text-[9.5px] md:text-[9.5px] lg:text-[11px] xl:text-[13px] font-medium text-[#00285e]/90 leading-tight mt-0.5 sm:mt-1">
-                      Know the Right Course for You
+                      {heroSettings.counsellingSubtitle || 'Know the Right Course for You'}
                     </p>
                   </div>
                 </div>
@@ -1462,12 +1778,15 @@ export default function MainPage() {
                 {/* Card White Body */}
                 <div className="flex-1 flex flex-col justify-between px-2.5 py-2.5 md:px-2.5 md:py-2.5 lg:px-3 lg:py-3 xl:px-5 xl:py-4.5 bg-white">
                   <ul className="space-y-1.5 md:space-y-1.5 lg:space-y-2 xl:space-y-4 mb-2.5 md:mb-2.5 lg:mb-3 xl:mb-5">
-                    {[
-                      'Personalised Guidance',
-                      'Course Comparison',
-                      'Career Roadmap',
-                      '100% Free Consultation'
-                    ].map((item, idx) => (
+                    {(heroSettings.counsellingPoints && heroSettings.counsellingPoints.length > 0
+                      ? heroSettings.counsellingPoints
+                      : [
+                          'Personalised Guidance',
+                          'Course Comparison',
+                          'Career Roadmap',
+                          '100% Free Consultation'
+                        ]
+                    ).map((item, idx) => (
                       <li key={idx} className="flex items-center gap-1.5 md:gap-1.5 lg:gap-2 xl:gap-3">
                         <div className="w-3.5 h-3.5 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 xl:w-5.5 xl:h-5.5 rounded-full bg-[#0052cc] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
                           <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
@@ -1487,7 +1806,7 @@ export default function MainPage() {
                     onClick={() => setIsModalOpen(true)}
                     className="w-full mt-auto bg-gradient-to-r from-[#fed000] to-[#f5b800] hover:from-[#ffe14d] hover:to-[#fed000] text-[#00285e] font-semibold text-[10.5px] md:text-[10.5px] lg:text-[12px] xl:text-[14px] py-1.5 md:py-1.5 lg:py-2 xl:py-3 px-2.5 rounded-full transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-1 md:gap-1.5 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                   >
-                    <span>Book Your Counselling</span>
+                    <span>{heroSettings.counsellingBtnText || 'Book Your Counselling'}</span>
                     <ArrowRight className="w-3 h-3 md:w-3 md:h-3 lg:w-3.5 lg:h-3.5 xl:w-4 xl:h-4 stroke-[2.5]" />
                   </button>
                 </div>
@@ -1508,10 +1827,10 @@ export default function MainPage() {
                 </div>
                 <div>
                   <h4 className="font-bold text-[#00285e] text-sm leading-tight">
-                    Free Career Counselling
+                    {heroSettings.counsellingTitle || 'Free Career Counselling'}
                   </h4>
                   <p className="text-[11px] font-medium text-[#00285e]/90 leading-tight mt-0.5">
-                    Know the Right Course for You
+                    {heroSettings.counsellingSubtitle || 'Know the Right Course for You'}
                   </p>
                 </div>
               </div>
@@ -1519,12 +1838,15 @@ export default function MainPage() {
               {/* Card White Body */}
               <div className="p-3.5 bg-white">
                 <ul className="space-y-2 mb-3.5">
-                  {[
-                    'Personalised Guidance',
-                    'Course Comparison',
-                    'Career Roadmap',
-                    '100% Free Consultation'
-                  ].map((item, idx) => (
+                  {(heroSettings.counsellingPoints && heroSettings.counsellingPoints.length > 0
+                    ? heroSettings.counsellingPoints
+                    : [
+                        'Personalised Guidance',
+                        'Course Comparison',
+                        'Career Roadmap',
+                        '100% Free Consultation'
+                      ]
+                  ).map((item, idx) => (
                     <li key={idx} className="flex items-center gap-2.5">
                       <div className="w-4 h-4 rounded-full bg-[#0052cc] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
                         <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5">
@@ -1544,7 +1866,7 @@ export default function MainPage() {
                   onClick={() => setIsModalOpen(true)}
                   className="w-full bg-gradient-to-r from-[#fed000] to-[#f5b800] hover:from-[#ffe14d] hover:to-[#fed000] text-[#00285e] font-semibold text-xs py-2.5 px-3 rounded-full shadow-md flex items-center justify-center gap-1.5 active:scale-[0.98] cursor-pointer"
                 >
-                  <span>Book Your Counselling</span>
+                  <span>{heroSettings.counsellingBtnText || 'Book Your Counselling'}</span>
                   <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
                 </button>
               </div>
@@ -1557,7 +1879,7 @@ export default function MainPage() {
 
 
       {/* ── 2. EXPLORE OUR COURSES BANNER (6 CATEGORY CARDS) ── */}
-      <section className="bg-white pt-3 pb-1 sm:pt-4 sm:pb-1.5">
+      <section className="bg-white pt-3 pb-1 sm:pt-4 sm:pb-1.5 reveal-on-scroll">
         <div className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10">
           <div className="bg-[#00488f] bg-gradient-to-r from-[#00488f] via-[#004080] to-[#003875] rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:py-4.5 lg:px-6 shadow-xl relative overflow-hidden">
             
@@ -1635,7 +1957,7 @@ export default function MainPage() {
 
 
       {/* ── 3. POPULAR COURSES / PROFESSIONAL COURSES ── */}
-      <section className="bg-white pt-2 pb-8 sm:pt-3 sm:pb-10 lg:pt-4">
+      <section className="bg-white pt-2 pb-8 sm:pt-3 sm:pb-10 lg:pt-4 reveal-on-scroll">
         <div className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10">
           
           {/* Section Header */}
@@ -1717,7 +2039,7 @@ export default function MainPage() {
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUpOrLeave}
               onMouseLeave={handleMouseUpOrLeave}
-              className={`flex-1 min-w-0 flex items-stretch gap-3 sm:gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory py-2 px-1 pb-4 touch-pan-x select-none ${
+              className={`flex-1 min-w-0 flex items-stretch gap-2.5 sm:gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory py-2 px-1 pb-3 touch-pan-x select-none ${
                 isMouseDown ? 'cursor-grabbing' : 'cursor-grab'
               }`}
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
@@ -1729,104 +2051,102 @@ export default function MainPage() {
                     if (hasDragged) return;
                     openCourseModal(course);
                   }}
-                  className="w-[82vw] sm:w-[calc((100%-16px)/2)] lg:w-[calc((100%-32px)/3)] xl:w-[calc((100%-48px)/4)] flex-shrink-0 snap-start bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-blue-300 hover:-translate-y-1.5 transition-all duration-300 p-3 sm:p-3.5 flex flex-col justify-between group select-none overflow-hidden cursor-pointer"
+                  className="w-[82vw] sm:w-[calc((100%-12px)/2)] lg:w-[calc((100%-24px)/3)] xl:w-[calc((100%-36px)/4)] flex-shrink-0 snap-start bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-blue-300 hover:-translate-y-1.5 transition-all duration-300 p-3 sm:p-3.5 flex flex-col group select-none overflow-hidden cursor-pointer"
                 >
-                  <div>
-                    {/* Top Thumbnail Image */}
-                    <div className="relative w-full h-32 sm:h-36 rounded-xl overflow-hidden mb-3 bg-slate-100 shadow-inner group/img">
-                      <img
-                        src={course.image}
-                        alt={course.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                        loading="lazy"
-                        onError={(e) => {
-                          e.currentTarget.onerror = null;
-                          e.currentTarget.src = '/course_web_design.jpg';
-                        }}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-slate-950/10 to-transparent pointer-events-none"></div>
+                  {/* Top Thumbnail Image */}
+                  <div className="relative w-full h-28 sm:h-32 rounded-xl overflow-hidden mb-2 bg-slate-100 shadow-inner group/img flex-shrink-0">
+                    <img
+                      src={course.image}
+                      alt={course.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = '/course_web_design.jpg';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-slate-950/10 to-transparent pointer-events-none"></div>
 
-                      {/* Top Category Badge */}
-                      {course.subgroup && (
-                        <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wide shadow-sm flex items-center gap-1 bg-blue-600/95 text-white backdrop-blur-md border border-white/20">
-                          <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-                          <span>{course.subgroup}</span>
-                        </div>
-                      )}
-
-                      {/* Top Right Popular Badge */}
-                      <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md bg-amber-400 text-slate-900 font-extrabold text-[9px] shadow-sm flex items-center gap-0.5">
-                        <Star className="w-2.5 h-2.5 fill-slate-900 stroke-none" />
-                        <span>POPULAR</span>
-                      </div>
-
-                      {/* Duration Pill */}
-                      <div className="absolute bottom-2 left-2 px-1.5 py-0.5 rounded-md bg-black/65 backdrop-blur-md text-white text-[9.5px] font-semibold flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-cyan-300" />
-                        <span>{course.duration}</span>
-                      </div>
-
-                      {/* Rating */}
-                      <div className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded-md bg-black/65 backdrop-blur-md text-amber-300 text-[9.5px] font-semibold flex items-center gap-1">
-                        <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                        <span className="text-white">{course.rating || '4.9'}</span>
-                      </div>
-                    </div>
-
-                    {/* Title & Subtitle */}
-                    <h3 className="font-bold text-[#00285e] text-[13.5px] leading-tight mb-1 group-hover:text-blue-600 transition-colors line-clamp-1">
-                      {course.title}
-                    </h3>
-                    <p className="text-[#64748b] text-[11px] leading-snug mb-2 min-h-[30px] line-clamp-2">
-                      {course.subtitle}
-                    </p>
-
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-1 mb-2">
-                      {course.tags.map((tag, tIdx) => (
-                        <span
-                          key={tIdx}
-                          className="bg-slate-50 text-[#004bb5] border border-blue-100/70 text-[9px] font-medium px-1.5 py-0.5 rounded-md leading-tight"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Feature Checkmarks (from Courses.jsx) */}
-                    {course.features && (
-                      <div className="space-y-1 mb-2.5 pt-2 border-t border-slate-100">
-                        {course.features.map((feat, fIdx) => (
-                          <div key={fIdx} className="flex items-start gap-1.5 text-[10.5px] text-slate-600 leading-tight">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
-                            <span className="line-clamp-1">{feat}</span>
-                          </div>
-                        ))}
+                    {/* Top Category Badge */}
+                    {course.subgroup && (
+                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wide shadow-sm flex items-center gap-1 bg-blue-600/95 text-white backdrop-blur-md border border-white/20">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                        <span>{course.subgroup}</span>
                       </div>
                     )}
+
+                    {/* Top Right Popular Badge */}
+                    <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md bg-amber-400 text-slate-900 font-extrabold text-[9px] shadow-sm flex items-center gap-0.5">
+                      <Star className="w-2.5 h-2.5 fill-slate-900 stroke-none" />
+                      <span>POPULAR</span>
+                    </div>
+
+                    {/* Duration Pill */}
+                    <div className="absolute bottom-2 left-2 px-1.5 py-0.5 rounded-md bg-black/65 backdrop-blur-md text-white text-[9.5px] font-semibold flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-cyan-300" />
+                      <span>{course.duration}</span>
+                    </div>
+
+                    {/* Rating */}
+                    <div className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded-md bg-black/65 backdrop-blur-md text-amber-300 text-[9.5px] font-semibold flex items-center gap-1">
+                      <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                      <span className="text-white">{course.rating || '4.9'}</span>
+                    </div>
                   </div>
 
-                  <div>
-                    {/* Bottom Action Bar with Role + Direct Links: Curriculum & Details */}
-                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-1.5 mt-auto">
-                      <div className="flex items-center gap-1 text-[10px] font-semibold text-blue-900 min-w-0 flex-1">
-                        <Award className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
-                        <span className="truncate" title={course.role}>{course.role}</span>
-                      </div>
+                  {/* Title & Subtitle */}
+                  <h3 className="font-bold text-[#00285e] text-[13px] sm:text-[13.5px] leading-tight mb-1 group-hover:text-blue-600 transition-colors line-clamp-1">
+                    {course.title}
+                  </h3>
+                  <p className="text-[#64748b] text-[11px] leading-snug mb-1.5 h-[30px] line-clamp-2">
+                    {course.subtitle}
+                  </p>
 
-                      <div className="flex items-center gap-1 flex-shrink-0">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openCourseModal(course);
-                          }}
-                          className={`inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r ${course.btnGrad || 'from-blue-600 to-indigo-600'} text-white font-bold text-[10.5px] shadow-sm transition-all hover:scale-105 hover:shadow-md cursor-pointer`}
-                        >
-                          <span>Details</span>
-                          <ArrowRight className="w-3 h-3 stroke-[2.5]" />
-                        </button>
-                      </div>
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {(course.tags || []).slice(0, 4).map((tag, tIdx) => (
+                      <span
+                        key={tIdx}
+                        className="bg-slate-50 text-[#004bb5] border border-blue-100/70 text-[9px] font-medium px-1.5 py-0.5 rounded-md leading-tight"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Feature Checkmarks */}
+                  {Array.isArray(course.features) && course.features.length > 0 && (
+                    <div className="space-y-1 mb-2 pt-1.5 border-t border-slate-100">
+                      {course.features.slice(0, 4).map((feat, fIdx) => (
+                        <div key={fIdx} className="flex items-start gap-1.5 text-[10.5px] text-slate-600 leading-tight">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                          <span className="line-clamp-1">{feat}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Bottom Action Bar with Role + Direct Links: Curriculum & Details */}
+                  <div className="pt-2 mt-auto border-t border-slate-100 flex items-center justify-between gap-1.5">
+                    <div className="flex items-center gap-1 text-[10px] font-semibold text-blue-900 min-w-0 flex-1">
+                      <Award className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
+                      <span className="truncate" title={course.role || course.certification || 'Certified Program'}>
+                        {course.role || course.certification || 'Certified Program'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openCourseModal(course);
+                        }}
+                        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r ${course.btnGrad || 'from-blue-600 to-indigo-600'} text-white font-bold text-[10.5px] shadow-sm transition-all hover:scale-105 hover:shadow-md cursor-pointer`}
+                      >
+                        <span>Details</span>
+                        <ArrowRight className="w-3 h-3 stroke-[2.5]" />
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -2013,7 +2333,7 @@ export default function MainPage() {
         </div>
 
         {/* ── WHY CHOOSE US STRIP (Matches Professional Courses Length) ── */}
-        <div className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10 mt-5 sm:mt-6">
+        <div className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10 mt-5 sm:mt-6 reveal-scale">
           <div className="bg-[#f0f6ff] border border-[#cfe1fb] rounded-2xl lg:rounded-3xl p-3 sm:p-4 lg:py-3.5 lg:px-4 shadow-xs flex flex-col lg:flex-row items-stretch">
             
             {/* Left Title Area */}
@@ -2071,7 +2391,7 @@ export default function MainPage() {
         </div>
 
         {/* ── 3.8. OUR IMPACT IN NUMBERS & STUDENT TESTIMONIAL ── */}
-        <div className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10 mt-4 sm:mt-5">
+        <div className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10 mt-4 sm:mt-5 reveal-on-scroll">
           <div className="flex flex-col lg:flex-row items-stretch gap-4 sm:gap-4.5">
             
             {/* Left Block: Image + Impact in Numbers (Combined Rounded Unit) */}
@@ -2182,91 +2502,105 @@ export default function MainPage() {
             </div>
 
             {/* Right Block: What Our Students Say (Testimonial Card) */}
-            <div className="w-full lg:w-[32%] xl:w-[29%] bg-white border border-blue-100/90 rounded-2xl lg:rounded-3xl p-4 sm:p-5 lg:p-5 shadow-sm flex flex-col justify-between">
-              <div>
-                {/* Header with Title & 5 Gold Stars */}
-                <div className="flex items-center justify-between gap-2 mb-2.5">
-                  <h4 className="text-[#00285e] font-bold text-sm sm:text-[15px] tracking-tight">
-                    What Our Students Say
-                  </h4>
-                  <div className="flex items-center gap-0.5 text-amber-400">
-                    {[...Array(5)].map((_, sIdx) => (
-                      <Star key={sIdx} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Quote with stylish quotation mark */}
+            <div className="w-full lg:w-[32%] xl:w-[29%] bg-gradient-to-b from-white via-white to-blue-50/40 border border-blue-100/90 rounded-2xl lg:rounded-3xl p-4 sm:p-5 lg:p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between relative overflow-hidden">
+              {/* Subtle Decorative Ambient Glow */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-200/20 rounded-full blur-2xl pointer-events-none -mr-8 -mt-8" />
+              
+              <div className="relative z-10 flex flex-col justify-between h-full">
+                {/* Dynamic Student Testimonial */}
                 {(() => {
                   const currentT = testimonialsList[activeTestimonialIdx % (testimonialsList.length || 1)] || studentTestimonials[0];
+                  const starCount = Math.min(5, Math.max(1, Number(currentT.rating) || 5));
                   return (
                     <>
-                      <div className="flex items-start gap-2.5 my-2">
-                        <span className="text-blue-500 text-2xl sm:text-3xl font-serif font-black leading-none select-none flex-shrink-0 opacity-80">
-                          “
-                        </span>
-                        <p className="text-[#334155] text-xs sm:text-[12.5px] leading-relaxed italic">
-                          {currentT.quote}
-                        </p>
-                      </div>
+                      <div>
+                        {/* Header with Title & Gold Stars */}
+                        <div className="flex items-center justify-between gap-2 mb-2.5">
+                          <div className="flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                            <h4 className="text-[#00285e] font-bold text-sm sm:text-[15px] tracking-tight">
+                              What Our Students Say
+                            </h4>
+                          </div>
+                          <div className="flex items-center gap-0.5 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/80">
+                            {[...Array(starCount)].map((_, sIdx) => (
+                              <Star key={sIdx} className="w-3 h-3 fill-amber-400 text-amber-400" />
+                            ))}
+                            <span className="text-[10px] font-bold text-amber-800 ml-1">{starCount}.0</span>
+                          </div>
+                        </div>
 
-                    <div className="pt-2">
-                      {/* Student info */}
-                      <div className="flex items-center gap-2.5 mb-3">
-                        <img
-                          src={currentT.avatar}
-                          alt={currentT.name}
-                          className="w-10 h-10 rounded-full object-cover border-2 border-blue-100 shadow-xs"
-                          onError={(e) => { e.currentTarget.src = '/rahul_sharma_avatar.jpg'; }}
-                        />
-                        <div>
-                          <h5 className="font-bold text-[#00285e] text-xs sm:text-[13px] leading-tight">
-                            — {currentT.name}
-                          </h5>
-                          <p className="text-[#64748b] font-medium text-[10.5px] sm:text-[11px] leading-tight mt-0.5">
-                            {currentT.role}
+                        {/* Quote Box */}
+                        <div className="flex items-start gap-2.5 my-2.5 bg-white/80 backdrop-blur-xs p-3 rounded-2xl border border-blue-50 shadow-2xs">
+                          <span className="text-amber-500 text-2xl sm:text-3xl font-serif font-black leading-none select-none flex-shrink-0 opacity-80">
+                            “
+                          </span>
+                          <p className="text-[#334155] text-xs sm:text-[12.5px] leading-relaxed italic font-normal">
+                            {currentT.quote}
                           </p>
                         </div>
                       </div>
 
-                      {/* Pagination Dots and Prev/Next Arrows */}
-                      <div className="flex items-center justify-between pt-2.5 border-t border-slate-100">
-                        <div className="flex items-center gap-1.5">
-                          {testimonialsList.map((_, dotIdx) => (
-                            <button
-                              key={dotIdx}
-                              onClick={() => setActiveTestimonialIdx(dotIdx)}
-                              aria-label={`Go to testimonial ${dotIdx + 1}`}
-                              className={`transition-all rounded-full cursor-pointer ${
-                                (activeTestimonialIdx % testimonialsList.length) === dotIdx
-                                  ? 'w-5 h-2 bg-[#0052cc]'
-                                  : 'w-2 h-2 bg-blue-200 hover:bg-blue-300'
-                              }`}
+                      <div className="pt-2">
+                        {/* Student info */}
+                        <div className="flex items-center gap-3 mb-3 bg-blue-50/50 p-2 rounded-xl border border-blue-100/60">
+                          <div className="relative shrink-0">
+                            <img
+                              src={currentT.avatar}
+                              alt={currentT.name}
+                              className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-xs"
+                              onError={(e) => { e.currentTarget.src = '/rahul_sharma_avatar.jpg'; }}
                             />
-                          ))}
+                            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white" />
+                          </div>
+                          <div className="min-w-0">
+                            <h5 className="font-extrabold text-[#00285e] text-xs sm:text-[13px] leading-tight truncate">
+                              {currentT.name}
+                            </h5>
+                            <p className="text-[#64748b] font-medium text-[10.5px] sm:text-[11px] leading-tight mt-0.5 truncate">
+                              {currentT.role}
+                            </p>
+                          </div>
                         </div>
 
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => setActiveTestimonialIdx((prev) => (prev - 1 + testimonialsList.length) % testimonialsList.length)}
-                            aria-label="Previous Testimonial"
-                            className="w-7 h-7 rounded-full border border-blue-200 text-[#00285e] hover:bg-blue-50 flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer"
-                          >
-                            <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setActiveTestimonialIdx((prev) => (prev + 1) % testimonialsList.length)}
-                            aria-label="Next Testimonial"
-                            className="w-7 h-7 rounded-full border border-blue-200 text-[#00285e] hover:bg-blue-50 flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer"
-                          >
-                            <ChevronRight className="w-4 h-4 stroke-[2.5]" />
-                          </button>
+                        {/* Pagination Dots and Prev/Next Arrows */}
+                        <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                          <div className="flex items-center gap-1.5">
+                            {testimonialsList.map((_, dotIdx) => (
+                              <button
+                                key={dotIdx}
+                                onClick={() => setActiveTestimonialIdx(dotIdx)}
+                                aria-label={`Go to testimonial ${dotIdx + 1}`}
+                                className={`transition-all rounded-full cursor-pointer ${
+                                  (activeTestimonialIdx % testimonialsList.length) === dotIdx
+                                    ? 'w-5 h-1.5 bg-gradient-to-r from-amber-500 to-orange-500'
+                                    : 'w-1.5 h-1.5 bg-blue-200 hover:bg-blue-300'
+                                }`}
+                              />
+                            ))}
+                          </div>
+
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => setActiveTestimonialIdx((prev) => (prev - 1 + testimonialsList.length) % testimonialsList.length)}
+                              aria-label="Previous Testimonial"
+                              className="w-7 h-7 rounded-full border border-blue-200 text-[#00285e] hover:bg-blue-50 flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                            >
+                              <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setActiveTestimonialIdx((prev) => (prev + 1) % testimonialsList.length)}
+                              aria-label="Next Testimonial"
+                              className="w-7 h-7 rounded-full border border-blue-200 text-[#00285e] hover:bg-blue-50 flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                            >
+                              <ChevronRight className="w-4 h-4 stroke-[2.5]" />
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </>
+                    </>
                   );
                 })()}
               </div>
@@ -2540,195 +2874,479 @@ export default function MainPage() {
           </div>
         </div>
 
-        {/* ── 3.10. LATEST UPDATES & BLOGS (Exact Ref Match) ── */}
-        <div className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10 mt-6 sm:mt-7">
-          {/* Header Row: Title & Subtitle on Left, View All Blogs on Right */}
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-3 sm:mb-3.5 px-1">
+        {/* ── 3.10. LATEST UPDATES & BLOGS (Auto-Sliding Carousel & Rich Content) ── */}
+        <div className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10 mt-6 sm:mt-7 reveal-on-scroll">
+          {/* Header Row: Title on Left, Controls & View All on Right */}
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-3.5 sm:mb-4 px-1">
             <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+                <span className="text-[11px] font-bold text-blue-700 uppercase tracking-wider">
+                  Knowledge Hub &amp; Insights
+                </span>
+              </div>
               <h3 className="text-xl sm:text-2xl font-bold text-[#00285e] leading-tight tracking-tight">
                 Latest Updates &amp; Blogs
               </h3>
               <p className="text-[#1d5bd8] font-normal text-xs sm:text-[13px] leading-tight mt-0.5">
-                Stay informed with the latest trends, career tips and updates.
+                Stay informed with the latest trends, career roadmaps, and industry skills.
               </p>
             </div>
-            <NavLink
-              to="/blogs"
-              className="inline-flex items-center gap-1.5 text-[#0052cc] hover:text-[#00285e] font-medium text-xs sm:text-[13px] transition-colors self-start sm:self-auto group"
-            >
-              <span>View All Blogs</span>
-              <ArrowRight className="w-3.5 h-3.5 stroke-[2.5] group-hover:translate-x-0.5 transition-transform" />
-            </NavLink>
+
+            {/* Carousel Navigation Buttons & View All Link */}
+            <div className="flex items-center gap-2 self-start sm:self-auto">
+              <button
+                type="button"
+                onClick={handlePrevBlogSlide}
+                className="w-8 h-8 rounded-full border border-blue-200 bg-white hover:bg-blue-50 text-[#00285e] flex items-center justify-center transition shadow-xs cursor-pointer active:scale-95"
+                title="Previous blog"
+                aria-label="Previous blog"
+              >
+                <ChevronLeft className="w-4 h-4 stroke-[2.2]" />
+              </button>
+              <button
+                type="button"
+                onClick={handleNextBlogSlide}
+                className="w-8 h-8 rounded-full border border-blue-200 bg-white hover:bg-blue-50 text-[#00285e] flex items-center justify-center transition shadow-xs cursor-pointer active:scale-95"
+                title="Next blog"
+                aria-label="Next blog"
+              >
+                <ChevronRight className="w-4 h-4 stroke-[2.2]" />
+              </button>
+
+              <NavLink
+                to="/blogs"
+                className="inline-flex items-center gap-1.5 text-[#0052cc] hover:text-[#00285e] font-semibold text-xs sm:text-[13px] transition-colors group ml-2 px-3 py-1.5 rounded-xl hover:bg-blue-50/80"
+              >
+                <span>View All Blogs</span>
+                <ArrowRight className="w-3.5 h-3.5 stroke-[2.5] group-hover:translate-x-0.5 transition-transform" />
+              </NavLink>
+            </div>
           </div>
 
-          {/* 4 Blog Cards Horizontal Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-3.5 lg:gap-4">
-            {latestBlogs.map((blog) => (
-              <div
-                key={blog.id}
-                onClick={() => setSelectedBlogModal(blog)}
-                className="bg-white rounded-2xl p-2.5 sm:p-3 border border-blue-100/90 shadow-xs hover:shadow-lg hover:border-blue-300 transition-all duration-300 flex items-center gap-3 group cursor-pointer hover:-translate-y-0.5"
-              >
-                {/* Thumbnail Image */}
-                <div className="w-[100px] h-[78px] sm:w-[108px] sm:h-[82px] xl:w-[104px] xl:h-[78px] rounded-xl overflow-hidden flex-shrink-0 bg-slate-100 relative">
-                  <img
-                    src={blog.image}
-                    alt={blog.title}
-                    className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-300"
-                    onError={(e) => { e.target.src = '/course_hero.png'; }}
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none" />
-                </div>
+          {/* Automatic Sliding Carousel Track */}
+          <div
+            className="relative overflow-hidden"
+            onMouseEnter={() => setIsBlogPaused(true)}
+            onMouseLeave={() => setIsBlogPaused(false)}
+            onTouchStart={() => setIsBlogPaused(true)}
+            onTouchEnd={() => setIsBlogPaused(false)}
+          >
+            <div
+              ref={blogScrollRef}
+              className="flex items-stretch gap-3.5 sm:gap-4 overflow-x-auto scrollbar-none scroll-smooth py-2 px-1"
+            >
+              {blogsList.map((blog) => {
+                const tagStr = (blog.tag || '').toLowerCase();
+                let theme = {
+                  border: 'border-amber-200/90 hover:border-amber-400 hover:shadow-amber-500/15',
+                  badge: 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs',
+                  accentBar: 'from-amber-500 to-orange-400',
+                  hoverBg: 'hover:bg-gradient-to-br hover:from-white hover:to-amber-50/40',
+                  readBtn: 'text-amber-700 hover:text-amber-900',
+                };
+                if (tagStr.includes('ai') || tagStr.includes('tech')) {
+                  theme = {
+                    border: 'border-cyan-200/90 hover:border-cyan-400 hover:shadow-cyan-500/15',
+                    badge: 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-xs',
+                    accentBar: 'from-blue-600 to-cyan-500',
+                    hoverBg: 'hover:bg-gradient-to-br hover:from-white hover:to-cyan-50/40',
+                    readBtn: 'text-cyan-700 hover:text-cyan-900',
+                  };
+                } else if (tagStr.includes('internship') || tagStr.includes('placement')) {
+                  theme = {
+                    border: 'border-purple-200/90 hover:border-purple-400 hover:shadow-purple-500/15',
+                    badge: 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-xs',
+                    accentBar: 'from-purple-600 to-indigo-500',
+                    hoverBg: 'hover:bg-gradient-to-br hover:from-white hover:to-purple-50/40',
+                    readBtn: 'text-purple-700 hover:text-purple-900',
+                  };
+                } else if (tagStr.includes('distance') || tagStr.includes('education') || tagStr.includes('degree')) {
+                  theme = {
+                    border: 'border-emerald-200/90 hover:border-emerald-400 hover:shadow-emerald-500/15',
+                    badge: 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-xs',
+                    accentBar: 'from-emerald-600 to-teal-500',
+                    hoverBg: 'hover:bg-gradient-to-br hover:from-white hover:to-emerald-50/40',
+                    readBtn: 'text-emerald-700 hover:text-emerald-900',
+                  };
+                } else if (tagStr.includes('web') || tagStr.includes('dev') || tagStr.includes('stack')) {
+                  theme = {
+                    border: 'border-rose-200/90 hover:border-rose-400 hover:shadow-rose-500/15',
+                    badge: 'bg-gradient-to-r from-rose-600 to-pink-600 text-white shadow-xs',
+                    accentBar: 'from-rose-600 to-pink-500',
+                    hoverBg: 'hover:bg-gradient-to-br hover:from-white hover:to-rose-50/40',
+                    readBtn: 'text-rose-700 hover:text-rose-900',
+                  };
+                }
 
-                {/* Right Content */}
-                <div className="flex-1 min-w-0 flex flex-col justify-between h-full py-0.5">
-                  <div>
-                    {/* Category Tag */}
-                    <span className="inline-block bg-[#e1f0ff] text-[#0062ff] font-medium text-[10px] sm:text-[10.5px] px-2.5 py-0.5 rounded-full leading-tight mb-1 group-hover:bg-[#0062ff] group-hover:text-white transition-colors">
-                      {blog.tag}
-                    </span>
+                return (
+                  <div
+                    key={blog.id || blog._id}
+                    data-blog-card
+                    onClick={() => navigate(`/blog/${blog.id || blog._id}`, { state: { blog } })}
+                    className={`w-[290px] sm:w-[330px] lg:w-[330px] xl:w-[345px] flex-shrink-0 bg-white ${theme.hoverBg} rounded-2xl p-3 sm:p-3.5 border ${theme.border} shadow-xs hover:shadow-xl hover-card-elevate transition-all duration-300 flex items-center gap-3.5 group cursor-pointer hover:-translate-y-1 select-none relative overflow-hidden`}
+                  >
+                    {/* Top colored accent line */}
+                    <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${theme.accentBar}`} />
 
-                    {/* Title */}
-                    <h4 className="font-semibold text-[#00285e] text-xs sm:text-[12px] lg:text-[12.5px] leading-snug line-clamp-2 group-hover:text-[#0052cc] transition-colors">
-                      {blog.title}
-                    </h4>
+                    {/* Thumbnail Image with zoom & overlay */}
+                    <div className="w-[102px] h-[84px] sm:w-[110px] sm:h-[88px] rounded-xl overflow-hidden flex-shrink-0 bg-slate-100 relative shadow-2xs border border-slate-200/70">
+                      <img
+                        src={blog.image}
+                        alt={blog.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        onError={(e) => { e.target.src = '/corporate_ai.jpg'; }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+                    </div>
+
+                    {/* Right Content */}
+                    <div className="flex-1 min-w-0 flex flex-col justify-between h-full py-0.5 space-y-1">
+                      <div>
+                        {/* Category Tag with gradient pill */}
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span className={`inline-block font-extrabold text-[9.5px] sm:text-[10px] px-2.5 py-0.5 rounded-full leading-tight ${theme.badge}`}>
+                            {blog.tag}
+                          </span>
+                          {blog.readTime && (
+                            <span className="text-[10px] text-slate-400 font-medium hidden sm:inline">
+                              • {blog.readTime}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Title */}
+                        <h4 className="font-extrabold text-slate-900 group-hover:text-blue-700 text-xs sm:text-[13px] leading-snug line-clamp-2 transition-colors">
+                          {blog.title}
+                        </h4>
+                      </div>
+
+                      {/* Footer: Date & Read More */}
+                      <div className="flex items-center justify-between pt-1 border-t border-slate-100">
+                        <span className="text-slate-400 font-medium text-[10px] sm:text-[10.5px]">
+                          {blog.date}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/blog/${blog.id || blog._id}`, { state: { blog } });
+                          }}
+                          className={`${theme.readBtn} font-bold text-[10.5px] sm:text-[11px] flex items-center gap-0.5 hover:underline cursor-pointer group-hover:translate-x-0.5 transition-transform`}
+                        >
+                          <span>Read</span>
+                          <ArrowRight className="w-2.5 h-2.5 stroke-[2.5]" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
-
-                  {/* Footer: Date & Read More */}
-                  <div className="flex items-center justify-between mt-2 pt-1 border-t border-slate-100/80">
-                    <span className="text-[#8ea3bf] font-normal text-[10px] sm:text-[10.5px]">
-                      {blog.date}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedBlogModal(blog);
-                      }}
-                      className="text-[#0052cc] font-medium text-[10.5px] sm:text-[11px] flex items-center gap-0.5 hover:underline cursor-pointer group-hover:translate-x-0.5 transition-transform"
-                    >
-                      <span>Read More</span>
-                      <ArrowRight className="w-2.5 h-2.5 stroke-[2.5]" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+                );
+              })}
+            </div>
           </div>
         </div>
 
       </section>
 
-      {/* ── Blog Article Modal ── */}
+      {/* ── 4. COLORFUL & CLEAN 90% x 90% PREMIUM BLOG ARTICLE MODAL ── */}
       {selectedBlogModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-slate-950/75 backdrop-blur-md animate-in fade-in duration-200"
           onClick={() => setSelectedBlogModal(null)}
         >
           <div
-            className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-blue-100 flex flex-col relative animate-in zoom-in-95 duration-200"
+            className="w-[95vw] sm:w-[90vw] max-w-[1380px] h-[92vh] sm:h-[90vh] max-h-[92vh] bg-white rounded-3xl shadow-2xl border border-blue-200/80 flex flex-col relative overflow-hidden animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header Image Banner */}
-            <div className="relative h-48 sm:h-56 w-full overflow-hidden bg-slate-900 flex-shrink-0">
-              <img
-                src={selectedBlogModal.image}
-                alt={selectedBlogModal.title}
-                className="w-full h-full object-cover object-center"
-                onError={(e) => { e.target.src = '/course_hero.png'; }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#00183b] via-[#00183b]/60 to-transparent" />
-
-              <button
-                type="button"
-                onClick={() => setSelectedBlogModal(null)}
-                className="absolute top-3 right-3 text-white/90 hover:text-white bg-black/50 hover:bg-black/75 p-2 rounded-full transition-colors cursor-pointer backdrop-blur-md z-20"
-                aria-label="Close"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              <div className="absolute bottom-3 left-4 right-4 text-white z-10">
-                <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#e1f0ff] text-[#0062ff] shadow-xs">
-                    {selectedBlogModal.tag}
-                  </span>
-                  <span className="text-[11px] text-slate-200 flex items-center gap-1 font-normal">
-                    <Clock className="w-3 h-3" />
-                    {selectedBlogModal.date} • {selectedBlogModal.readTime || '3 min read'}
-                  </span>
-                </div>
-                <h3 className="text-base sm:text-xl font-bold leading-snug drop-shadow-sm text-white">
+            {/* 1. Permanent Sticky Top Bar with Prominent CUT / CLOSE Button */}
+            <div className="px-4 sm:px-6 py-3 bg-gradient-to-r from-[#001c44] via-[#00285e] to-[#001432] text-white flex items-center justify-between gap-3 border-b border-white/10 shrink-0 z-30 shadow-md">
+              <div className="flex items-center gap-2 sm:gap-3 overflow-hidden">
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-xs shrink-0">
+                  {selectedBlogModal.tag}
+                </span>
+                <span className="hidden sm:inline-block text-white/40 text-xs">•</span>
+                <span className="text-xs text-slate-300 font-medium hidden sm:flex items-center gap-1.5 shrink-0">
+                  <Clock className="w-3.5 h-3.5 text-amber-400" />
+                  {selectedBlogModal.date} • {selectedBlogModal.readTime || '4 min read'}
+                </span>
+                <span className="hidden md:inline-block text-white/40 text-xs">•</span>
+                <span className="text-xs text-white/90 font-semibold truncate hidden md:inline-block max-w-md">
                   {selectedBlogModal.title}
-                </h3>
+                </span>
+              </div>
+
+              {/* Prominent Actions (Open Full Page + Cut / Close) */}
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const b = selectedBlogModal;
+                    setSelectedBlogModal(null);
+                    navigate(`/blog/${b.id || b._id}`, { state: { blog: b } });
+                  }}
+                  className="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md transition-all cursor-pointer border border-blue-400/40"
+                  title="Open in Full Dedicated Page"
+                >
+                  <span className="tracking-wide">Open Full Page</span>
+                  <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedBlogModal(null)}
+                  className="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-rose-500/90 hover:bg-rose-600 text-white font-bold text-xs shadow-md shadow-rose-500/30 transition-all cursor-pointer group active:scale-95 border border-rose-400/40"
+                  title="Cut / Close Popup (Esc)"
+                  aria-label="Close modal"
+                >
+                  <span className="tracking-wide">Cut / Close</span>
+                  <X className="w-4 h-4 stroke-[2.5] group-hover:rotate-90 transition-transform" />
+                </button>
               </div>
             </div>
 
-            {/* Modal Content */}
-            <div className="p-5 sm:p-6 space-y-4 overflow-y-auto">
-              <div className="flex items-center justify-between text-xs text-slate-500 border-b border-slate-100 pb-3">
-                <span className="font-medium text-slate-700">Author: {selectedBlogModal.author || 'Academic Cell'}</span>
-                <span className="text-[#0052cc] font-medium">Aayush Institute Knowledge Hub</span>
-              </div>
-
-              {selectedBlogModal.excerpt && (
-                <p className="text-slate-800 text-xs sm:text-sm font-semibold leading-relaxed bg-blue-50/70 p-3.5 rounded-xl border border-blue-100">
-                  {selectedBlogModal.excerpt}
-                </p>
-              )}
-
-              <div className="text-slate-700 text-xs sm:text-sm leading-relaxed space-y-3 font-normal">
-                <p>{selectedBlogModal.content}</p>
-              </div>
-
-              {selectedBlogModal.highlights && selectedBlogModal.highlights.length > 0 && (
-                <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-200/80 space-y-2">
-                  <h5 className="text-xs font-bold text-[#00285e] flex items-center gap-1.5">
-                    <Sparkles className="w-4 h-4 text-amber-500" />
-                    Key Takeaways &amp; Career Insights
-                  </h5>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
-                    {selectedBlogModal.highlights.map((h, i) => (
-                      <div key={i} className="flex items-start gap-2 text-[11.5px] text-slate-700">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                        <span>{h}</span>
+            {/* 2. Scrollable Body: Split Two-Column Magazine Layout */}
+            <div
+              ref={blogModalContentRef}
+              className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 scroll-smooth"
+            >
+              {/* Top Hero Layout: Left Visual Showcase (5 cols) + Right In-Depth Header (7 cols) */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-7 items-start">
+                
+                {/* Left Column: Visual Showcase & Meta */}
+                <div className="lg:col-span-5 space-y-4">
+                  {/* Rounded Cover Image Card */}
+                  <div className="relative rounded-2xl overflow-hidden shadow-lg border border-blue-100 bg-slate-900 group">
+                    <div className="h-60 sm:h-72 lg:h-80 w-full relative overflow-hidden">
+                      <img
+                        src={selectedBlogModal.image}
+                        alt={selectedBlogModal.title}
+                        className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500"
+                        onError={(e) => { e.target.src = '/course_hero.png'; }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent" />
+                      
+                      {/* Floating Badges inside Hero Image */}
+                      <div className="absolute bottom-3.5 left-3.5 right-3.5 flex items-center justify-between text-white text-xs z-10">
+                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/95 text-blue-700 shadow-md backdrop-blur-xs">
+                          {selectedBlogModal.tag}
+                        </span>
+                        <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-black/60 text-amber-300 backdrop-blur-xs flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {selectedBlogModal.readTime || '4 min read'}
+                        </span>
                       </div>
-                    ))}
+                    </div>
+                  </div>
+
+                  {/* Highlights Card in Left Column */}
+                  <div className="bg-gradient-to-br from-indigo-50/70 via-purple-50/50 to-blue-50/60 rounded-2xl p-4 border border-indigo-100/90 shadow-xs space-y-2.5">
+                    <div className="flex items-center gap-2 pb-2 border-b border-indigo-100/80">
+                      <div className="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                      </div>
+                      <h4 className="font-bold text-xs sm:text-sm text-[#00285e]">
+                        Article Highlights &amp; Insights
+                      </h4>
+                    </div>
+
+                    <div className="space-y-2">
+                      {(selectedBlogModal.highlights || [
+                        "Hands-on practical industry workflows",
+                        "Direct mentor feedback & code reviews",
+                        "Verified GitHub projects & portfolio",
+                        "100% placement guidance & interview prep"
+                      ]).map((h, i) => (
+                        <div key={i} className="flex items-start gap-2 text-xs text-slate-700 bg-white/90 p-2 rounded-xl border border-slate-100 shadow-2xs">
+                          <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 font-bold text-[9px] flex items-center justify-center shrink-0 mt-0.5">
+                            ✓
+                          </span>
+                          <span className="font-medium text-[11.5px] leading-tight">{h}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              )}
+
+                {/* Right Column: Title, Author, Excerpt & Main Text */}
+                <div className="lg:col-span-7 flex flex-col space-y-4 sm:space-y-5">
+                  {/* Category Pill, Publication Date, Verified Badge */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-xs">
+                      {selectedBlogModal.tag}
+                    </span>
+                    <span className="text-xs text-slate-400 font-medium">
+                      Published {selectedBlogModal.date}
+                    </span>
+                    <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                      Verified Article
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#00285e] leading-[1.25] tracking-tight">
+                    {selectedBlogModal.title}
+                  </h1>
+
+                  {/* Author Card */}
+                  <div className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-slate-50 to-blue-50/60 border border-blue-100 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 text-white font-extrabold text-sm flex items-center justify-center shadow-md shadow-blue-500/20">
+                        {(selectedBlogModal.author || 'A')[0]}
+                      </div>
+                      <div>
+                        <h4 className="text-xs sm:text-sm font-bold text-slate-800">
+                          {selectedBlogModal.author || 'Academic Cell'}
+                        </h4>
+                        <p className="text-[11px] text-slate-500">
+                          Faculty &amp; Industry Mentor at Aayush Institute
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-[11px] font-bold text-blue-700 bg-white px-3 py-1 rounded-xl shadow-xs border border-blue-200 hidden sm:inline-block">
+                      Official Publication
+                    </span>
+                  </div>
+
+                  {/* Excerpt Pull Quote */}
+                  {selectedBlogModal.excerpt && (
+                    <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-yellow-400/10 to-blue-500/10 border-l-4 border-amber-400 shadow-xs">
+                      <p className="text-xs sm:text-sm font-semibold text-slate-800 italic leading-relaxed">
+                        "{selectedBlogModal.excerpt}"
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Main Article Paragraphs */}
+                  <div className="text-slate-700 text-sm sm:text-base leading-relaxed space-y-3.5 font-normal pt-1">
+                    <p className="text-slate-800 leading-relaxed font-normal">
+                      {selectedBlogModal.content}
+                    </p>
+                    <p className="text-slate-600 leading-relaxed text-sm">
+                      At Aayush Institute, our curriculum is engineered alongside seasoned corporate partners and senior technology leads. Whether you are starting your tech journey or upskilling for leadership positions, practical projects, code reviews, and mock technical rounds form the cornerstone of every module.
+                    </p>
+                  </div>
+
+                  {/* CTA Banner */}
+                  <div className="p-5 rounded-2xl bg-gradient-to-r from-[#003882] via-[#0052cc] to-[#0070f3] text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg shadow-blue-600/20 mt-4">
+                    <div>
+                      <h4 className="font-extrabold text-base sm:text-lg text-white">
+                        Want hands-on training in this field?
+                      </h4>
+                      <p className="text-xs sm:text-sm text-sky-100 mt-1">
+                        Learn directly with industry mentors and guaranteed 100% placement support.
+                      </p>
+                    </div>
+                    {selectedBlogModal.relatedLink && (
+                      <NavLink
+                        to={selectedBlogModal.relatedLink}
+                        onClick={() => setSelectedBlogModal(null)}
+                        className="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-900 font-extrabold text-xs shadow-md transition-all whitespace-nowrap active:scale-95"
+                      >
+                        Explore Programs →
+                      </NavLink>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* ── Other Blogs Section: Interactive Colorful Cards ── */}
+              <div className="pt-6 border-t border-slate-200/90 mt-8 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-[11px] font-bold text-indigo-600 uppercase tracking-wider block">
+                      More From Knowledge Hub
+                    </span>
+                    <h3 className="text-base sm:text-xl font-extrabold text-[#00285e]">
+                      Other Articles You Might Like
+                    </h3>
+                  </div>
+                  <span className="text-xs text-slate-400 hidden sm:inline">
+                    Click any article to read directly
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {blogsList
+                    .filter((b) => (b.id || b._id) !== (selectedBlogModal.id || selectedBlogModal._id))
+                    .slice(0, 3)
+                    .map((otherBlog) => (
+                      <div
+                        key={otherBlog.id || otherBlog._id}
+                        onClick={() => {
+                          setSelectedBlogModal(otherBlog);
+                          if (blogModalContentRef.current) {
+                            blogModalContentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+                          }
+                        }}
+                        className="p-3.5 rounded-2xl border border-slate-200 hover:border-indigo-300 bg-gradient-to-b from-white to-slate-50/50 hover:to-indigo-50/30 transition-all duration-300 shadow-xs hover:shadow-lg cursor-pointer group flex flex-col justify-between hover:-translate-y-1"
+                      >
+                        <div className="h-32 rounded-xl overflow-hidden bg-slate-200 relative mb-3">
+                          <img
+                            src={otherBlog.image}
+                            alt={otherBlog.title}
+                            className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                            onError={(e) => { e.target.src = '/course_hero.png'; }}
+                          />
+                          <span className="absolute bottom-2 left-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/95 text-indigo-700 shadow-xs backdrop-blur-xs">
+                            {otherBlog.tag}
+                          </span>
+                        </div>
+
+                        <div>
+                          <h4 className="text-xs sm:text-sm font-bold text-[#00285e] line-clamp-2 group-hover:text-indigo-600 transition-colors leading-snug">
+                            {otherBlog.title}
+                          </h4>
+                          <p className="text-[11px] text-slate-400 mt-1">
+                            {otherBlog.date} • {otherBlog.readTime}
+                          </p>
+                        </div>
+
+                        <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs text-indigo-600 font-bold group-hover:text-indigo-800">
+                          <span>Read Article</span>
+                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+
             </div>
 
-            {/* Modal Footer Actions */}
-            <div className="p-4 border-t border-slate-100 bg-slate-50/80 flex flex-wrap items-center justify-between gap-2.5 mt-auto">
+            {/* 3. Modal Bottom Action Bar with Secondary Cut Button */}
+            <div className="p-3.5 sm:p-4 border-t border-slate-100 bg-slate-50/90 flex flex-wrap items-center justify-between gap-3 shrink-0 z-20">
               <div className="flex items-center gap-2">
                 <NavLink
                   to={`/blogs?id=${selectedBlogModal.id}`}
                   onClick={() => setSelectedBlogModal(null)}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#0052cc] text-xs font-semibold border border-blue-200/60 transition-all cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200 transition shadow-xs cursor-pointer"
                 >
-                  <BookOpen className="w-3.5 h-3.5" />
+                  <BookOpen className="w-3.5 h-3.5 text-indigo-600" />
                   <span>Open in Blogs Library</span>
                 </NavLink>
+
                 {selectedBlogModal.relatedLink && (
                   <NavLink
                     to={selectedBlogModal.relatedLink}
                     onClick={() => setSelectedBlogModal(null)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#0052cc] hover:bg-[#00285e] text-white text-xs font-semibold shadow-xs transition-all cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition cursor-pointer"
                   >
                     <span>Explore Courses</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </NavLink>
                 )}
               </div>
+
+              {/* Bottom Cut Button */}
               <button
                 type="button"
                 onClick={() => setSelectedBlogModal(null)}
-                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-semibold transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 border border-rose-200 text-xs font-bold transition-all cursor-pointer"
               >
-                Close
+                <X className="w-3.5 h-3.5" />
+                <span>Cut / Close</span>
               </button>
             </div>
+
           </div>
         </div>
       )}
@@ -3041,6 +3659,7 @@ export default function MainPage() {
         isOpen={isCourseModalOpen}
         course={selectedCourseDetails}
         onClose={closeCourseModal}
+        onSelectCourse={(c) => setSelectedCourseDetails(c)}
       />
 
     </div>

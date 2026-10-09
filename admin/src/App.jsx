@@ -16,13 +16,14 @@ const SmartHomeRedirect = () => {
 
   try {
     const user = JSON.parse(userStr);
-    if (user?.role === "student" || user?.role === "alumni") {
-      return <Navigate to="/student" replace />;
-    }
-    if (user?.role === "admin") {
+    const role = String(user?.role || "").toLowerCase();
+    if (role === "admin" || user?.email === "aastechit@admin.com") {
       return <Navigate to="/panel" replace />;
     }
-    if (user?.role === "staff" && user?.isApproved === true && user?.status === "active") {
+    if (role === "student" || role === "alumni") {
+      return <Navigate to="/student" replace />;
+    }
+    if (role === "staff") {
       return <Navigate to="/panel" replace />;
     }
   } catch (err) {}

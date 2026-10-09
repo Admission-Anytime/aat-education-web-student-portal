@@ -1,6 +1,6 @@
 import React from 'react'
 import MainPage from './components/MainPage'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import SchoolWebsite from './components/SchoolWebsite'
 import AboutUs from './components/Pages/AboutUs'
 import Courses from './components/Navbar/Courses'
@@ -24,7 +24,7 @@ import DigitalMarketing from './components/Pages/DigitalMarketing'
 import TallyAccounting from './components/Pages/TallyAccounting'
 import AdminPanel from './components/Panel/AdminPanel'
 import StudentProfile from './components/Pages/StudentProfile'
-import StaffPage from './components/Pages/StaffPage'
+import BlogDetails from './components/Pages/BlogDetails'
 import Layout from './components/Layout'
 import ScrollToTop from './components/ScrollToTop'
 import ErrorBoundary from './components/Common/ErrorBoundary'
@@ -39,10 +39,6 @@ const App = () => {
         <Route path='' element={<Layout />} >
           <Route path='' element={<SchoolWebsite />} >
             <Route index element={<MainPage />} />
-            <Route path='staff' element={<StaffPage />} />
-            <Route path='faculty' element={<StaffPage />} />
-            <Route path='our-faculty' element={<StaffPage />} />
-            <Route path='team' element={<StaffPage />} />
             <Route path='Aboutus' element={<AboutUs />} />
             <Route path='AboutUs' element={<AboutUs />} />
             <Route path='about' element={<AboutUs />} />
@@ -151,6 +147,11 @@ const App = () => {
             <Route path='blog' element={<News />} />
             <Route path='Blogs' element={<News />} />
             <Route path='Blog' element={<News />} />
+            <Route path='blog/:id' element={<BlogDetails />} />
+            <Route path='blogs/:id' element={<BlogDetails />} />
+            <Route path='Blog/:id' element={<BlogDetails />} />
+            <Route path='Blogs/:id' element={<BlogDetails />} />
+            <Route path='news/:id' element={<BlogDetails />} />
             <Route path='vlogs' element={<News />} />
             <Route path='vlog' element={<News />} />
             <Route path='Vlogs' element={<News />} />
@@ -162,6 +163,8 @@ const App = () => {
             <Route path='profile' element={<StudentProfile />} />
             <Route path='student-profile' element={<StudentProfile />} />
             <Route path='dashboard' element={<StudentProfile />} />
+            <Route path='staff' element={<Navigate to="/" replace />} />
+            <Route path='faculty' element={<Navigate to="/" replace />} />
           </Route>
         </Route>
 
@@ -171,7 +174,9 @@ const App = () => {
         <Route path='panel' element={<AdminPanel />} />
 
         {/* Catch-all fallback route to prevent blank screens on unmatched URLs */}
-        <Route path='*' element={<SchoolWebsite />} />
+        <Route path='staff' element={<Navigate to="/" replace />} />
+        <Route path='faculty' element={<Navigate to="/" replace />} />
+        <Route path='*' element={<Navigate to="/" replace />} />
 
       </Routes>
       </ErrorBoundary>

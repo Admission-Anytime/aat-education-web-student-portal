@@ -24,25 +24,27 @@ export const AdminProtectedRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  // ⛔ STRICT POLICY: Student or Alumni can NEVER navigate to Admin Panel
-  if (user?.role === "student" || user?.role === "alumni") {
+  const userRole = String(user?.role || "").toLowerCase();
+
+  // ⛔ STRICT POLICY: Student can NEVER navigate to Admin Panel
+  if (userRole === "student" || userRole === "alumni") {
     console.warn("⛔ Access Denied: Only Admin and approved Staff can access the Admin Panel.");
     return <Navigate to="/student" replace />;
   }
 
+  // 🛡️ Super Admin Access (check admin first!)
+  if (userRole === "admin" || user?.email === "aastechit@admin.com") {
+    return children;
+  }
+
   // 🔒 STRICT APPROVAL: Staff MUST have explicit admin approval
-  if (user?.role === "staff") {
-    if (user?.isApproved !== true || user?.status !== "active") {
+  if (userRole === "staff") {
+    if (user?.isApproved === false || user?.status === "pending" || user?.status === "suspended") {
       console.warn("🔒 Staff account requires administrator approval.");
       localStorage.removeItem("adminToken");
       localStorage.removeItem("adminUser");
       return <Navigate to="/login?pending=true" replace />;
     }
-    return children;
-  }
-
-  // 🛡️ Super Admin Access
-  if (user?.role === "admin") {
     return children;
   }
 

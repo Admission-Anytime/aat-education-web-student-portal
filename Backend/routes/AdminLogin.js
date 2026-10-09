@@ -208,10 +208,16 @@ router.post("/register-request", async (req, res) => {
       return res.status(400).json({ success: false, message: "An account with this email already exists" });
     }
 
-    const targetRole = role === "staff" ? "staff" : role === "alumni" ? "alumni" : "student";
-    // Staff and Alumni require admin approval; Students are active for student portal
-    const targetStatus = targetRole === "student" ? "active" : "pending";
-    const isApproved = targetRole === "student";
+    if (role === "student") {
+      return res.status(403).json({
+        success: false,
+        message: "Students cannot register from this portal. Please use the Student Portal on the main website."
+      });
+    }
+
+    const targetRole = role === "alumni" ? "alumni" : "staff";
+    const targetStatus = "pending";
+    const isApproved = false;
 
     const genId = targetRole === "staff" ? `STF-${Math.floor(100 + Math.random() * 900)}` :
       targetRole === "alumni" ? `ALM-${new Date().getFullYear()}-${Math.floor(10 + Math.random() * 90)}` :
@@ -292,75 +298,11 @@ router.post("/login", async (req, res) => {
 
     const cleanEmail = email.trim().toLowerCase();
 
-    // 1️⃣ Role-based authentication segregation
+    // 1️⃣ Role-based authentication segregation: Block student logins from Admin Portal
     if (roleHint === "student") {
-      // 🎓 STRICT STUDENT LOOKUP: Never check Admin collection for student logins
-      let student = await User.findOne({
-        email: { $regex: new RegExp(`^${cleanEmail}$`, "i") },
-        role: "student"
-      });
-
-      // Auto-create official student demo account if matching standard student emails
-      if (!student && (cleanEmail === "student@aayushinstitute.com" || cleanEmail === "student@aayush.com")) {
-        const hashedPass = await bcrypt.hash("password123", 10);
-        student = new User({
-          name: "Aryan Sharma",
-          email: cleanEmail,
-          password: hashedPass,
-          role: "student",
-          phone: "+91-9876543210",
-          course: "Software & Full Stack Development",
-          memberId: "AAY-STU-1082",
-          batch: "2024-2025",
-          status: "active",
-          isApproved: true
-        });
-        await student.save();
-      }
-
-      if (!student) {
-        return res.status(400).json({ success: false, message: "No student account found with this email. Please register or contact admin." });
-      }
-
-      let passwordMatch = false;
-      if (student.password && (student.password.startsWith("$2a$") || student.password.startsWith("$2b$"))) {
-        passwordMatch = await bcrypt.compare(password, student.password);
-      } else {
-        passwordMatch = (student.password === password);
-      }
-
-      if (!passwordMatch && (cleanEmail === "student@aayushinstitute.com" || cleanEmail === "student@aayush.com") && password === "password123") {
-        passwordMatch = true;
-      }
-
-      if (!passwordMatch) {
-        return res.status(400).json({ success: false, message: "Invalid email or password" });
-      }
-
-      const token = jwt.sign(
-        { id: student._id, email: student.email, role: "student" },
-        process.env.JWT_SECRET_KEY || "myscretkey",
-        { expiresIn: "24h" }
-      );
-
-      return res.json({
-        success: true,
-        message: "Student login successful! Welcome to Student Portal.",
-        token,
-        role: "student",
-        user: {
-          _id: student._id,
-          name: student.name,
-          email: student.email,
-          role: "student",
-          course: student.course || "Software & Full Stack Development",
-          memberId: student.memberId || "AAY-STU-1082",
-          batch: student.batch || "2024-2025",
-          phone: student.phone || "+91-9876543210",
-          status: "active",
-          isApproved: true,
-        },
-        redirectTo: "/student"
+      return res.status(403).json({
+        success: false,
+        message: "Access Denied: Students cannot log in from the Admin Portal. Please use the Student Portal on the main website."
       });
     }
 
@@ -415,15 +357,17 @@ router.post("/login", async (req, res) => {
             _id: admin._id,
             email: admin.email,
             name: admin.name || "Super Admin",
-            role: admin.role || "admin",
-            status: admin.status || "active"
+            role: "admin",
+            status: admin.status || "active",
+            isApproved: true
           },
           user: {
             _id: admin._id,
             email: admin.email,
             name: admin.name || "Super Admin",
-            role: admin.role || "admin",
-            status: admin.status || "active"
+            role: "admin",
+            status: admin.status || "active",
+            isApproved: true
           },
           redirectTo: "/panel"
         });
@@ -451,16 +395,29 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid email or password" });
     }
 
-    // 🔒 STRICT APPROVAL ENFORCEMENT: No unapproved user can log in to admin panel
+    // ⛔ STRICT RESTRICTION: Students are not allowed on this portal
+    if (user.role === "student") {
+      return res.status(403).json({
+        success: false,
+        message: "Access Denied: Students cannot log in from this portal. Please use the Student Portal on the main website.",
+      });
+    }
+
+    // 🔒 STRICT APPROVAL ENFORCEMENT: Staff & Alumni MUST be approved by an Admin
     if (user.role === "staff" || user.role === "alumni") {
       if (user.isApproved !== true || user.status !== "active") {
         return res.status(403).json({
           success: false,
           accountPending: true,
           role: user.role,
-          message: `Admin Approval Required: Your ${user.role.toUpperCase()} account is pending Administrator approval. You cannot log in or access the admin panel until an administrator verifies and approves your profile.`,
+          message: `Admin Approval Required: Your ${user.role.toUpperCase()} account is pending Administrator approval. You cannot log in until verified.`,
         });
       }
+    } else {
+      return res.status(403).json({
+        success: false,
+        message: "Access Denied: Only Staff and Alumni members can access this portal.",
+      });
     }
 
     // Generate JWT token
@@ -470,34 +427,26 @@ router.post("/login", async (req, res) => {
       { expiresIn: "24h" }
     );
 
-    // 🎯 STRICT NAVIGATION DESTINATION DETERMINATION
-    // - Student -> strictly /student
-    // - Approved Staff -> /panel
-    // - Approved Alumni -> /alumni or /student
-    const redirectTo = user.role === "student"
-      ? "/student"
-      : user.role === "staff"
-      ? "/panel"
-      : "/student";
+    const redirectTo = user.role === "alumni" ? "/student" : "/panel";
 
     return res.json({
       success: true,
-      message: `${user.role.charAt(0).toUpperCase() + user.role.slice(1)} login successful!`,
+      message: `${user.role === "alumni" ? "Alumni" : "Staff"} login successful!`,
       token,
       role: user.role,
       user: {
         _id: user._id,
-        email: user.email,
         name: user.name,
+        email: user.email,
         role: user.role,
-        status: user.status,
-        department: user.department,
-        course: user.course,
+        department: user.department || "",
+        company: user.company || "",
+        batch: user.batch || "",
         memberId: user.memberId,
-        batch: user.batch,
-        company: user.company,
+        status: user.status,
+        isApproved: user.isApproved !== false
       },
-      redirectTo,
+      redirectTo
     });
   } catch (err) {
     console.error("Login error:", err);

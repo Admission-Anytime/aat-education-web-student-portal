@@ -34,6 +34,7 @@ import { MongoClient } from "mongodb";
  import footerRoutes from './routes/footerRoutes.js';
  import Footer from './models/Footer.js';
 import inquiryRoutes from "./routes/InquiryRoutes.js";
+import siteSettingsRoutes from "./routes/siteSettingsRoutes.js";
 import Admin from "./models/AdminLogin.js"; // <-- important!3
 import bcrypt from "bcryptjs"; // <-- important!3
 import AdminLogin from "./routes/AdminLogin.js"; // <-- important!3
@@ -61,6 +62,7 @@ app.use("/Uploads", express.static("Uploads"));
 app.use("/api/courses", coursesRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/site-settings", siteSettingsRoutes);
  
 
 
@@ -126,7 +128,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);*/
 // Serve static images in Uploads folder
 app.use("/Uploads", express.static(path.join(__dirname, "Uploads")));
-//app.use("/uploads", express.static("/Uploads"));
+app.use("/uploads", express.static(path.join(__dirname, "Uploads")));
 
 /*app.post("/api/blogs", upload.fields([
   { name: "coverImage", maxCount: 1 },

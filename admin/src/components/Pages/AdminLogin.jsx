@@ -26,13 +26,13 @@ export default function AdminLogin() {
 
   // Mode: "login" or "register"
   const [mode, setMode] = useState("login");
-  const [selectedRole, setSelectedRole] = useState("admin"); // "admin", "staff", "alumni", "student"
+  const [selectedRole, setSelectedRole] = useState("staff"); // "staff" or "alumni"
 
   // Login Form
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // Register Form (for Staff, Alumni, Student)
+  // Register Form (for Staff or Alumni)
   const [regForm, setRegForm] = useState({
     name: "",
     email: "",
@@ -56,15 +56,21 @@ export default function AdminLogin() {
     if (token) {
       try {
         const user = JSON.parse(userStr);
-        if (user?.role === "student" || user?.role === "alumni") {
-          navigate("/student");
-          return;
-        }
-        if (user?.role === "admin") {
+        const role = String(user?.role || "").toLowerCase();
+        if (role === "admin" || user?.email === "aastechit@admin.com") {
           navigate("/panel");
           return;
         }
-        if (user?.role === "staff" && user?.isApproved === true && user?.status === "active") {
+        if (role === "student") {
+          localStorage.removeItem("adminToken");
+          localStorage.removeItem("adminUser");
+          return;
+        }
+        if (role === "alumni") {
+          navigate("/student");
+          return;
+        }
+        if (role === "staff") {
           navigate("/panel");
           return;
         }
@@ -74,7 +80,7 @@ export default function AdminLogin() {
     if (searchParams.get("pending")) {
       setMessage({
         type: "pending",
-        text: "Your account is currently pending Administrator approval. You cannot access the Admin Panel until verified.",
+        text: "Your account is currently pending Administrator approval. You cannot access the portal until verified.",
       });
     }
   }, [navigate, searchParams]);
@@ -119,25 +125,35 @@ export default function AdminLogin() {
         throw new Error(result.message || "Invalid email or password");
       }
 
-      // Store authentic credentials
+      // Check role returned from backend
+      const finalRole = result.role || result.user?.role || result.admin?.role || selectedRole;
+
+      // ⛔ STRICT RESTRICTION: Block Student from logging into this portal
+      if (finalRole === "student") {
+        localStorage.removeItem("adminToken");
+        localStorage.removeItem("adminUser");
+        setMessage({
+          type: "error",
+          text: "Access Denied: Students are not permitted to log in from this portal. Please use the Student Portal on the main website.",
+        });
+        return;
+      }
+
+      // Store authentic credentials for staff / alumni / admin
       localStorage.setItem("adminToken", result.token || "logged_in");
-      const userData = result.user || result.admin || { email, role: result.role || selectedRole };
+      const userData = result.user || result.admin || { email, role: finalRole };
       localStorage.setItem("adminUser", JSON.stringify(userData));
 
-      // 🔒 STRICT NAVIGATION ENFORCEMENT
-      const finalRole = result.role || userData.role || selectedRole;
-      if (finalRole === "student") {
-        userData.role = "student";
-        localStorage.setItem("adminUser", JSON.stringify(userData));
+      if (finalRole === "alumni") {
         setMessage({
           type: "success",
-          text: "Student login successful! Redirecting to Student Portal...",
+          text: "Alumni login successful! Redirecting to Alumni Portal...",
         });
         setTimeout(() => navigate("/student"), 400);
       } else {
         setMessage({
           type: "success",
-          text: `${result.role ? result.role.toUpperCase() : "Admin"} login successful! Redirecting to Management Panel...`,
+          text: `${finalRole.toUpperCase()} login successful! Redirecting to Management Panel...`,
         });
         setTimeout(() => navigate("/panel"), 400);
       }
@@ -188,17 +204,10 @@ export default function AdminLogin() {
         throw new Error(result.message || "Failed to submit registration");
       }
 
-      if (regForm.role === "staff" || regForm.role === "alumni") {
-        setMessage({
-          type: "pending",
-          text: `Application Submitted! Your ${regForm.role} account has been registered and is now PENDING ADMINISTRATOR APPROVAL. Once approved by an admin, you will be able to log in.`,
-        });
-      } else {
-        setMessage({
-          type: "success",
-          text: "Student account registered successfully! You can now log in to the Student Portal.",
-        });
-      }
+      setMessage({
+        type: "pending",
+        text: `Application Submitted! Your ${regForm.role === "alumni" ? "Alumni" : "Faculty/Staff"} account has been registered and is now PENDING ADMINISTRATOR APPROVAL. Once approved by an admin, you will be able to log in.`,
+      });
 
       // Switch back to login form with pre-filled email
       setEmail(regForm.email);
@@ -303,23 +312,29 @@ export default function AdminLogin() {
                 <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">
                   Select Your Portal Role
                 </label>
-                <div className="grid grid-cols-3 gap-1.5 bg-gray-50 p-1 rounded-xl border border-gray-200 text-xs">
+                <div className="grid grid-cols-2 gap-2 bg-gray-50 p-1.5 rounded-xl border border-gray-200 text-xs">
                   <button
                     type="button"
-                    onClick={() => setSelectedRole("admin")}
-                    className={`py-1.5 px-2 rounded-lg font-semibold transition-all flex items-center justify-center gap-1 ${
-                      selectedRole === "admin"
+                    onClick={() => {
+                      setSelectedRole("staff");
+                      if (email === "alumni@techcorp.com") setEmail("staff@aayushinstitute.com");
+                    }}
+                    className={`py-2 px-3 rounded-lg font-bold transition-all flex items-center justify-center gap-1.5 ${
+                      selectedRole === "staff"
                         ? "bg-[#6d28d9] text-white shadow-xs"
                         : "text-gray-600 hover:text-gray-900"
                     }`}
                   >
-                    <ShieldCheck className="w-3.5 h-3.5" />
-                    Admin/Staff
+                    <Briefcase className="w-3.5 h-3.5" />
+                    Staff / Faculty
                   </button>
                   <button
                     type="button"
-                    onClick={() => setSelectedRole("alumni")}
-                    className={`py-1.5 px-2 rounded-lg font-semibold transition-all flex items-center justify-center gap-1 ${
+                    onClick={() => {
+                      setSelectedRole("alumni");
+                      if (email === "staff@aayushinstitute.com" || email === "aastechit@admin.com") setEmail("alumni@techcorp.com");
+                    }}
+                    className={`py-2 px-3 rounded-lg font-bold transition-all flex items-center justify-center gap-1.5 ${
                       selectedRole === "alumni"
                         ? "bg-[#6d28d9] text-white shadow-xs"
                         : "text-gray-600 hover:text-gray-900"
@@ -327,18 +342,6 @@ export default function AdminLogin() {
                   >
                     <Users className="w-3.5 h-3.5" />
                     Alumni
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedRole("student")}
-                    className={`py-1.5 px-2 rounded-lg font-semibold transition-all flex items-center justify-center gap-1 ${
-                      selectedRole === "student"
-                        ? "bg-[#6d28d9] text-white shadow-xs"
-                        : "text-gray-600 hover:text-gray-900"
-                    }`}
-                  >
-                    <GraduationCap className="w-3.5 h-3.5" />
-                    Student
                   </button>
                 </div>
               </div>
@@ -356,10 +359,8 @@ export default function AdminLogin() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder={
-                      selectedRole === "admin"
-                        ? "aastechit@admin.com"
-                        : selectedRole === "student"
-                        ? "student@aayushinstitute.com"
+                      selectedRole === "staff"
+                        ? "staff@aayushinstitute.com"
                         : "alumni@techcorp.com"
                     }
                     className="w-full pl-10 pr-4 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#6d28d9] transition-all"
@@ -391,8 +392,12 @@ export default function AdminLogin() {
               </div>
 
               {/* Policy note */}
-              <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-100 text-[11px] text-purple-900 leading-relaxed">
-                <span className="font-bold">Security & Role Notice:</span> Staff and Alumni accounts require explicit Admin Approval before login is permitted. Students log in directly to the Student Portal.
+              <div className="p-3.5 rounded-xl bg-purple-50/70 border border-purple-200 text-[11px] text-purple-950 leading-relaxed">
+                <span className="font-bold flex items-center gap-1.5 text-purple-900 mb-0.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#6d28d9]" />
+                  Security & Role Notice:
+                </span>
+                Staff and Alumni accounts require explicit Admin Approval before login is permitted. Students log in directly to the Student Portal.
               </div>
 
               {/* Submit Button */}
@@ -410,6 +415,21 @@ export default function AdminLogin() {
                   </>
                 )}
               </button>
+
+              {/* Direct Link to Student Portal */}
+              <div className="pt-2 text-center border-t border-gray-100">
+                <p className="text-xs text-gray-500">
+                  Are you a student?{" "}
+                  <a
+                    href="http://localhost:5173/ims-login"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#6d28d9] font-bold hover:underline inline-flex items-center gap-1"
+                  >
+                    Student Portal Login &rarr;
+                  </a>
+                </p>
+              </div>
             </form>
           )}
 
@@ -421,7 +441,7 @@ export default function AdminLogin() {
               <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-900 leading-relaxed flex items-center gap-2">
                 <Clock className="w-4 h-4 text-amber-700 shrink-0" />
                 <span>
-                  <strong>Admin Approval Workflow:</strong> Staff & Alumni registration will be queued for administrator review. You cannot access the admin panel until approved.
+                  <strong>Approval Workflow:</strong> Staff & Alumni registration will be queued for administrator review. You cannot access the portal until approved.
                 </span>
               </div>
 
@@ -437,7 +457,6 @@ export default function AdminLogin() {
                 >
                   <option value="staff">Faculty / Staff Member (Requires Admin Approval)</option>
                   <option value="alumni">Alumnus / Former Graduate (Requires Admin Approval)</option>
-                  <option value="student">Student (Direct Student Portal Access)</option>
                 </select>
               </div>
 
@@ -451,7 +470,7 @@ export default function AdminLogin() {
                   required
                   value={regForm.name}
                   onChange={(e) => setRegForm({ ...regForm, name: e.target.value })}
-                  placeholder="e.g. Dr. Ramesh Sharma"
+                  placeholder={regForm.role === "alumni" ? "e.g. Rahul Verma" : "e.g. Dr. Ramesh Sharma"}
                   className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#6d28d9]"
                 />
               </div>
@@ -466,7 +485,7 @@ export default function AdminLogin() {
                   required
                   value={regForm.email}
                   onChange={(e) => setRegForm({ ...regForm, email: e.target.value })}
-                  placeholder="ramesh.sharma@aayushinstitute.com"
+                  placeholder={regForm.role === "alumni" ? "rahul.verma@alumni.com" : "ramesh.sharma@aayushinstitute.com"}
                   className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#6d28d9]"
                 />
               </div>
@@ -500,28 +519,30 @@ export default function AdminLogin() {
                 />
               </div>
 
-              {/* Department or Course / Company */}
+              {/* Department or Alumni Batch & Company */}
               {regForm.role === "staff" ? (
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">
-                    Faculty Department
+                    Faculty Department *
                   </label>
                   <input
                     type="text"
+                    required
                     value={regForm.department}
                     onChange={(e) => setRegForm({ ...regForm, department: e.target.value })}
                     placeholder="e.g. Computer Science & AI"
                     className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#6d28d9]"
                   />
                 </div>
-              ) : regForm.role === "alumni" ? (
+              ) : (
                 <div className="grid grid-cols-2 gap-2">
                   <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1">
-                      Graduation Batch
+                      Graduation Batch *
                     </label>
                     <input
                       type="text"
+                      required
                       value={regForm.batch}
                       onChange={(e) => setRegForm({ ...regForm, batch: e.target.value })}
                       placeholder="e.g. 2022-2023"
@@ -536,23 +557,10 @@ export default function AdminLogin() {
                       type="text"
                       value={regForm.company}
                       onChange={(e) => setRegForm({ ...regForm, company: e.target.value })}
-                      placeholder="e.g. Infosys / TCS"
+                      placeholder="e.g. TCS / Infosys"
                       className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#6d28d9]"
                     />
                   </div>
-                </div>
-              ) : (
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
-                    Enrolled Course
-                  </label>
-                  <input
-                    type="text"
-                    value={regForm.course}
-                    onChange={(e) => setRegForm({ ...regForm, course: e.target.value })}
-                    placeholder="e.g. Software & Full Stack Development"
-                    className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#6d28d9]"
-                  />
                 </div>
               )}
 

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
     Search,
     Calendar,
@@ -27,9 +27,10 @@ import {
     ShieldCheck,
     Lock,
     KeyRound,
-    RefreshCw
+    RefreshCw,
+    ExternalLink
 } from 'lucide-react';
-import { NavLink, useSearchParams, useLocation } from 'react-router-dom';
+import { NavLink, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 
 const getCategoryTheme = (category) => {
     switch (category) {
@@ -358,6 +359,7 @@ const newsArticles = [
 ];
 
 const News = () => {
+    const navigate = useNavigate();
     const location = useLocation();
     const [searchParams] = useSearchParams();
     const [selectedCategory, setSelectedCategory] = useState(() => {
@@ -366,8 +368,33 @@ const News = () => {
         if (/blogs?|vlogs?/i.test(window.location.pathname)) return 'Blogs';
         return 'All';
     });
-    const [searchTerm, setSearchTerm] = useState('');
     const [selectedArticle, setSelectedArticle] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const articleModalContentRef = useRef(null);
+
+    const handleArticleClick = (article) => {
+        if (!article) return;
+        if (article.category === 'Blogs' || selectedCategory === 'Blogs' || String(article.id).startsWith('10')) {
+            navigate(`/blog/${article.id || article._id}`, { state: { blog: article } });
+        } else {
+            setSelectedArticle(article);
+        }
+    };
+
+    // Close article modal on Escape key press & prevent background scrolling
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') setSelectedArticle(null);
+        };
+        if (selectedArticle) {
+            window.addEventListener('keydown', handleKeyDown);
+            document.body.style.overflow = 'hidden';
+        }
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            document.body.style.overflow = '';
+        };
+    }, [selectedArticle]);
 
     // Staff Authentication & Mode Detection
     const [currentUser, setCurrentUser] = useState(() => {
@@ -378,59 +405,9 @@ const News = () => {
         }
     });
 
-    const [isStaffQuickUnlocked, setIsStaffQuickUnlocked] = useState(() => {
-        return sessionStorage.getItem('aayush_staff_quick_unlocked') === 'true';
-    });
+    // Staff mode disabled
+    const isStaff = false;
 
-    const isStaff = currentUser?.role === 'staff' || currentUser?.role === 'admin' || isStaffQuickUnlocked;
-
-    // Staff Security PIN Gate (Master PIN: 2580)
-    const STAFF_SECRET_PIN = '2580';
-    const [showStaffUnlockModal, setShowStaffUnlockModal] = useState(false);
-    const [staffPinInput, setStaffPinInput] = useState('');
-    const [staffPinError, setStaffPinError] = useState('');
-
-    const handleStaffUnlockSubmit = (e) => {
-        e.preventDefault();
-        if (staffPinInput.trim() === STAFF_SECRET_PIN) {
-            sessionStorage.setItem('aayush_staff_quick_unlocked', 'true');
-            setIsStaffQuickUnlocked(true);
-            setShowStaffUnlockModal(false);
-            setStaffPinInput('');
-            setStaffPinError('');
-            window.dispatchEvent(new Event('authChange'));
-            window.dispatchEvent(new Event('storage'));
-            showToast('Staff Access Granted: News & notice editing and deletion enabled!', 'success');
-        } else {
-            setStaffPinError('Incorrect 4-digit PIN. Authorized faculty and staff only.');
-        }
-    };
-
-    const handleStaffLock = () => {
-        sessionStorage.removeItem('aayush_staff_quick_unlocked');
-        setIsStaffQuickUnlocked(false);
-        window.dispatchEvent(new Event('authChange'));
-        window.dispatchEvent(new Event('storage'));
-        showToast('Staff Mode locked.', 'info');
-    };
-
-    useEffect(() => {
-        const syncAuth = () => {
-            try {
-                const u = JSON.parse(localStorage.getItem('aayush_user') || 'null');
-                setCurrentUser(u);
-            } catch {
-                setCurrentUser(null);
-            }
-            setIsStaffQuickUnlocked(sessionStorage.getItem('aayush_staff_quick_unlocked') === 'true');
-        };
-        window.addEventListener('authChange', syncAuth);
-        window.addEventListener('storage', syncAuth);
-        return () => {
-            window.removeEventListener('authChange', syncAuth);
-            window.removeEventListener('storage', syncAuth);
-        };
-    }, []);
 
     // News Articles State backed by localStorage
     const [dbArticles, setDbArticles] = useState(() => {
@@ -466,7 +443,7 @@ const News = () => {
                                 ) || {};
 
                                 const imgUrl = a.image 
-                                    ? (a.image.startsWith('http') || a.image.startsWith('/') ? a.image : `http://localhost:4001/Uploads/${a.image}`)
+                                    ? (a.image.startsWith('http') || a.image.startsWith('/') ? a.image : `/Uploads/${a.image}`)
                                     : (defMatch.image || '/corporate_ai.jpg');
 
                                 return {
@@ -718,12 +695,14 @@ const News = () => {
     }, [searchParams, location.pathname, dbArticles]);
 
     const filteredArticles = useMemo(() => {
-        return dbArticles.filter(item => {
+        const term = (searchTerm || '').trim().toLowerCase();
+        return (dbArticles || []).filter(item => {
+            if (!item) return false;
             const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
-            const matchesSearch =
-                item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.tags.some(t => t.toLowerCase().includes(searchTerm.toLowerCase()));
+            const matchesSearch = !term ||
+                (item.title && item.title.toLowerCase().includes(term)) ||
+                (item.excerpt && item.excerpt.toLowerCase().includes(term)) ||
+                (Array.isArray(item.tags) && item.tags.some(t => t && String(t).toLowerCase().includes(term)));
             return matchesCategory && matchesSearch;
         });
     }, [selectedCategory, searchTerm, dbArticles]);
@@ -734,7 +713,7 @@ const News = () => {
         <div className="min-h-screen bg-[#f4f8fc]">
             {/* ── 1. HERO SECTION (Matching Courses, UniversityCourses, Placement, LiveProject) ── */}
             <div
-                className="relative overflow-hidden bg-no-repeat bg-cover bg-right md:bg-center min-h-[220px] sm:min-h-[240px] lg:min-h-[255px] flex items-center"
+                className="relative overflow-hidden bg-no-repeat bg-cover bg-right md:bg-center min-h-[290px] sm:min-h-[340px] lg:min-h-[380px] flex items-center"
                 style={{
                     backgroundImage: "url('/course_hero.png')",
                     backgroundColor: '#d6ecff'
@@ -744,15 +723,15 @@ const News = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-[#d6ecff]/95 via-[#d6ecff]/80 to-transparent lg:from-transparent lg:via-transparent lg:to-transparent pointer-events-none"></div>
 
                 <div className="relative z-10 max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10 w-full">
-                    <div className="flex flex-col justify-center py-3 sm:py-3.5 lg:py-4 max-w-full sm:max-w-[460px] md:max-w-[500px] lg:max-w-2xl">
+                    <div className="flex flex-col justify-center py-6 sm:py-8 lg:py-10 xl:py-12 max-w-full sm:max-w-[460px] md:max-w-[500px] lg:max-w-2xl">
                         {/* Glowing Pill Badge */}
-                        <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-white/90 text-[#0055cc] text-[11px] sm:text-[11.5px] font-semibold tracking-wide mb-1.5 border border-blue-200/60 shadow-xs w-fit backdrop-blur-xs">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 text-[#0055cc] text-[11px] sm:text-xs font-semibold tracking-wide mb-2 sm:mb-2.5 border border-blue-200/60 shadow-xs w-fit backdrop-blur-xs">
                             <Bell className="w-3.5 h-3.5 text-[#0055cc]" />
                             <span>NEWS, EVENTS &amp; ACADEMIC UPDATES</span>
                         </div>
 
                         {/* Main Heading (Matching First Page scale) */}
-                        <h1 className="text-2xl sm:text-3xl lg:text-[29px] xl:text-[36px] 2xl:text-[38px] font-bold text-[#00285e] leading-[1.12] tracking-tight mb-1.5">
+                        <h1 className="text-2xl sm:text-3xl lg:text-[32px] xl:text-[38px] 2xl:text-[40px] font-bold text-[#00285e] leading-[1.15] tracking-tight mb-2 sm:mb-2.5">
                             Stay Updated with{' '}
                             <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent block sm:inline">
                                 Latest News &amp; Announcements
@@ -760,12 +739,12 @@ const News = () => {
                         </h1>
 
                         {/* Subtitle */}
-                        <p className="text-[#3b516d] text-xs sm:text-[13px] lg:text-[12px] xl:text-[13px] leading-relaxed max-w-xl mb-2 font-normal">
+                        <p className="text-[#3b516d] text-xs sm:text-sm lg:text-[13px] xl:text-sm leading-relaxed max-w-xl mb-3 sm:mb-4 font-normal">
                             Explore recent academic announcements, upcoming batch schedules, campus placement drives, hands-on workshops, and university notices.
                         </p>
 
                         {/* 3 Trust Badges */}
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-3.5 mb-2.5">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3.5 mb-3.5 sm:mb-4.5">
                             <div className="flex items-center gap-1.5 bg-white/80 md:bg-transparent backdrop-blur-xs md:backdrop-blur-none px-2 py-0.5 md:p-0 rounded-lg border border-blue-200/60 md:border-none shadow-2xs md:shadow-none">
                                 <div className="w-6 h-6 rounded-md bg-blue-500 flex items-center justify-center flex-shrink-0 shadow-xs text-white">
                                     <BookOpen className="w-3.5 h-3.5" />
@@ -809,70 +788,7 @@ const News = () => {
 
             {/* ── 2. FILTER TABS & SEARCH BAR ── */}
             <div id="news-catalog" className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10 pt-4 pb-6">
-                {/* Staff Management Banner */}
-                {isStaff ? (
-                    <div className="mb-6 bg-gradient-to-r from-purple-950 via-indigo-950 to-slate-900 border border-purple-500/40 rounded-2xl p-3.5 sm:p-4 text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3 relative overflow-hidden animate-in fade-in duration-300">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-                        <div className="flex items-center gap-3 relative z-10 w-full sm:w-auto">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-purple-500/30 flex-shrink-0">
-                                <ShieldCheck className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <div className="flex items-center gap-2 flex-wrap">
-                                    <span className="font-bold text-xs sm:text-sm text-white">Staff Management Mode</span>
-                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                        {currentUser?.name ? `Faculty: ${currentUser.name}` : 'Faculty: Faculty Member'}
-                                    </span>
-                                </div>
-                                <p className="text-[11px] text-purple-200/80 leading-tight mt-0.5">
-                                    All cards have active "Edit" &amp; "Delete" buttons. You can also add and publish new announcements.
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-2 relative z-10 w-full sm:w-auto justify-end flex-wrap">
-                            <button
-                                type="button"
-                                onClick={openAddModal}
-                                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-emerald-500/25 transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
-                            >
-                                <Plus className="w-4 h-4 stroke-[2.5]" />
-                                <span>Add News Update</span>
-                            </button>
-                            <button
-                                type="button"
-                                onClick={handleResetToDefaults}
-                                title="Reset Catalog to Defaults"
-                                className="px-3 py-2 rounded-xl bg-purple-950/70 hover:bg-purple-900 text-purple-300 hover:text-white text-xs font-semibold border border-purple-500/30 flex items-center gap-1 transition-all cursor-pointer"
-                            >
-                                <RefreshCw className="w-3.5 h-3.5" />
-                                <span className="hidden sm:inline">Reset Defaults</span>
-                            </button>
-                            {isStaffQuickUnlocked && (
-                                <button
-                                    type="button"
-                                    onClick={handleStaffLock}
-                                    title="Lock Staff Mode"
-                                    className="px-3 py-2 rounded-xl bg-rose-950/60 hover:bg-rose-900 text-rose-300 hover:text-white text-xs font-semibold border border-rose-500/30 flex items-center gap-1 transition-all cursor-pointer"
-                                >
-                                    <Lock className="w-3.5 h-3.5" />
-                                    <span className="hidden sm:inline">Lock</span>
-                                </button>
-                            )}
-                        </div>
-                    </div>
-                ) : (
-                    <div className="flex justify-end mb-4">
-                        <button
-                            type="button"
-                            onClick={() => setShowStaffUnlockModal(true)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 hover:bg-purple-50 text-slate-600 hover:text-purple-700 text-[11px] font-semibold border border-slate-200 hover:border-purple-300 shadow-2xs transition-all cursor-pointer"
-                            title="Faculty / Staff Quick Access"
-                        >
-                            <KeyRound className="w-3.5 h-3.5 text-purple-600" />
-                            <span>Staff / Faculty Mode</span>
-                        </button>
-                    </div>
-                )}
+
 
                 {/* Floating pill navigation */}
                 <div
@@ -947,7 +863,7 @@ const News = () => {
                             {featuredArticles.map((article) => (
                                 <div
                                     key={article.id}
-                                    onClick={() => setSelectedArticle(article)}
+                                    onClick={() => handleArticleClick(article)}
                                     className={`bg-white rounded-2xl border-2 ${article.theme.border} shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col sm:flex-row group cursor-pointer hover:-translate-y-1`}
                                 >
                                     {/* Thumbnail Image */}
@@ -1037,7 +953,7 @@ const News = () => {
                             {filteredArticles.map((article) => (
                                 <div
                                     key={article.id}
-                                    onClick={() => setSelectedArticle(article)}
+                                    onClick={() => handleArticleClick(article)}
                                     className={`bg-white rounded-2xl border-2 ${article.theme.border} shadow-[0_2px_14px_rgba(0,0,0,0.03)] hover:shadow-xl transition-all duration-300 flex flex-col justify-between group overflow-hidden cursor-pointer hover:-translate-y-1.5`}
                                 >
                                     {/* Card Image */}
@@ -1163,21 +1079,35 @@ const News = () => {
                 </div>
             </div>
 
-            {/* ── 6. ARTICLE DETAILS MODAL ── */}
+            {/* ── 6. COLORFUL & CLEAN 90% x 90% PREMIUM ARTICLE MODAL ── */}
             {selectedArticle && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 z-50 animate-fadeIn">
-                    <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-100 overflow-hidden flex flex-col">
-                        {/* Modal Header Image */}
-                        <div className="relative h-48 sm:h-56 w-full overflow-hidden bg-slate-900 flex-shrink-0">
-                            <img
-                                src={selectedArticle.image}
-                                alt={selectedArticle.title}
-                                className="w-full h-full object-cover object-center"
-                                onError={(e) => { e.target.src = '/course_hero.png'; }}
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-slate-950/75 backdrop-blur-md animate-in fade-in duration-200"
+                    onClick={() => setSelectedArticle(null)}
+                >
+                    <div
+                        className="w-[95vw] sm:w-[90vw] max-w-[1380px] h-[92vh] sm:h-[90vh] max-h-[92vh] bg-white rounded-3xl shadow-2xl border border-blue-200/80 flex flex-col relative overflow-hidden animate-in zoom-in-95 duration-200"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* 1. Permanent Sticky Top Bar with Prominent CUT / CLOSE Button */}
+                        <div className="px-4 sm:px-6 py-3 bg-gradient-to-r from-[#001c44] via-[#00285e] to-[#001432] text-white flex items-center justify-between gap-3 border-b border-white/10 shrink-0 z-30 shadow-md">
+                            <div className="flex items-center gap-2 sm:gap-3 overflow-hidden">
+                                <span className={`px-3 py-1 rounded-full text-xs font-bold border backdrop-blur-md shadow-xs shrink-0 ${selectedArticle.theme?.badge || 'bg-blue-50 text-blue-700 border-blue-200'}`}>
+                                    {selectedArticle.category || 'Article'}
+                                </span>
+                                <span className="hidden sm:inline-block text-white/40 text-xs">•</span>
+                                <span className="text-xs text-slate-300 font-medium hidden sm:flex items-center gap-1.5 shrink-0">
+                                    <Clock className="w-3.5 h-3.5 text-amber-400" />
+                                    {selectedArticle.date} • {selectedArticle.readTime || '4 min read'}
+                                </span>
+                                <span className="hidden md:inline-block text-white/40 text-xs">•</span>
+                                <span className="text-xs text-white/90 font-semibold truncate hidden md:inline-block max-w-md">
+                                    {selectedArticle.title}
+                                </span>
+                            </div>
 
-                            <div className="absolute top-3 right-3 flex items-center gap-2 z-20">
+                            {/* Actions on Top Right (Staff + Cut / Close) */}
+                            <div className="flex items-center gap-2 shrink-0">
                                 {isStaff && (
                                     <>
                                         <button
@@ -1187,7 +1117,7 @@ const News = () => {
                                             title="Edit Article (Staff)"
                                         >
                                             <Edit3 className="w-3.5 h-3.5 text-purple-300" />
-                                            <span>Staff Edit</span>
+                                            <span className="hidden sm:inline">Staff Edit</span>
                                         </button>
                                         <button
                                             type="button"
@@ -1196,91 +1126,311 @@ const News = () => {
                                             title="Delete Article (Staff)"
                                         >
                                             <Trash2 className="w-3.5 h-3.5 text-rose-100" />
-                                            <span>Delete</span>
+                                            <span className="hidden sm:inline">Delete</span>
                                         </button>
                                     </>
                                 )}
                                 <button
-                                    onClick={() => setSelectedArticle(null)}
-                                    className="text-white/90 hover:text-white bg-black/40 hover:bg-black/65 p-2 rounded-full transition-colors cursor-pointer backdrop-blur-md"
-                                    aria-label="Close"
+                                    type="button"
+                                    onClick={() => {
+                                        const art = selectedArticle;
+                                        setSelectedArticle(null);
+                                        navigate(`/blog/${art.id || art._id}`, { state: { blog: art } });
+                                    }}
+                                    className="px-3 py-1.5 rounded-full bg-blue-600/90 hover:bg-blue-500 text-white text-xs font-bold shadow-md transition-all cursor-pointer flex items-center gap-1.5 border border-blue-400/30"
+                                    title="Open in Full Dedicated Page"
                                 >
-                                    <X className="w-5 h-5" />
+                                    <span>Full Page</span>
+                                    <ExternalLink className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedArticle(null)}
+                                    className="w-8 h-8 rounded-full bg-rose-500/90 hover:bg-rose-600 text-white flex items-center justify-center shadow-md shadow-rose-500/30 transition-all cursor-pointer group active:scale-90 border border-rose-400/40"
+                                    title="Close (Esc)"
+                                    aria-label="Close modal"
+                                >
+                                    <X className="w-4 h-4 stroke-[2.5] group-hover:rotate-90 transition-transform" />
                                 </button>
                             </div>
-
-                            <div className="absolute bottom-3.5 left-4 right-4 text-white z-10">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold border backdrop-blur-md bg-white/95 ${selectedArticle.theme.badge}`}>
-                                        {selectedArticle.category}
-                                    </span>
-                                    <span className="text-[11px] text-slate-300 flex items-center gap-1 font-normal">
-                                        <Calendar className="w-3 h-3" />
-                                        {selectedArticle.date}
-                                    </span>
-                                </div>
-                                <h3 className="text-base sm:text-lg font-bold leading-snug drop-shadow-sm">
-                                    {selectedArticle.title}
-                                </h3>
-                            </div>
                         </div>
 
-                        {/* Modal Content */}
-                        <div className="p-5 sm:p-6 space-y-4 overflow-y-auto">
-                            <div className="flex items-center justify-between text-xs text-slate-500 border-b border-slate-100 pb-3">
-                                <span className="font-medium text-slate-700">Published by: {selectedArticle.author}</span>
-                                <span className="flex items-center gap-1 font-normal">
-                                    <Clock className="w-3.5 h-3.5" />
-                                    {selectedArticle.readTime}
-                                </span>
-                            </div>
+                        {/* 2. Scrollable Body: Split Two-Column Magazine Layout */}
+                        <div
+                            ref={articleModalContentRef}
+                            className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 scroll-smooth"
+                        >
+                            {/* Top Hero Layout: Left Visual Showcase (5 cols) + Right In-Depth Content (7 cols) */}
+                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-7 items-start">
+                                
+                                {/* Left Column: Visual Showcase & Meta */}
+                                <div className="lg:col-span-5 space-y-4">
+                                    {/* Cover Image Card */}
+                                    <div className="relative rounded-2xl overflow-hidden shadow-lg border border-blue-100 bg-slate-900 group">
+                                        <div className="h-60 sm:h-72 lg:h-80 w-full relative overflow-hidden">
+                                            <img
+                                                src={selectedArticle.image}
+                                                alt={selectedArticle.title}
+                                                className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500"
+                                                onError={(e) => { e.target.src = '/course_hero.png'; }}
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent" />
+                                            
+                                            {/* Floating Badges inside Hero Image */}
+                                            <div className="absolute bottom-3.5 left-3.5 right-3.5 flex items-center justify-between text-white text-xs z-10">
+                                                <span className={`px-3 py-1 rounded-full text-xs font-bold border backdrop-blur-md shadow-md ${selectedArticle.theme?.badge || 'bg-white text-blue-700'}`}>
+                                                    {selectedArticle.category || 'Article'}
+                                                </span>
+                                                <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-black/60 text-amber-300 backdrop-blur-xs flex items-center gap-1">
+                                                    <Clock className="w-3 h-3" />
+                                                    {selectedArticle.readTime || '4 min read'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                            <p className="text-slate-700 text-xs sm:text-sm leading-relaxed font-normal">
-                                {selectedArticle.content}
-                            </p>
+                                    {/* Highlights Card in Left Column */}
+                                    <div className="bg-gradient-to-br from-indigo-50/70 via-purple-50/50 to-blue-50/60 rounded-2xl p-4 border border-indigo-100/90 shadow-xs space-y-2.5">
+                                        <div className="flex items-center gap-2 pb-2 border-b border-indigo-100/80">
+                                            <div className="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center">
+                                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                            </div>
+                                            <h4 className="font-bold text-xs sm:text-sm text-[#00285e]">
+                                                Key Takeaways &amp; Highlights
+                                            </h4>
+                                        </div>
 
-                            <div className="bg-blue-50/70 rounded-xl p-3.5 border border-blue-100 text-xs text-blue-900 font-normal space-y-1">
-                                <div className="font-semibold text-blue-950 flex items-center gap-1.5">
-                                    <CheckCircle2 className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                                    <span>Important Student Instruction</span>
+                                        <div className="space-y-2">
+                                            {[
+                                                "Official verified update from Aayush Institute",
+                                                "Career-aligned curriculum & hands-on practical learning",
+                                                "Dedicated student mentorship & placement assistance",
+                                                "Batch enrollment & support via helpdesk"
+                                            ].map((h, i) => (
+                                                <div key={i} className="flex items-start gap-2 text-xs text-slate-700 bg-white/90 p-2 rounded-xl border border-slate-100 shadow-2xs">
+                                                    <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 font-bold text-[9px] flex items-center justify-center shrink-0 mt-0.5">
+                                                        ✓
+                                                    </span>
+                                                    <span className="font-medium text-[11.5px] leading-tight">{h}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Student Instruction Banner */}
+                                    <div className="bg-blue-50/80 rounded-2xl p-4 border border-blue-200/80 text-xs text-blue-900 font-normal space-y-1.5 shadow-xs">
+                                        <div className="font-bold text-blue-950 flex items-center gap-1.5 text-xs sm:text-sm">
+                                            <Building2 className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                                            <span>Institute Helpdesk Assistance</span>
+                                        </div>
+                                        <p className="text-blue-800/90 text-xs leading-relaxed">
+                                            For batch timings, fee structures, or campus visits regarding this update, connect with Student Support at <strong>0120-2611111</strong> or WhatsApp <strong>+91 93107 00411</strong>.
+                                        </p>
+                                    </div>
                                 </div>
-                                <p className="text-blue-800/90 text-[11.5px]">
-                                    For official verification or batch enrollments regarding this update, please reach out to the Aayush Institute Student Helpdesk at <strong>0120-2611111</strong> or visit our office campus.
-                                </p>
-                            </div>
 
-                            {/* Tags */}
-                            <div>
-                                <h5 className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Related Topics</h5>
-                                <div className="flex flex-wrap gap-1.5">
-                                    {selectedArticle.tags.map((tag, idx) => (
-                                        <span
-                                            key={idx}
-                                            className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-medium border border-slate-200"
-                                        >
-                                            #{tag}
+                                {/* Right Column: Title, Author, Excerpt & Main Content */}
+                                <div className="lg:col-span-7 flex flex-col space-y-4 sm:space-y-5">
+                                    {/* Category Pill, Publication Date, Verified Badge */}
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <span className={`px-3 py-1 rounded-full text-xs font-extrabold border shadow-xs ${selectedArticle.theme?.badge || 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white'}`}>
+                                            {selectedArticle.category || 'Updates'}
                                         </span>
-                                    ))}
+                                        <span className="text-xs text-slate-400 font-medium flex items-center gap-1">
+                                            <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                                            Published {selectedArticle.date}
+                                        </span>
+                                        <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                                            Verified Notice
+                                        </span>
+                                    </div>
+
+                                    {/* Headline Title */}
+                                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#00285e] leading-[1.25] tracking-tight">
+                                        {selectedArticle.title}
+                                    </h1>
+
+                                    {/* Author Card */}
+                                    <div className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-slate-50 to-blue-50/60 border border-blue-100 flex items-center justify-between gap-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 text-white font-extrabold text-sm flex items-center justify-center shadow-md shadow-blue-500/20">
+                                                {(selectedArticle.author || 'A')[0]}
+                                            </div>
+                                            <div>
+                                                <h4 className="text-xs sm:text-sm font-bold text-slate-800">
+                                                    {selectedArticle.author || 'Academic Advisory'}
+                                                </h4>
+                                                <p className="text-[11px] text-slate-500">
+                                                    Author &amp; Faculty Contributor
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <span className="text-[11px] font-bold text-blue-700 bg-white px-3 py-1 rounded-xl shadow-xs border border-blue-200 hidden sm:inline-block">
+                                            Aayush Institute Knowledge Hub
+                                        </span>
+                                    </div>
+
+                                    {/* Excerpt Pull Quote */}
+                                    {selectedArticle.excerpt && (
+                                        <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-yellow-400/10 to-blue-500/10 border-l-4 border-amber-400 shadow-xs">
+                                            <p className="text-xs sm:text-sm font-semibold text-slate-800 italic leading-relaxed">
+                                                "{selectedArticle.excerpt}"
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {/* Main Content Paragraphs */}
+                                    <div className="text-slate-700 text-sm sm:text-base leading-relaxed space-y-3.5 font-normal pt-1">
+                                        {/<[a-z][\s\S]*>/i.test(selectedArticle.content) ? (
+                                            <div 
+                                                className="prose prose-slate max-w-none text-slate-800 leading-relaxed font-normal text-sm sm:text-base"
+                                                dangerouslySetInnerHTML={{ __html: selectedArticle.content }} 
+                                            />
+                                        ) : (
+                                            <p className="text-slate-800 leading-relaxed font-normal whitespace-pre-line">
+                                                {selectedArticle.content}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    {/* Tags Cloud */}
+                                    {selectedArticle.tags && selectedArticle.tags.length > 0 && (
+                                        <div className="pt-2">
+                                            <h5 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                                                Related Topics
+                                            </h5>
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {selectedArticle.tags.map((tag, idx) => (
+                                                    <span
+                                                        key={idx}
+                                                        className="px-3 py-1 rounded-full bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 text-xs font-semibold border border-slate-200 transition-colors"
+                                                    >
+                                                        #{tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* CTA Banner */}
+                                    <div className="p-5 rounded-2xl bg-gradient-to-r from-[#003882] via-[#0052cc] to-[#0070f3] text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg shadow-blue-600/20 mt-4">
+                                        <div>
+                                            <h4 className="font-extrabold text-base sm:text-lg text-white">
+                                                Interested in this program or update?
+                                            </h4>
+                                            <p className="text-xs sm:text-sm text-sky-100 mt-1">
+                                                Speak directly with our senior educational counselors today.
+                                            </p>
+                                        </div>
+                                        <NavLink
+                                            to="/ContactUs"
+                                            onClick={() => setSelectedArticle(null)}
+                                            className="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-900 font-extrabold text-xs shadow-md transition-all whitespace-nowrap active:scale-95"
+                                        >
+                                            Inquire Now →
+                                        </NavLink>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            {/* ── Other Articles Section: Interactive Colorful Cards ── */}
+                            <div className="pt-6 border-t border-slate-200/90 mt-8 space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <span className="text-[11px] font-bold text-indigo-600 uppercase tracking-wider block">
+                                            More From Knowledge Hub
+                                        </span>
+                                        <h3 className="text-base sm:text-xl font-extrabold text-[#00285e]">
+                                            Other Articles &amp; Updates You Might Like
+                                        </h3>
+                                    </div>
+                                    <span className="text-xs text-slate-400 hidden sm:inline">
+                                        Click any article to read directly
+                                    </span>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    {(dbArticles || newsArticles)
+                                        .filter((b) => b.id !== selectedArticle.id)
+                                        .slice(0, 3)
+                                        .map((otherArticle) => (
+                                            <div
+                                                key={otherArticle.id}
+                                                onClick={() => {
+                                                    setSelectedArticle(otherArticle);
+                                                    if (articleModalContentRef.current) {
+                                                        articleModalContentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+                                                    }
+                                                }}
+                                                className="p-3.5 rounded-2xl border border-slate-200 hover:border-indigo-300 bg-gradient-to-b from-white to-slate-50/50 hover:to-indigo-50/30 transition-all duration-300 shadow-xs hover:shadow-lg cursor-pointer group flex flex-col justify-between hover:-translate-y-1"
+                                            >
+                                                <div className="h-32 rounded-xl overflow-hidden bg-slate-200 relative mb-3">
+                                                    <img
+                                                        src={otherArticle.image}
+                                                        alt={otherArticle.title}
+                                                        className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                                                        onError={(e) => { e.target.src = '/course_hero.png'; }}
+                                                    />
+                                                    <span className="absolute bottom-2 left-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/95 text-indigo-700 shadow-xs backdrop-blur-xs">
+                                                        {otherArticle.category || 'Article'}
+                                                    </span>
+                                                </div>
+
+                                                <div>
+                                                    <h4 className="text-xs sm:text-sm font-bold text-[#00285e] line-clamp-2 group-hover:text-indigo-600 transition-colors leading-snug">
+                                                        {otherArticle.title}
+                                                    </h4>
+                                                    <p className="text-[11px] text-slate-400 mt-1">
+                                                        {otherArticle.date} • {otherArticle.readTime}
+                                                    </p>
+                                                </div>
+
+                                                <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs text-indigo-600 font-bold group-hover:text-indigo-800">
+                                                    <span>Read Article</span>
+                                                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                                                </div>
+                                            </div>
+                                        ))}
                                 </div>
                             </div>
+
                         </div>
 
-                        {/* Modal Footer */}
-                        <div className="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between gap-3 mt-auto">
-                            <NavLink
-                                to="/ContactUs"
-                                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#0066ff] hover:bg-[#0052cc] text-white text-xs font-semibold shadow-xs transition-all cursor-pointer"
-                            >
-                                <MessageSquare className="w-3.5 h-3.5" />
-                                <span>Inquire Regarding This</span>
-                            </NavLink>
+                        {/* 3. Modal Bottom Action Bar */}
+                        <div className="p-3.5 sm:p-4 border-t border-slate-100 bg-slate-50/90 flex flex-wrap items-center justify-between gap-3 shrink-0 z-20">
+                            <div className="flex items-center gap-2">
+                                <NavLink
+                                    to="/ContactUs"
+                                    onClick={() => setSelectedArticle(null)}
+                                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200 transition shadow-xs cursor-pointer"
+                                >
+                                    <MessageSquare className="w-3.5 h-3.5 text-blue-600" />
+                                    <span>Inquire Regarding This</span>
+                                </NavLink>
+
+                                <NavLink
+                                    to="/Courses"
+                                    onClick={() => setSelectedArticle(null)}
+                                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition cursor-pointer"
+                                >
+                                    <span>Explore Courses</span>
+                                    <ArrowRight className="w-3.5 h-3.5" />
+                                </NavLink>
+                            </div>
+
+                            {/* Bottom Close Button (Icon Only) */}
                             <button
+                                type="button"
                                 onClick={() => setSelectedArticle(null)}
-                                className="px-4 py-2 rounded-full border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-semibold transition-colors cursor-pointer"
+                                className="w-9 h-9 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 border border-rose-200 flex items-center justify-center transition-all cursor-pointer active:scale-95 shadow-2xs group"
+                                title="Close (Esc)"
+                                aria-label="Close modal"
                             >
-                                Close
+                                <X className="w-4 h-4 group-hover:rotate-90 transition-transform" />
                             </button>
                         </div>
+
                     </div>
                 </div>
             )}
@@ -1607,49 +1757,7 @@ const News = () => {
                 </div>
             )}
 
-            {/* ── 9. STAFF PIN UNLOCK MODAL ── */}
-            {showStaffUnlockModal && (
-                <div className="fixed inset-0 z-[999] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-purple-100 relative animate-scaleIn">
-                        <button
-                            type="button"
-                            onClick={() => { setShowStaffUnlockModal(false); setStaffPinError(''); }}
-                            className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
-                        >
-                            <X className="w-4 h-4" />
-                        </button>
-                        <div className="text-center mb-5">
-                            <div className="w-12 h-12 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center mx-auto mb-3 shadow-inner">
-                                <KeyRound className="w-6 h-6" />
-                            </div>
-                            <h3 className="font-bold text-slate-900 text-base">Faculty &amp; Staff Access</h3>
-                            <p className="text-xs text-slate-500 mt-1">Enter Master PIN to enable notice editing and deletion</p>
-                        </div>
-                        <form onSubmit={handleStaffUnlockSubmit} className="space-y-4">
-                            <div>
-                                <input
-                                    type="password"
-                                    maxLength={8}
-                                    placeholder="Enter 4-digit PIN (2580)"
-                                    value={staffPinInput}
-                                    onChange={(e) => { setStaffPinInput(e.target.value); setStaffPinError(''); }}
-                                    className="w-full text-center text-lg tracking-widest font-mono font-bold px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-100"
-                                    autoFocus
-                                />
-                                {staffPinError && (
-                                    <p className="text-[11px] text-red-500 mt-1.5 text-center font-medium">{staffPinError}</p>
-                                )}
-                            </div>
-                            <button
-                                type="submit"
-                                className="w-full bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white font-bold text-xs py-2.5 rounded-xl shadow-md transition-all cursor-pointer"
-                            >
-                                Unlock Staff Mode
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            )}
+
 
             {/* Toast Notification Container */}
             {toastMsg && (

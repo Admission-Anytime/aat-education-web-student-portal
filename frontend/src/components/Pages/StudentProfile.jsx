@@ -1047,7 +1047,7 @@ const StudentProfile = () => {
                                 </p>
                                 <div className="pt-1 flex items-center gap-2">
                                     <a
-                                        href="tel:+918800817447"
+                                        href="tel:+919311050670"
                                         className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-blue-50 text-[#00488f] border border-blue-200 font-semibold text-xs flex items-center justify-center gap-1.5 shadow-2xs"
                                     >
                                         <Phone className="w-3 h-3" />
@@ -1522,7 +1522,7 @@ const StudentProfile = () => {
                                 {hasCourse ? 'Official Student Identity Card' : 'Provisional ID Card (Pending Enrollment)'}
                             </p>
                             <h4 className="text-sm font-bold mt-0.5">Aayush Institute of Professional Studies</h4>
-                            <p className="text-[10px] text-blue-200">Govt. Registered • Uttam Nagar East, New Delhi</p>
+                            <p className="text-[10px] text-blue-200">Govt. Registered • Sahibabad, Ghaziabad (NCR)</p>
                         </div>
 
                         {/* ID Card Body */}
@@ -1638,7 +1638,7 @@ const StudentProfile = () => {
                         </div>
 
                         <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 text-center">
-                            Authorized Seal: Aayush Institute Accounts Cell • Uttam Nagar East
+                            Authorized Seal: Aayush Institute Accounts Cell • Sahibabad, Ghaziabad
                         </div>
 
                         <div className="flex items-center gap-2 pt-2">

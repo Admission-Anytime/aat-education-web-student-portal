@@ -10,11 +10,8 @@ const defaultFooterData = {
     { text: "Terms and Conditions", href: "/terms" },
     { text: "Blog", href: "/blogs" },
     { text: "Admission", href: "/admission" },
-    { text: "Student Portal", href: "/profile" },
-    { text: "Result", href: "/result" },
     { text: "Career", href: "/Placement" },
-    { text: "FAQs", href: "/FAQ" },
-    { text: "Staff", href: "/login?type=staff" }
+    { text: "FAQs", href: "/FAQ" }
   ],
   sections: [
     {

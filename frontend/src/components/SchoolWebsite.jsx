@@ -5,13 +5,23 @@ import CooperateTrainingProgram from './Navbar/CooperateTrainingProgram'
 import News from './Navbar/News'
 import Courses from './Navbar/Courses'
 import logo_image from '../assets/img/Logo.jpg'
-import { Facebook, Instagram, Linkedin, MapPin, Youtube } from 'lucide-react'
+import { Facebook, Instagram, Linkedin, MapPin, Youtube, Twitter, MessageCircle } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
 import Header from './Navbar/Header'
+import MobileTabBar from './Navbar/MobileTabBar'
+import WhatsAppFloatingBtn from './Common/WhatsAppFloatingBtn'
 
 
 const SchoolWebsite = () => {
     const [footerData, setFooterData] = useState(null);
+    const [socialLinks, setSocialLinks] = useState({
+        facebook: 'https://facebook.com',
+        instagram: 'https://instagram.com',
+        youtube: 'https://youtube.com',
+        linkedin: 'https://linkedin.com',
+        twitter: '',
+        whatsapp: ''
+    });
 
     useEffect(() => {
         const fetchFooter = async () => {
@@ -25,9 +35,29 @@ const SchoolWebsite = () => {
                 }
             } catch (err) {}
         };
+
+        const fetchSocial = async () => {
+            try {
+                const res = await fetch('/api/site-settings');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data?.data?.socialLinks) {
+                        setSocialLinks(data.data.socialLinks);
+                    }
+                }
+            } catch (err) {}
+        };
+
         fetchFooter();
+        fetchSocial();
         const poll = setInterval(fetchFooter, 6000);
-        return () => clearInterval(poll);
+        window.addEventListener('siteSettingsUpdated', fetchSocial);
+        window.addEventListener('storage', fetchSocial);
+        return () => {
+            clearInterval(poll);
+            window.removeEventListener('siteSettingsUpdated', fetchSocial);
+            window.removeEventListener('storage', fetchSocial);
+        };
     }, []);
 
     const defaultQuickLinks = [
@@ -36,16 +66,17 @@ const SchoolWebsite = () => {
         { text: 'Terms and Conditions', href: '/terms' },
         { text: 'Blog', href: '/blogs' },
         { text: 'Admission', href: '/admission' },
-        { text: 'Student Portal', href: '/profile' },
-        { text: 'Result', href: '/result' },
-        { text: 'FAQs', href: '/FAQ' },
-        { text: 'Our Faculty & Staff', href: '/staff' },
-        { text: 'Staff Portal', href: '/login?type=staff' }
+        { text: 'FAQs', href: '/FAQ' }
     ];
 
-    const quickLinks = (footerData?.mainLinks && footerData.mainLinks.length > 0)
+    const excludedLinkNames = ['faculty', 'staff', 'student', 'result'];
+    const rawLinks = (footerData?.mainLinks && footerData.mainLinks.length > 0)
         ? footerData.mainLinks
         : defaultQuickLinks;
+    const quickLinks = rawLinks.filter(item => {
+        const text = (item.text || item.title || item.label || '').toLowerCase();
+        return !excludedLinkNames.some(ex => text.includes(ex));
+    });
 
     return (
 
@@ -54,10 +85,12 @@ const SchoolWebsite = () => {
             {/* Header */}
             <Header />
 
-            <Outlet />
+            <main className="pb-6 md:pb-0">
+                <Outlet />
+            </main>
 
             {/* Footer */}
-            <footer className="bg-gradient-to-b from-[#001c44] via-[#001432] to-[#000d22] text-white relative border-t border-blue-400/20 shadow-[0_-8px_30px_rgba(0,18,50,0.25)]">
+            <footer className="bg-gradient-to-b from-[#001c44] via-[#001432] to-[#000d22] text-white relative border-t border-blue-400/20 shadow-[0_-8px_30px_rgba(0,18,50,0.25)] pb-20 md:pb-0">
                 
                 {/* 1. Top Quick Links Navigation Bar */}
                 <div className="border-b border-white/10 bg-[#00102b]/60 backdrop-blur-sm py-2">
@@ -80,16 +113,17 @@ const SchoolWebsite = () => {
 
                         {/* Left Brand Column */}
                         <div className="col-span-2 md:col-span-4 flex flex-col items-center md:items-start text-center md:text-left pr-0 md:pr-4">
-                            <div className="relative group">
+                            <div className="relative group md:ml-3">
                                 <img
                                     src="/ayush_circle_logo.png"
                                     alt="Aayush Institute"
-                                    className="w-20 h-20 sm:w-22 sm:h-22 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)] transition-transform duration-200 group-hover:scale-105"
+                                    className="w-14 h-14 sm:w-16 sm:h-16 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)] transition-transform duration-200 group-hover:scale-105"
                                 />
                             </div>
 
-                            <h3 className="text-white font-bold text-[16px] sm:text-[17px] leading-snug mt-2.5 max-w-xs">
-                                Aayush Institute Of Professional Studies
+                            <h3 className="text-white font-bold text-[16px] sm:text-[17.5px] leading-snug mt-3 tracking-tight max-w-[280px]">
+                                Aayush Institute of <br className="hidden sm:inline" />
+                                Professional Studies
                             </h3>
 
                             {/* Crisp Tagline */}
@@ -101,10 +135,16 @@ const SchoolWebsite = () => {
                                 <span className="text-sky-300">Build Your Future</span>
                             </div>
 
-                            <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-3 pt-2.5 border-t border-white/10 w-full justify-center md:justify-start">
-                                <MapPin className="w-3.5 h-3.5 text-[#fed000] flex-shrink-0" />
-                                <span className="truncate">Uttam Nagar East, New Delhi - 110059</span>
-                            </div>
+                            <a
+                                href="https://www.google.com/search?q=aayush+institute+of+professional+studies"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-start gap-1.5 text-xs text-slate-400 mt-3 pt-2.5 border-t border-white/10 w-full justify-center md:justify-start hover:text-[#fed000] transition-colors group"
+                                title="View on Google Maps / Search"
+                            >
+                                <MapPin className="w-3.5 h-3.5 text-[#fed000] flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                                <span className="leading-snug">S-14, DLF Dilshad Extention II, Bhopura, Sahibabad, Ghaziabad, Uttar Pradesh 201006</span>
+                            </a>
                         </div>
 
                         {/* Column: Popular Course */}
@@ -225,48 +265,88 @@ const SchoolWebsite = () => {
                             
                             <div className="flex items-center gap-1.5">
                                 {/* Facebook */}
-                                <a
-                                    href="https://facebook.com"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    aria-label="Facebook"
-                                    className="w-7 h-7 rounded-md bg-[#1877f2] text-white flex items-center justify-center transition-transform hover:scale-110 shadow-xs"
-                                >
-                                    <Facebook className="w-3.5 h-3.5 fill-current" />
-                                </a>
+                                {socialLinks.facebook && (
+                                    <a
+                                        href={socialLinks.facebook}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        aria-label="Facebook"
+                                        title="Facebook"
+                                        className="w-7 h-7 rounded-md bg-[#1877f2] text-white flex items-center justify-center transition-transform hover:scale-110 shadow-xs"
+                                    >
+                                        <Facebook className="w-3.5 h-3.5 fill-current" />
+                                    </a>
+                                )}
 
                                 {/* Instagram */}
-                                <a
-                                    href="https://instagram.com"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    aria-label="Instagram"
-                                    className="w-7 h-7 rounded-md bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] text-white flex items-center justify-center transition-transform hover:scale-110 shadow-xs"
-                                >
-                                    <Instagram className="w-3.5 h-3.5 stroke-[2]" />
-                                </a>
+                                {socialLinks.instagram && (
+                                    <a
+                                        href={socialLinks.instagram}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        aria-label="Instagram"
+                                        title="Instagram"
+                                        className="w-7 h-7 rounded-md bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] text-white flex items-center justify-center transition-transform hover:scale-110 shadow-xs"
+                                    >
+                                        <Instagram className="w-3.5 h-3.5 stroke-[2]" />
+                                    </a>
+                                )}
 
                                 {/* YouTube */}
-                                <a
-                                    href="https://youtube.com"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    aria-label="YouTube"
-                                    className="w-7 h-7 rounded-md bg-[#ff0000] text-white flex items-center justify-center transition-transform hover:scale-110 shadow-xs"
-                                >
-                                    <Youtube className="w-3.5 h-3.5 stroke-[2]" />
-                                </a>
+                                {socialLinks.youtube && (
+                                    <a
+                                        href={socialLinks.youtube}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        aria-label="YouTube"
+                                        title="YouTube"
+                                        className="w-7 h-7 rounded-md bg-[#ff0000] text-white flex items-center justify-center transition-transform hover:scale-110 shadow-xs"
+                                    >
+                                        <Youtube className="w-3.5 h-3.5 stroke-[2]" />
+                                    </a>
+                                )}
 
                                 {/* LinkedIn */}
-                                <a
-                                    href="https://linkedin.com"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    aria-label="LinkedIn"
-                                    className="w-7 h-7 rounded-md bg-[#0a66c2] text-white flex items-center justify-center transition-transform hover:scale-110 shadow-xs"
-                                >
-                                    <Linkedin className="w-3.5 h-3.5 stroke-[2]" />
-                                </a>
+                                {socialLinks.linkedin && (
+                                    <a
+                                        href={socialLinks.linkedin}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        aria-label="LinkedIn"
+                                        title="LinkedIn"
+                                        className="w-7 h-7 rounded-md bg-[#0a66c2] text-white flex items-center justify-center transition-transform hover:scale-110 shadow-xs"
+                                    >
+                                        <Linkedin className="w-3.5 h-3.5 stroke-[2]" />
+                                    </a>
+                                )}
+
+                                {/* Twitter / X */}
+                                {socialLinks.twitter && (
+                                    <a
+                                        href={socialLinks.twitter}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        aria-label="Twitter / X"
+                                        title="Twitter / X"
+                                        className="w-7 h-7 rounded-md bg-black text-white flex items-center justify-center transition-transform hover:scale-110 shadow-xs"
+                                    >
+                                        <Twitter className="w-3.5 h-3.5 stroke-[2]" />
+                                    </a>
+                                )}
+
+                                {/* WhatsApp */}
+                                {socialLinks.whatsapp && (
+                                    <a
+                                        href={socialLinks.whatsapp}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        aria-label="WhatsApp"
+                                        title="WhatsApp"
+                                        className="w-7 h-7 rounded-md bg-[#25D366] text-white flex items-center justify-center transition-transform hover:scale-110 shadow-xs"
+                                    >
+                                        <MessageCircle className="w-3.5 h-3.5 stroke-[2]" />
+                                    </a>
+                                )}
                             </div>
                         </div>
 
@@ -275,6 +355,11 @@ const SchoolWebsite = () => {
 
             </footer>
 
+            {/* Global Floating WhatsApp Action Button (Mobile & Desktop) */}
+            <WhatsAppFloatingBtn />
+
+            {/* Floating Mobile Bottom Tab Bar (Strictly Mobile md:hidden) */}
+            <MobileTabBar />
 
         </div>
     )

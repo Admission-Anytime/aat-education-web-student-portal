@@ -100,4 +100,108 @@ input, select, textarea {
   animation-play-state: paused;
 }
 
+/* ── Modern Scroll Reveal & Micro-Animations ── */
+@keyframes autoRevealFallback {
+  0% { opacity: 0; }
+  100% { opacity: 1; transform: none; }
+}
+
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+  animation: autoRevealFallback 0.6s 1.2s forwards;
+}
+
+.reveal-on-scroll.is-revealed {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  animation: none !important;
+}
+
+.reveal-fade {
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  will-change: opacity;
+  animation: autoRevealFallback 0.6s 1.2s forwards;
+}
+
+.reveal-fade.is-revealed {
+  opacity: 1 !important;
+  animation: none !important;
+}
+
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+  animation: autoRevealFallback 0.6s 1.2s forwards;
+}
+
+.reveal-scale.is-revealed {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+  animation: none !important;
+}
+
+/* Stagger transition delay helpers */
+.delay-75 { transition-delay: 75ms !important; }
+.delay-100 { transition-delay: 100ms !important; }
+.delay-150 { transition-delay: 150ms !important; }
+.delay-200 { transition-delay: 200ms !important; }
+.delay-250 { transition-delay: 250ms !important; }
+.delay-300 { transition-delay: 300ms !important; }
+.delay-400 { transition-delay: 400ms !important; }
+.delay-500 { transition-delay: 500ms !important; }
+
+/* Soft floating badge & orb animation */
+@keyframes softFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-soft-float {
+  animation: softFloat 4.5s ease-in-out infinite;
+}
+
+/* Floating reverse */
+@keyframes softFloatReverse {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(8px);
+  }
+}
+
+.animate-soft-float-reverse {
+  animation: softFloatReverse 5.5s ease-in-out infinite;
+}
+
+/* Interactive Card Hover Elevate */
+.hover-card-elevate {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-card-elevate:hover {
+  transform: translateY(-6px);
+}
+
+/* Scroll progress bar at top of window */
+.scroll-progress-line {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3.5px;
+  background: linear-gradient(90deg, #0052cc 0%, #00d2ff 50%, #25D366 100%);
+  z-index: 99999;
+  transition: width 0.12s ease-out;
+  box-shadow: 0 0 10px rgba(0, 150, 255, 0.5);
+}
+
  

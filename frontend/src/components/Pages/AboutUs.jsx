@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import axios from 'axios';
 import {
     Award,
     BookOpen,
@@ -27,8 +26,10 @@ const AboutUs = () => {
     useEffect(() => {
         const fetchFaculty = async () => {
             try {
-                const res = await axios.get('/api/users?role=staff');
-                const list = Array.isArray(res.data?.data) ? res.data.data : Array.isArray(res.data) ? res.data : [];
+                const baseUrl = import.meta.env.VITE_ERP_API_BASE_URL || '';
+                const res = await fetch(`${baseUrl}/api/users?role=staff`);
+                const json = await res.json();
+                const list = Array.isArray(json?.data) ? json.data : Array.isArray(json) ? json : [];
                 if (list.length > 0) {
                     setFacultyList(list.slice(0, 4));
                 }
@@ -609,10 +610,10 @@ const AboutUs = () => {
                                 </p>
                             </div>
                             <NavLink
-                                to="/staff"
+                                to="/Courses"
                                 className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-800 transition shrink-0"
                             >
-                                <span>View All Faculty Directory</span>
+                                <span>Explore All Courses</span>
                                 <ChevronRight className="w-3.5 h-3.5" />
                             </NavLink>
                         </div>
@@ -656,10 +657,10 @@ const AboutUs = () => {
                                             {faculty.department}
                                         </span>
                                         <NavLink
-                                            to="/staff"
+                                            to="/ContactUs"
                                             className="font-bold text-blue-600 hover:text-blue-800"
                                         >
-                                            Profile →
+                                            Inquire →
                                         </NavLink>
                                     </div>
                                 </div>
@@ -792,22 +793,26 @@ const AboutUs = () => {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5 pt-3 border-t border-slate-100 text-xs">
                             {/* Address */}
-                            <div className="lg:col-span-4 p-2.5 rounded-lg bg-slate-50 border border-slate-200/50 flex flex-col items-center text-center justify-center">
-                                <MapPin className="w-3.5 h-3.5 text-[#0055ff] mb-1" />
+                            <a
+                                href="https://www.google.com/search?q=aayush+institute+of+professional+studies"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="lg:col-span-5 p-2.5 rounded-lg bg-slate-50 hover:bg-blue-50/50 border border-slate-200/50 hover:border-blue-200 flex flex-col items-center text-center justify-center transition-all group"
+                                title="View on Google"
+                            >
+                                <MapPin className="w-3.5 h-3.5 text-[#0055ff] mb-1 group-hover:scale-110 transition-transform" />
                                 <h4 className="font-semibold text-slate-700 uppercase text-[9.5px] tracking-wider mb-0.5">Address</h4>
-                                <p className="text-slate-600 text-[11px] leading-snug lg:whitespace-nowrap">
-                                    Plot 14, Block S, DLF Dilshad Ext. 2, Ghaziabad, UP – 201005
+                                <p className="text-slate-600 group-hover:text-blue-700 text-[11px] leading-snug">
+                                    S-14, DLF Dilshad Extention II, Bhopura, Sahibabad, Ghaziabad, Uttar Pradesh 201006
                                 </p>
-                            </div>
+                            </a>
 
                             {/* Phone */}
                             <div className="lg:col-span-4 p-2.5 rounded-lg bg-slate-50 border border-slate-200/50 flex flex-col items-center text-center justify-center">
                                 <Phone className="w-3.5 h-3.5 text-[#0055ff] mb-1" />
                                 <h4 className="font-semibold text-slate-700 uppercase text-[9.5px] tracking-wider mb-0.5">Phone</h4>
                                 <div className="flex flex-wrap items-center justify-center gap-1.5 text-slate-600 text-[11px] font-medium whitespace-nowrap">
-                                    <a href="tel:01202611111" className="hover:text-[#0055ff] transition-colors">0120-2611111</a>
-                                    <span className="text-slate-300">•</span>
-                                    <a href="tel:+918800817447" className="hover:text-[#0055ff] transition-colors">+91-8800817447</a>
+                                    <a href="tel:09350157447" className="hover:text-[#0055ff] transition-colors font-bold">093501 57447</a>
                                     <span className="text-slate-300">•</span>
                                     <a href="tel:+919311050670" className="hover:text-[#0055ff] transition-colors">+91-9311050670</a>
                                 </div>

@@ -865,8 +865,8 @@ export default function DigitalMarketing() {
                         </div>
                         <div className="pt-2.5 border-t border-emerald-200 flex items-center justify-between">
                             <span className="text-xs font-semibold text-slate-700">Helpline:</span>
-                            <a href="tel:8800817447" className="text-xs font-semibold text-blue-600 hover:underline">
-                                0120-2611111 / +91-8800817447
+                            <a href="tel:9311050670" className="text-xs font-semibold text-blue-600 hover:underline">
+                                0120-2611111 / +91-9311050670
                             </a>
                         </div>
                     </div>
@@ -1343,11 +1343,11 @@ export default function DigitalMarketing() {
                                 <ArrowRight className="w-4 h-4 stroke-[2.5]" />
                             </NavLink>
                             <a
-                                href="tel:8800817447"
+                                href="tel:9311050670"
                                 className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 text-white font-medium text-xs sm:text-sm px-5 py-3 rounded-full border border-white/30 backdrop-blur-xs transition-all duration-200"
                             >
                                 <Phone className="w-3.5 h-3.5" />
-                                <span>Call 0120-2611111</span>
+                                <span>Call +91-9311050670</span>
                             </a>
                         </div>
                     </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, NavLink } from 'react-router-dom';
 import {
     Code,
     Smartphone,
@@ -36,7 +36,10 @@ import {
     ShieldCheck,
     RefreshCw,
     Lock,
-    KeyRound
+    KeyRound,
+    Zap,
+    PhoneCall,
+    Briefcase
 } from 'lucide-react';
 
 const projectCategories = [
@@ -567,50 +570,7 @@ const LiveProject = () => {
         notes: ''
     });
 
-    // Staff Authentication & Mode Detection
-    const [currentUser, setCurrentUser] = useState(() => {
-        try {
-            return JSON.parse(localStorage.getItem('aayush_user') || 'null');
-        } catch {
-            return null;
-        }
-    });
-
-    const [isStaffQuickUnlocked, setIsStaffQuickUnlocked] = useState(() => {
-        return sessionStorage.getItem('aayush_staff_quick_unlocked') === 'true';
-    });
-
-    const isStaff = currentUser?.role === 'staff' || currentUser?.role === 'admin' || isStaffQuickUnlocked;
-
-    // Staff Security PIN Gate (Master PIN: 2580)
-    const STAFF_SECRET_PIN = '2580';
-    const [showStaffUnlockModal, setShowStaffUnlockModal] = useState(false);
-    const [staffPinInput, setStaffPinInput] = useState('');
-    const [staffPinError, setStaffPinError] = useState('');
-
-    const handleStaffUnlockSubmit = (e) => {
-        e.preventDefault();
-        if (staffPinInput.trim() === STAFF_SECRET_PIN) {
-            sessionStorage.setItem('aayush_staff_quick_unlocked', 'true');
-            setIsStaffQuickUnlocked(true);
-            setShowStaffUnlockModal(false);
-            setStaffPinInput('');
-            setStaffPinError('');
-            window.dispatchEvent(new Event('authChange'));
-            window.dispatchEvent(new Event('storage'));
-            showToast('Staff Access Granted: Live project editing and deletion enabled!', 'success');
-        } else {
-            setStaffPinError('Incorrect 4-digit PIN. Authorized faculty and staff only.');
-        }
-    };
-
-    const handleStaffLock = () => {
-        sessionStorage.removeItem('aayush_staff_quick_unlocked');
-        setIsStaffQuickUnlocked(false);
-        window.dispatchEvent(new Event('authChange'));
-        window.dispatchEvent(new Event('storage'));
-        showToast('Staff Mode locked.', 'info');
-    };
+    const isStaff = false;
 
     useEffect(() => {
         const syncAuth = () => {
@@ -1060,18 +1020,7 @@ const LiveProject = () => {
                                 </span>
                             )}
                         </div>
-                        {isStaff && (
-                            <button
-                                type="button"
-                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); openEditModal(course); }}
-                                className="pointer-events-auto px-2 py-1 bg-purple-900/90 hover:bg-purple-950 text-purple-100 text-[10px] font-bold rounded-full flex items-center gap-1 shadow-md border border-purple-400/40 backdrop-blur-md cursor-pointer transition-transform hover:scale-105"
-                                title="Edit Project (Staff)"
-                            >
-                                <Edit3 className="w-2.5 h-2.5 text-purple-300" />
-                                <span>Staff Edit</span>
-                            </button>
-                        )}
-                    </div>
+                        </div>
 
                     {/* Floating Bottom Metadata on Image */}
                     <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-white text-xs font-medium">
@@ -1277,144 +1226,151 @@ const LiveProject = () => {
 
     return (
         <div className="min-h-screen bg-[#f4f8fc]">
-            {/* Hero Section with exact course hero background image and layout */}
-            <div 
-                className="relative overflow-hidden bg-no-repeat bg-cover bg-right md:bg-center min-h-[250px] sm:min-h-[270px] lg:min-h-[290px] flex items-center"
-                style={{ 
-                    backgroundImage: "url('/course_hero.png')",
-                    backgroundColor: '#d6ecff'
-                }}
-            >
-                {/* Mobile overlay so text is cleanly readable on narrow screens */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#d6ecff]/90 via-[#d6ecff]/75 to-transparent sm:from-transparent sm:via-transparent sm:to-transparent pointer-events-none"></div>
+            {/* ── 1. BANNER (EXACT COURSES PAGE DESIGN & CONTENT, HOMEPAGE RESPONSIVE LOGIC) ── */}
+            <div className="relative overflow-hidden bg-[#d6ecff] border-b border-blue-100 py-4 sm:py-6 md:py-8 lg:py-10 min-h-[340px] md:min-h-[370px] lg:min-h-[420px] flex items-center">
+                
+                {/* Full-width Panoramic Background Image (Desktop & Tablet Only) */}
+                <div className="absolute inset-0 z-0">
+                    <img
+                        src="/course_hero.png"
+                        alt="Hero Background"
+                        className="w-full h-full object-cover object-[85%_center] lg:object-right hidden md:block"
+                    />
+                    {/* Responsive Contrast Overlay: Keeps text razor sharp on tablet & desktop without obscuring the student graphic */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#d6ecff] via-[#d6ecff]/95 to-transparent pointer-events-none hidden md:block lg:from-[#d6ecff]/75 lg:via-[#d6ecff]/20"></div>
+                </div>
 
-                <div className="relative z-10 max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10 w-full">
-                    <div className="flex flex-col justify-center py-4 sm:py-5 lg:py-6 max-w-xl lg:max-w-2xl">
-                        {/* Badge */}
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 text-[#0055cc] text-[11px] font-bold tracking-wide mb-2 border border-blue-200/60 shadow-xs w-fit backdrop-blur-xs">
-                            <Sparkles className="w-3.5 h-3.5" />
-                            <span>LIVE PROJECT TRAINING</span>
+                <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 w-full flex items-center">
+                    {/* Content Column: Full-width on Mobile (1-col stack), 54%-58% on Tablet/Desktop leaving the right-side student graphic clear */}
+                    <div className="w-full md:w-[55%] lg:w-[57%] xl:w-[60%] flex flex-col justify-center">
+                        
+                        {/* Top Badge: White rounded pill with blue dot */}
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white text-[#0055cc] text-[10.5px] sm:text-xs font-bold tracking-wide mb-2 sm:mb-2.5 border border-blue-100 shadow-2xs w-fit">
+                            <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+                            <span>LIVE PROJECT TRAINING • PRACTICAL CAPSTONE</span>
                         </div>
 
-                        {/* Heading */}
-                        <h1 className="font-bold text-[#0a1f3c] leading-[1.18] mb-1.5" style={{fontSize: 'clamp(20px, 2.5vw, 32px)'}}>
+                        {/* Main Heading: Exact wording and gradient styling with Homepage-like tablet & mobile typography */}
+                        <h1 className="font-bold text-[#0a1f3c] leading-[1.14] text-2xl sm:text-3xl md:text-[24px] lg:text-[34px] xl:text-[40px] tracking-tight mb-2 sm:mb-2.5">
                             Learn by Working on{' '}
-                            <span className="text-[#0055ff]">Real Projects</span>
+                            <span className="bg-gradient-to-r from-[#0055ff] via-[#2563eb] to-[#7c3aed] bg-clip-text text-transparent block sm:inline">
+                                Real Industry Projects
+                            </span>
                         </h1>
 
-                        {/* Subtitle */}
-                        <p className="text-[#3b516d] text-xs sm:text-sm leading-relaxed max-w-lg mb-2.5 font-normal">
+                        {/* Tagline */}
+                        <p className="text-[#004b93] font-bold text-xs sm:text-[13px] md:text-[12px] lg:text-[13.5px] mb-2 sm:mb-2.5 flex items-center gap-1.5">
+                            <Sparkles className="w-4 h-4 text-amber-500 flex-shrink-0" />
+                            <span>Build • Deploy • Succeed with Real-World Software Engineering</span>
+                        </p>
+
+                        {/* Description (Exact content preserved) */}
+                        <p className="text-[#475569] text-xs sm:text-[13px] md:text-[11.5px] lg:text-[13px] leading-relaxed max-w-xl mb-3 sm:mb-3.5 font-normal">
                             Gain practical, hands-on experience through live, industry-oriented projects designed for technical students to build real software and portfolio-ready work.
                         </p>
 
-                        {/* Trust badges */}
-                        <div className="flex flex-wrap items-center gap-3 sm:gap-5 mb-3">
-                            <div className="flex items-center gap-2">
-                                <div className="w-7 h-7 rounded-lg bg-amber-400 flex items-center justify-center flex-shrink-0 shadow-xs">
-                                    <Award className="w-3.5 h-3.5 text-white" />
-                                </div>
-                                <span className="text-[12px] font-semibold text-[#1e3a5f] leading-tight">College Approved Projects</span>
+                        {/* Mobile Only: Dedicated Student Visual Card (< 768px) with 3 Feature Badges on Left Open Space */}
+                        <div className="block md:hidden my-3 relative rounded-2xl overflow-hidden shadow-md border-2 border-white h-[215px] w-full">
+                            <img
+                                src="/course_hero.png"
+                                alt="Live Project Training Students"
+                                className="w-full h-full object-cover object-[88%_center]"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-r from-[#d6ecff]/50 via-transparent to-transparent pointer-events-none"></div>
+
+                            {/* Slogan Badge Top-Right */}
+                            <div className="absolute top-2 right-2 bg-white/95 backdrop-blur-xs px-2 py-0.5 rounded-lg shadow-xs rotate-[-3deg] border border-blue-100 z-10">
+                                <span className="font-semibold text-[10.5px] text-[#1d4ed8]" style={{ fontFamily: "'Caveat', cursive, sans-serif" }}>
+                                    Build • Deploy • Succeed
+                                </span>
+                                <div className="w-10 h-0.5 bg-[#fed000] rounded-full mt-0.5"></div>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center flex-shrink-0 shadow-xs">
-                                    <Users className="w-3.5 h-3.5 text-white" />
+
+                            {/* 3 Pills placed on the left open space inside the image box */}
+                            <div className="absolute inset-y-0 left-0 w-[58%] p-2.5 flex flex-col justify-around z-10">
+                                {/* 1. College Approved Projects */}
+                                <div className="flex items-center gap-2">
+                                    <div className="w-5 h-5 rounded-md bg-amber-500 text-white flex items-center justify-center flex-shrink-0 shadow-2xs">
+                                        <Award className="w-3 h-3" />
+                                    </div>
+                                    <span className="text-[10.5px] font-bold text-[#00285e] leading-tight whitespace-nowrap">
+                                        College Approved
+                                    </span>
                                 </div>
-                                <span className="text-[12px] font-semibold text-[#1e3a5f] leading-tight">1-on-1 Mentor Guidance</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-7 h-7 rounded-lg bg-violet-500 flex items-center justify-center flex-shrink-0 shadow-xs">
-                                    <FileCheck className="w-3.5 h-3.5 text-white" />
+
+                                {/* 2. 1-on-1 Mentor Guidance */}
+                                <div className="flex items-center gap-2">
+                                    <div className="w-5 h-5 rounded-md bg-emerald-500 text-white flex items-center justify-center flex-shrink-0 shadow-2xs">
+                                        <Users className="w-3 h-3" />
+                                    </div>
+                                    <span className="text-[10.5px] font-bold text-[#00285e] leading-tight whitespace-nowrap">
+                                        1-on-1 Mentorship
+                                    </span>
                                 </div>
-                                <span className="text-[12px] font-semibold text-[#1e3a5f] leading-tight">SRS & Black Book Reports</span>
+
+                                {/* 3. SRS & Black Book Reports */}
+                                <div className="flex items-center gap-2">
+                                    <div className="w-5 h-5 rounded-md bg-purple-600 text-white flex items-center justify-center flex-shrink-0 shadow-2xs">
+                                        <FileCheck className="w-3.5 h-3.5" />
+                                    </div>
+                                    <span className="text-[10.5px] font-bold text-[#00285e] leading-tight whitespace-nowrap">
+                                        SRS &amp; Project Reports
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
-                        {/* CTA Buttons */}
-                        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                        {/* 3 Features: Tablet & Desktop Only (No Background) */}
+                        <div className="hidden md:flex flex-wrap items-center gap-4 lg:gap-6 mb-4 sm:mb-5 max-w-xl">
+                            <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded-lg bg-amber-500 text-white flex items-center justify-center flex-shrink-0 shadow-xs">
+                                    <Award className="w-3.5 h-3.5" />
+                                </div>
+                                <span className="text-xs sm:text-[13px] font-bold text-[#00285e] whitespace-nowrap">
+                                    College Approved Projects
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded-lg bg-emerald-500 text-white flex items-center justify-center flex-shrink-0 shadow-xs">
+                                    <Users className="w-3.5 h-3.5" />
+                                </div>
+                                <span className="text-xs sm:text-[13px] font-bold text-[#00285e] whitespace-nowrap">
+                                    1-on-1 Mentor Guidance
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center flex-shrink-0 shadow-xs">
+                                    <FileCheck className="w-3.5 h-3.5" />
+                                </div>
+                                <span className="text-xs sm:text-[13px] font-bold text-[#00285e] whitespace-nowrap">
+                                    SRS &amp; Black Book Reports
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Action Buttons: Full-width stacked on Mobile, comfortable sizing on Tablet/Desktop */}
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
                             <a
                                 href="#projects-catalog"
-                                className="inline-flex items-center gap-2 bg-[#0055ff] hover:bg-[#0044dd] text-white font-bold text-xs sm:text-sm px-5 py-2 sm:px-6 sm:py-2.5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 active:scale-95 cursor-pointer"
+                                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#2563eb] via-[#4f46e5] to-[#7c3aed] hover:from-[#1d4ed8] hover:to-[#6d28d9] text-white font-bold text-xs md:text-[11.5px] lg:text-[13px] px-6 md:px-4 lg:px-6 py-2.5 md:py-2 lg:py-2.5 rounded-full shadow-[0_6px_16px_rgba(37,99,235,0.25)] hover:shadow-[0_10px_22px_rgba(37,99,235,0.35)] transition-all duration-200 hover:-translate-y-0.5 active:scale-95 cursor-pointer text-center"
                             >
                                 <span>Explore Live Projects</span>
                                 <ArrowRight className="w-4 h-4 stroke-[2.5]" />
                             </a>
                             <button
                                 onClick={() => openApplyModal()}
-                                className="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-[#0055ff] border border-blue-200/80 font-bold text-xs sm:text-sm px-4 py-2 sm:px-5 sm:py-2.5 rounded-full shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer"
+                                className="inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-[#00285e] hover:text-[#0055ff] font-bold text-xs md:text-[11.5px] lg:text-[13px] px-5 md:px-3.5 lg:px-5 py-2.5 md:py-2 lg:py-2.5 rounded-full border border-blue-200/90 hover:border-blue-400 shadow-xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 active:scale-95 cursor-pointer text-center"
                             >
-                                <span>Apply Now</span>
+                                <PhoneCall className="w-3.5 h-3.5 text-[#0066ff]" />
+                                <span>Apply for Live Project</span>
                             </button>
                         </div>
+
                     </div>
                 </div>
             </div>
 
-            {/* Staff Management Control Banner */}
-            <div className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10 pt-4">
-                {isStaff ? (
-                    <div className="bg-gradient-to-r from-purple-950 via-indigo-950 to-slate-900 border border-purple-500/40 rounded-2xl p-3.5 sm:p-4 text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3 relative overflow-hidden animate-in fade-in duration-300">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-                        <div className="flex items-center gap-3 relative z-10 w-full sm:w-auto">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-purple-500/30 flex-shrink-0">
-                                <ShieldCheck className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <div className="flex items-center gap-2 flex-wrap">
-                                    <span className="font-bold text-xs sm:text-sm text-white">Staff Management Mode</span>
-                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                        {currentUser?.name ? `Faculty: ${currentUser.name}` : 'Faculty: Faculty Member'}
-                                    </span>
-                                </div>
-                                <p className="text-[11px] text-purple-200/80 leading-tight mt-0.5">
-                                    All cards have active "Edit" &amp; "Delete" buttons. You can also add and publish new live projects.
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-2 relative z-10 w-full sm:w-auto justify-end flex-wrap">
-                            <button
-                                type="button"
-                                onClick={openAddModal}
-                                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-emerald-500/25 transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
-                            >
-                                <Plus className="w-4 h-4 stroke-[2.5]" />
-                                <span>Add Live Project</span>
-                            </button>
-                            <button
-                                type="button"
-                                onClick={handleResetToDefaults}
-                                title="Reset Catalog to Defaults"
-                                className="px-3 py-2 rounded-xl bg-purple-950/70 hover:bg-purple-900 text-purple-300 hover:text-white text-xs font-semibold border border-purple-500/30 flex items-center gap-1 transition-all cursor-pointer"
-                            >
-                                <RefreshCw className="w-3.5 h-3.5" />
-                                <span className="hidden sm:inline">Reset Defaults</span>
-                            </button>
-                            {isStaffQuickUnlocked && (
-                                <button
-                                    type="button"
-                                    onClick={handleStaffLock}
-                                    title="Lock Staff Mode"
-                                    className="px-3 py-2 rounded-xl bg-rose-950/60 hover:bg-rose-900 text-rose-300 hover:text-white text-xs font-semibold border border-rose-500/30 flex items-center gap-1 transition-all cursor-pointer"
-                                >
-                                    <Lock className="w-3.5 h-3.5" />
-                                    <span className="hidden sm:inline">Lock</span>
-                                </button>
-                            )}
-                        </div>
-                    </div>
-                ) : (
-                    <div className="flex justify-end">
-                        <button
-                            type="button"
-                            onClick={() => setShowStaffUnlockModal(true)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 hover:bg-purple-50 text-slate-600 hover:text-purple-700 text-[11px] font-semibold border border-slate-200 hover:border-purple-300 shadow-2xs transition-all cursor-pointer"
-                            title="Faculty / Staff Quick Access"
-                        >
-                            <KeyRound className="w-3.5 h-3.5 text-purple-600" />
-                            <span>Staff / Faculty Mode</span>
-                        </button>
-                    </div>
-                )}
-            </div>
+
 
             {/* Category Tabs Section */}
             <div id="projects-catalog" className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10 py-5 sm:py-6">
@@ -1445,6 +1401,110 @@ const LiveProject = () => {
                         })}
                     </div>
                 </div>
+
+                {/* ── 2. BANNER KE JUST UNDER — COLORFUL SEO INTRODUCTION ── */}
+                <section className="w-full bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-slate-200/90 shadow-[0_4px_25px_rgba(0,0,0,0.03)] mb-6 sm:mb-8 relative overflow-hidden">
+                    {/* Subtle ambient corner glow */}
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-blue-50/80 via-indigo-50/30 to-transparent rounded-full blur-3xl pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-sky-50/80 via-transparent to-transparent rounded-full blur-3xl pointer-events-none" />
+
+                    <div className="relative z-10 w-full">
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-6 lg:gap-8 items-center w-full">
+                            
+                            {/* Left Column (7 cols): Headings & Comprehensive Overview */}
+                            <div className="md:col-span-7 flex flex-col justify-center">
+                                <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#0055cc] text-[10px] sm:text-[11px] font-semibold tracking-wide uppercase mb-2.5 sm:mb-3 border border-blue-200/80 shadow-2xs w-fit">
+                                    <Sparkles className="w-3.5 h-3.5 text-[#0055cc]" />
+                                    <span>Practical Software Capstone</span>
+                                </div>
+
+                                <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-[#0a2540] tracking-tight mb-2.5 sm:mb-3.5 leading-tight">
+                                    Hands-On Live Software &amp; <span className="bg-gradient-to-r from-[#0055cc] via-[#2563eb] to-[#7c3aed] bg-clip-text text-transparent">Capstone Portfolios</span>
+                                </h2>
+
+                                <div className="space-y-2 text-slate-600 text-xs sm:text-[13px] lg:text-[13.5px] leading-relaxed font-normal">
+                                    <p>
+                                        Gain practical, hands-on experience through live, industry-oriented projects designed for technical students to build real software and portfolio-ready work. Work on full-stack web applications, cross-platform mobile apps, artificial intelligence models, cloud architectures, and interactive digital products.
+                                    </p>
+                                    <p className="text-slate-500 text-[11px] sm:text-xs">
+                                        Each project includes end-to-end guidance from industry mentors, comprehensive SRS project documentation, black book report assistance, and verified certification for college semester submission and job interviews.
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Right Column (5 cols): 4 Feature Cards in a 2x2 Grid */}
+                            <div className="md:col-span-5 grid grid-cols-2 gap-2.5 sm:gap-3 w-full">
+                                <div className="flex flex-col justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-[#f8fbff] hover:bg-blue-50/70 border border-blue-100/90 hover:border-blue-200 transition-all duration-200 group shadow-2xs">
+                                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-blue-100 text-[#0066ff] flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-105 transition-transform shadow-2xs">
+                                        <Code className="w-4 h-4 sm:w-5 sm:h-5" />
+                                    </div>
+                                    <div>
+                                        <div className="text-[11.5px] sm:text-[13px] font-bold text-[#0a2540] leading-tight">100% Practical</div>
+                                        <div className="text-[10px] sm:text-[11px] text-slate-500 font-medium mt-0.5 leading-snug">Production-Grade Code</div>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-[#f6fcf8] hover:bg-emerald-50/70 border border-emerald-100/90 hover:border-emerald-200 transition-all duration-200 group shadow-2xs">
+                                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-105 transition-transform shadow-2xs">
+                                        <Award className="w-4 h-4 sm:w-5 sm:h-5" />
+                                    </div>
+                                    <div>
+                                        <div className="text-[11.5px] sm:text-[13px] font-bold text-[#0a2540] leading-tight">College Approved</div>
+                                        <div className="text-[10px] sm:text-[11px] text-slate-500 font-medium mt-0.5 leading-snug">University Acceptance</div>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-[#faf8ff] hover:bg-purple-50/70 border border-purple-100/90 hover:border-purple-200 transition-all duration-200 group shadow-2xs">
+                                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-105 transition-transform shadow-2xs">
+                                        <Users className="w-4 h-4 sm:w-5 sm:h-5" />
+                                    </div>
+                                    <div>
+                                        <div className="text-[11.5px] sm:text-[13px] font-bold text-[#0a2540] leading-tight">1-on-1 Mentors</div>
+                                        <div className="text-[10px] sm:text-[11px] text-slate-500 font-medium mt-0.5 leading-snug">Sprint &amp; Viva Guidance</div>
+                                    </div>
+                                </div>
+
+                                <NavLink
+                                    to="/Placement"
+                                    className="flex flex-col justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-[#fffbf5] hover:bg-amber-50/70 border border-amber-100/90 hover:border-amber-200 transition-all duration-200 group shadow-2xs cursor-pointer"
+                                >
+                                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-105 transition-transform shadow-2xs">
+                                        <Briefcase className="w-4 h-4 sm:w-5 sm:h-5" />
+                                    </div>
+                                    <div>
+                                        <div className="text-[11.5px] sm:text-[13px] font-bold text-[#0a2540] leading-tight flex items-center justify-between">
+                                            <span>Placement Ready</span>
+                                            <ArrowRight className="w-3 h-3 text-amber-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                                        </div>
+                                        <div className="text-[10px] sm:text-[11px] text-slate-500 font-medium mt-0.5 leading-snug">Portfolio Showcase</div>
+                                    </div>
+                                </NavLink>
+                            </div>
+
+                            {/* Explore More Academic & Career Pillars */}
+                            <div className="md:col-span-12 pt-3 mt-1 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-slate-50/80 rounded-xl p-2.5 sm:px-4">
+                                <div className="flex items-center gap-1.5 sm:gap-2">
+                                    <Sparkles className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
+                                    <span className="text-[11.5px] sm:text-xs font-bold text-[#0a2540]">Explore Career Pathways:</span>
+                                </div>
+                                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                                    <NavLink to="/Courses" className="inline-flex items-center gap-1 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-800 text-[10.5px] sm:text-xs font-semibold border border-blue-200 transition-all hover:scale-105">
+                                        <span>📚 Professional Courses</span>
+                                    </NavLink>
+                                    <NavLink to="/UniversityCourses" className="inline-flex items-center gap-1 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[10.5px] sm:text-xs font-semibold border border-emerald-200 transition-all hover:scale-105">
+                                        <span>🎓 University Programs</span>
+                                    </NavLink>
+                                    <NavLink to="/CorporateTraining" className="inline-flex items-center gap-1 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-orange-50 hover:bg-orange-100 text-orange-800 text-[10.5px] sm:text-xs font-semibold border border-orange-200 transition-all hover:scale-105">
+                                        <span>🏢 Corporate Training</span>
+                                    </NavLink>
+                                    <NavLink to="/Placement" className="inline-flex items-center gap-1 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-800 text-[10.5px] sm:text-xs font-semibold border border-rose-200 transition-all hover:scale-105">
+                                        <span>💼 Placement Cell</span>
+                                    </NavLink>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
                 {/* Active Category Header with Center Icon and Accent Lines */}
                 <div className="text-center mb-8 sm:mb-10">
@@ -2126,49 +2186,7 @@ const LiveProject = () => {
                 </div>
             )}
 
-            {/* Staff PIN Unlock Security Modal */}
-            {showStaffUnlockModal && (
-                <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
-                    <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 relative">
-                        <button
-                            type="button"
-                            onClick={() => { setShowStaffUnlockModal(false); setStaffPinError(''); setStaffPinInput(''); }}
-                            className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors"
-                        >
-                            <X className="w-4 h-4" />
-                        </button>
-                        <div className="text-center mb-5">
-                            <div className="w-12 h-12 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center mx-auto mb-3 shadow-inner">
-                                <KeyRound className="w-6 h-6" />
-                            </div>
-                            <h3 className="font-bold text-slate-900 text-base">Faculty &amp; Staff Access</h3>
-                            <p className="text-xs text-slate-500 mt-1">Enter Master PIN to enable live project editing and deletion</p>
-                        </div>
-                        <form onSubmit={handleStaffUnlockSubmit} className="space-y-4">
-                            <div>
-                                <input
-                                    type="password"
-                                    maxLength={8}
-                                    placeholder="Enter 4-digit PIN (2580)"
-                                    value={staffPinInput}
-                                    onChange={(e) => { setStaffPinInput(e.target.value); setStaffPinError(''); }}
-                                    className="w-full text-center text-lg tracking-widest font-mono font-bold px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-100"
-                                    autoFocus
-                                />
-                                {staffPinError && (
-                                    <p className="text-[11px] text-red-500 mt-1.5 text-center font-medium">{staffPinError}</p>
-                                )}
-                            </div>
-                            <button
-                                type="submit"
-                                className="w-full bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white font-bold text-xs py-2.5 rounded-xl shadow-md transition-all cursor-pointer"
-                            >
-                                Unlock Staff Mode
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            )}
+
 
             {/* Toast Notification */}
             {toastMsg && (

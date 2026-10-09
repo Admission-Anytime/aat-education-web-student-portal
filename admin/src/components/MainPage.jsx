@@ -1090,7 +1090,14 @@ export default function MainPage() {
                                 </div>
                                 <div>
                                     <h3 className="text-xl font-semibold text-gray-800 mb-2">Address</h3>
-                                    <p className="text-gray-600">Plot No. 14, DLF Dilshad Extn. II (Near DLF Toll Plaza) Ghaziabad, Uttar Pradesh – 201011</p>
+                                    <a
+                                        href="https://www.google.com/search?q=aayush+institute+of+professional+studies"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-gray-600 hover:text-blue-600 transition-colors block"
+                                    >
+                                        S-14, DLF Dilshad Extention II, Bhopura, Sahibabad, Ghaziabad, Uttar Pradesh 201006
+                                    </a>
                                 </div>
                             </div>
 
@@ -1100,7 +1107,11 @@ export default function MainPage() {
                                 </div>
                                 <div>
                                     <h3 className="text-xl font-semibold text-gray-800 mb-2">Phone</h3>
-                                    <p className="text-gray-600">+91 0120 2611111</p>
+                                    <p className="text-gray-600">
+                                        <a href="tel:09350157447" className="hover:text-blue-600 font-medium">093501 57447</a>
+                                        <span className="mx-2">•</span>
+                                        <a href="tel:+919311050670" className="hover:text-blue-600 font-medium">+91-9311050670</a>
+                                    </p>
                                 </div>
                             </div>
 

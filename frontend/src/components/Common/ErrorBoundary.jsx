@@ -22,8 +22,9 @@ class ErrorBoundary extends React.Component {
         try {
             localStorage.removeItem('aayush_custom_courses');
             localStorage.removeItem('aayush_university_courses_custom');
+            localStorage.removeItem('aayush_news_custom');
         } catch {}
-        window.location.href = '/Courses';
+        window.location.reload();
     };
 
     render() {
@@ -37,9 +38,14 @@ class ErrorBoundary extends React.Component {
                         <h2 className="text-xl font-bold text-slate-900 mb-2">
                             Something went wrong
                         </h2>
-                        <p className="text-slate-600 text-xs sm:text-sm mb-6 leading-relaxed">
-                            A display error occurred while rendering this page. You can reload the page or reset the course cache to restore normal view.
+                        <p className="text-slate-600 text-xs sm:text-sm mb-4 leading-relaxed">
+                            A display error occurred while rendering this page. You can reload the page or reset the cache to restore normal view.
                         </p>
+                        {this.state.error && (
+                            <div className="mb-5 text-left p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-[11px] font-mono overflow-auto max-h-32">
+                                {this.state.error.message || String(this.state.error)}
+                            </div>
+                        )}
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                             <button
                                 onClick={this.handleReload}
@@ -51,7 +57,7 @@ class ErrorBoundary extends React.Component {
                                 onClick={this.handleResetCache}
                                 className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-colors cursor-pointer"
                             >
-                                Reset Courses Cache
+                                Reset Cache & Reload
                             </button>
                         </div>
                     </div>
