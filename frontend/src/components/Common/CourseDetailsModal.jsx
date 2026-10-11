@@ -23,9 +23,12 @@ import {
     Zap,
     X,
     ChevronRight,
+    ChevronLeft,
     Compass,
     Clock
 } from 'lucide-react';
+import { courseApi } from '../../services/api';
+import { getAllDefaultCoursesFlat } from '../../data/coursesData';
 
 export const WhatsAppIcon = ({ className = "w-5 h-5" }) => (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor">
@@ -59,24 +62,40 @@ export const QRCodeWidget = ({ qrSrc, waNumber = "919311050670" }) => {
 export const CourseDetailsPoster = ({ course, isModal = false, onClose, onSelectCourse }) => {
     if (!course) return null;
 
-    const [otherCourses, setOtherCourses] = useState([]);
+    const [otherCourses, setOtherCourses] = useState(() => {
+        try {
+            return getAllDefaultCoursesFlat();
+        } catch {
+            return [];
+        }
+    });
     const [loadingOtherCourses, setLoadingOtherCourses] = useState(false);
     const [enquirySettings, setEnquirySettings] = useState(null);
+    const otherCoursesScrollRef = useRef(null);
+
+    const scrollOtherCourses = (direction) => {
+        if (!otherCoursesScrollRef.current) return;
+        const scrollAmount = 340;
+        otherCoursesScrollRef.current.scrollBy({
+            left: direction === 'left' ? -scrollAmount : scrollAmount,
+            behavior: 'smooth'
+        });
+    };
 
     useEffect(() => {
         let isMounted = true;
         const fetchCourses = async () => {
             try {
                 setLoadingOtherCourses(true);
-                const res = await fetch('/api/courses');
-                if (res.ok) {
-                    const data = await res.json();
-                    if (isMounted && Array.isArray(data)) {
-                        setOtherCourses(data.filter(c => c.visible !== false));
+                const res = await courseApi.getAll();
+                if (res && res.data && res.data.length > 0) {
+                    if (isMounted) {
+                        setOtherCourses(res.data.filter(c => c.visible !== false));
                     }
+                    return;
                 }
             } catch (err) {
-                console.warn('Failed to load other courses in modal:', err);
+                console.warn('Failed to load other courses via courseApi, falling back to defaults:', err);
             } finally {
                 if (isMounted) setLoadingOtherCourses(false);
             }
@@ -101,6 +120,14 @@ export const CourseDetailsPoster = ({ course, isModal = false, onClose, onSelect
         fetchEnquirySettings();
         return () => { isMounted = false; };
     }, []);
+
+    const displayOtherCourses = otherCourses.filter(c => {
+        const activeId = course.id || course._id;
+        const cId = c.id || c._id;
+        if (activeId && cId && String(activeId) === String(cId)) return false;
+        if (c.name && course.name && c.name.toLowerCase().trim() === course.name.toLowerCase().trim()) return false;
+        return true;
+    });
 
     const highlightItems = [];
     const courseName = course.name || course.title || '';
@@ -726,6 +753,148 @@ export const CourseDetailsPoster = ({ course, isModal = false, onClose, onSelect
                     </div>
                 </div>
             </div>
+
+            {/* ──── 3. BOTTOM SECTION: OTHER COURSES CAROUSEL / CARDS ──── */}
+            {displayOtherCourses.length > 0 && (
+                <div className="mt-7 sm:mt-9 pt-6 sm:pt-8 border-t border-slate-200/90">
+                    {/* Header with Title and Scroll Controls */}
+                    <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5">
+                        <div>
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-[#0066ff] text-[11px] font-semibold border border-blue-200/80 mb-2 shadow-2xs">
+                                <Sparkles className="w-3.5 h-3.5 text-[#0066ff]" />
+                                <span>Recommended Learning Pathways</span>
+                            </div>
+                            <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-[#0a2540] tracking-tight">
+                                Explore Other In-Demand Courses
+                            </h3>
+                            <p className="text-xs sm:text-[13px] text-slate-500 mt-1">
+                                Enhance your portfolio with industry-recognized certifications & professional tracks
+                            </p>
+                        </div>
+
+                        {/* Navigation Buttons */}
+                        <div className="flex items-center gap-2 self-end sm:self-auto">
+                            <button
+                                type="button"
+                                onClick={() => scrollOtherCourses('left')}
+                                className="w-9 h-9 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-[#0066ff] hover:border-blue-300 hover:bg-blue-50/50 flex items-center justify-center transition-all cursor-pointer shadow-2xs active:scale-95"
+                                title="Previous Courses"
+                                aria-label="Previous Courses"
+                            >
+                                <ChevronLeft className="w-4 h-4" />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => scrollOtherCourses('right')}
+                                className="w-9 h-9 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-[#0066ff] hover:border-blue-300 hover:bg-blue-50/50 flex items-center justify-center transition-all cursor-pointer shadow-2xs active:scale-95"
+                                title="Next Courses"
+                                aria-label="Next Courses"
+                            >
+                                <ChevronRight className="w-4 h-4" />
+                            </button>
+                            <NavLink
+                                to="/Courses"
+                                onClick={onClose}
+                                className="ml-1 inline-flex items-center gap-1 text-xs font-semibold text-[#0066ff] hover:text-blue-700 px-3 py-2 rounded-xl bg-blue-50/80 hover:bg-blue-100 transition-colors shadow-2xs"
+                            >
+                                <span>View All</span>
+                                <ArrowRight className="w-3.5 h-3.5" />
+                            </NavLink>
+                        </div>
+                    </div>
+
+                    {/* Scrollable Course Cards Row */}
+                    <div
+                        ref={otherCoursesScrollRef}
+                        className="flex gap-4 overflow-x-auto pb-4 pt-1 snap-x scroll-smooth custom-modal-scroll"
+                        style={{ scrollbarWidth: 'thin' }}
+                    >
+                        {displayOtherCourses.map((otherCourse, oIdx) => {
+                            const cImg = otherCourse.image || (oIdx % 2 === 0 ? '/course_mern.jpg' : '/course_web_design.jpg');
+                            const cTitle = otherCourse.name || otherCourse.title || 'Course';
+                            const cCategory = otherCourse.categoryName || otherCourse.subgroup || 'Professional Course';
+                            const cDuration = otherCourse.duration || '3–6 Months';
+                            const cLevel = otherCourse.level || 'Beginner to Advanced';
+                            const cDesc = otherCourse.oneLiner || otherCourse.details || otherCourse.subtitle || '';
+
+                            return (
+                                <div
+                                    key={otherCourse.id || otherCourse._id || oIdx}
+                                    onClick={() => onSelectCourse && onSelectCourse(otherCourse)}
+                                    className="min-w-[270px] max-w-[270px] sm:min-w-[300px] sm:max-w-[300px] bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xl hover:border-blue-300 transition-all duration-300 flex flex-col justify-between overflow-hidden group cursor-pointer snap-start flex-shrink-0"
+                                >
+                                    {/* Course Image & Badges */}
+                                    <div className="relative h-36 sm:h-40 w-full overflow-hidden bg-slate-100">
+                                        <img
+                                            src={cImg.startsWith('http') || cImg.startsWith('/') ? cImg : `/${cImg}`}
+                                            alt={cTitle}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            onError={(e) => {
+                                                e.currentTarget.onerror = null;
+                                                e.currentTarget.src = '/course_mern.jpg';
+                                            }}
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"></div>
+
+                                        {/* Category Badge */}
+                                        <div className="absolute top-2.5 left-2.5">
+                                            <span className="inline-block px-2.5 py-0.5 rounded-lg bg-white/95 backdrop-blur-xs text-[#0a2540] text-[10px] sm:text-[10.5px] font-bold shadow-xs">
+                                                {cCategory}
+                                            </span>
+                                        </div>
+
+                                        {/* Meta Tags */}
+                                        <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between text-white text-[10px]">
+                                            <span className="inline-flex items-center gap-1 font-medium bg-black/45 backdrop-blur-xs px-2 py-0.5 rounded-md">
+                                                <Clock className="w-3 h-3 text-cyan-300" />
+                                                <span>{cDuration}</span>
+                                            </span>
+                                            {otherCourse.popular && (
+                                                <span className="inline-flex items-center gap-1 font-bold bg-amber-500 text-slate-950 px-2 py-0.5 rounded-md">
+                                                    <Star className="w-3 h-3 fill-slate-950" />
+                                                    <span>Popular</span>
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Card Content */}
+                                    <div className="p-3.5 sm:p-4 flex flex-col flex-1 justify-between">
+                                        <div>
+                                            <h4 className="text-xs sm:text-sm font-bold text-[#0a2540] group-hover:text-[#0066ff] transition-colors line-clamp-1 mb-1" title={cTitle}>
+                                                {cTitle}
+                                            </h4>
+                                            {cDesc && (
+                                                <p className="text-[10.5px] sm:text-[11px] text-slate-500 line-clamp-2 leading-relaxed mb-2.5">
+                                                    {cDesc}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        {/* Bottom Action Footer */}
+                                        <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2 mt-auto">
+                                            <span className="text-[10px] sm:text-[10.5px] font-medium text-slate-600 truncate max-w-[120px]">
+                                                {cLevel}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    if (onSelectCourse) onSelectCourse(otherCourse);
+                                                }}
+                                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-blue-50 text-[#0066ff] group-hover:bg-[#0066ff] group-hover:text-white font-semibold text-[10.5px] sm:text-[11px] transition-all flex-shrink-0 cursor-pointer shadow-2xs"
+                                            >
+                                                <span>View Details</span>
+                                                <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
 
             {/* Mobile Sticky Quick CTA Bar */}
             <div className="md:hidden sticky bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md p-2.5 border-t border-slate-200/90 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] flex items-center gap-2 -mx-3.5 -mb-3.5 mt-4 rounded-b-3xl">

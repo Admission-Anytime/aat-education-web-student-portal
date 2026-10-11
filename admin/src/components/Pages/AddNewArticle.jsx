@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { getUploadUrl } from "../../config";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
@@ -172,7 +173,7 @@ console.log(editingEntry.readTime);
           />
           {editingEntry && editingEntry.image && !image && (
             <img
-              src={`http://localhost:4001/Uploads/${editingEntry.image}`}
+              src={getUploadUrl(`Uploads/${editingEntry.image}`)}
               alt="current"
               className="mt-2 w-32 h-32 object-cover rounded"
             />

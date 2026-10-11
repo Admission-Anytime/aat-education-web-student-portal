@@ -1,5 +1,21 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/api/:match*",
+      "destination": "https://aayushinstitute.onrender.com/api/:match*"
+    },
+    {
+      "source": "/Uploads/:match*",
+      "destination": "https://aayushinstitute.onrender.com/Uploads/:match*"
+    },
+    {
+      "source": "/uploads/:match*",
+      "destination": "https://aayushinstitute.onrender.com/uploads/:match*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
+

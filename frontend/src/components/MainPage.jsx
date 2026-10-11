@@ -976,8 +976,9 @@ const DEFAULT_HERO_SETTINGS = {
 const resolveHeroImageUrl = (img) => {
   if (!img) return "/hero_downloaded_bg.png";
   if (img.startsWith("http://") || img.startsWith("https://") || img.startsWith("data:")) return img;
-  if (img.startsWith("/Uploads/")) return `http://localhost:4001${img}`;
-  if (img.startsWith("Uploads/")) return `http://localhost:4001/${img}`;
+  const backend = import.meta.env.VITE_BACKEND_URL || "https://aayushinstitute.onrender.com";
+  if (img.startsWith("/Uploads/")) return `${backend}${img}`;
+  if (img.startsWith("Uploads/")) return `${backend}/${img}`;
   if (img.startsWith("/")) return img;
   return `/${img}`;
 };
@@ -1108,7 +1109,7 @@ export default function MainPage() {
                 image: b.coverImage 
                   ? (b.coverImage.startsWith('http') || b.coverImage.startsWith('/') 
                       ? b.coverImage 
-                      : `http://localhost:4001/${b.coverImage}`)
+                      : `${import.meta.env.VITE_BACKEND_URL || 'https://aayushinstitute.onrender.com'}/${b.coverImage}`)
                   : '/corporate_ai.jpg',
                 tag: b.tag || b.category || 'Career',
                 title: b.title,

@@ -92,23 +92,24 @@ export default function AdminLogin() {
     setIsLoading(true);
 
     try {
-      let res;
-      try {
-        res = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, roleHint: selectedRole }),
-        });
-      } catch (networkErr) {
-        const backendBase = import.meta.env.VITE_BACKEND_URL || "http://localhost:4001";
-        res = await fetch(`${backendBase}/api/auth/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, roleHint: selectedRole }),
-        });
-      }
+      const backendBase = import.meta.env.VITE_BACKEND_URL || "https://aayushinstitute.onrender.com";
+      const targetUrl = `${backendBase}/api/auth/login`;
 
-      const result = await res.json();
+      const res = await fetch(targetUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, roleHint: selectedRole }),
+      });
+
+      const text = await res.text();
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch (parseErr) {
+        throw new Error(
+          "Backend server starting up or not ready yet. Please wait 20-30 seconds and click Sign In again."
+        );
+      }
 
       // Check if account is blocked due to pending admin approval
       if (res.status === 403 || result.accountPending) {
@@ -171,7 +172,6 @@ export default function AdminLogin() {
     setIsLoading(true);
 
     try {
-      let res;
       const payload = {
         name: regForm.name,
         email: regForm.email,
@@ -184,22 +184,25 @@ export default function AdminLogin() {
         batch: regForm.batch,
       };
 
+      const backendBase = import.meta.env.VITE_BACKEND_URL || "https://aayushinstitute.onrender.com";
+      const targetUrl = `${backendBase}/api/auth/register-request`;
+
+      const res = await fetch(targetUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const text = await res.text();
+      let result;
       try {
-        res = await fetch("/api/auth/register-request", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-      } catch (err) {
-        const backendBase = import.meta.env.VITE_BACKEND_URL || "http://localhost:4001";
-        res = await fetch(`${backendBase}/api/auth/register-request`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+        result = JSON.parse(text);
+      } catch (parseErr) {
+        throw new Error(
+          "Backend server starting up or not ready yet. Please wait 20-30 seconds and try again."
+        );
       }
 
-      const result = await res.json();
       if (!res.ok) {
         throw new Error(result.message || "Failed to submit registration");
       }

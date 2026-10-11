@@ -23,7 +23,7 @@ import {
   GraduationCap
 } from "lucide-react";
 
-const BACKEND_BASE = import.meta.env.VITE_BACKEND_URL || "http://localhost:4001";
+const BACKEND_BASE = import.meta.env.VITE_BACKEND_URL || "https://aayushinstitute.onrender.com";
 const WEBSITE_URL = import.meta.env.VITE_WEBSITE_URL || "http://localhost:5174";
 const DEFAULT_AVATAR = "/rahul_sharma_avatar.jpg";
 

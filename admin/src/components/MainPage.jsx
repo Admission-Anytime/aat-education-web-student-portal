@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 
 import axios from "axios";
+import { getUploadUrl } from "../config";
 import { createPortal } from "react-dom";
 
 export default function MainPage() {
@@ -92,7 +93,7 @@ export default function MainPage() {
         const dataWithUrl = res.data.map((t) => ({
           ...t,
           profileImageUrl: t.profileImage
-            ? `http://localhost:4001${t.profileImage}` // ✅ add backend host
+            ? getUploadUrl(t.profileImage)
             : "/default-profile.jpg", // fallback
         }));
         console.log(dataWithUrl);
@@ -715,7 +716,7 @@ export default function MainPage() {
               >
                 {item.imagename ? (
                   <img
-                    src={`http://localhost:4001/Uploads/${item.imagename}`}
+                    src={getUploadUrl(`Uploads/${item.imagename}`)}
                     alt={item.title || "Campus"}
                     className="w-full h-full object-cover"
                   />
@@ -966,7 +967,7 @@ export default function MainPage() {
                 <div className=" overflow-hidden  flex flex-col ">
                   <a href="#" className="block overflow-hidden ">
                     <img
-                      src={`http://localhost:4001/Uploads/${featuredPost.image}`}
+                      src={getUploadUrl(`Uploads/${featuredPost.image}`)}
                       alt={featuredPost.title}
                       className="w-full h-auto object-cover hover:scale-105 transition-transform duration-300"
                     />
@@ -992,12 +993,12 @@ export default function MainPage() {
                 {smallPosts.map((post) => (
                   <a
                     key={post._id}
-                    href={`http://localhost:5173/news/${post._id}`} // optional link to detail page
+                    href={`/news/${post._id}`} // link to detail page
                     className="flex gap-4 group hover:bg-gray-100 p-2 rounded-md transition-colors"
                   >
                     <div className="flex-shrink-0 w-20 h-20 overflow-hidden rounded">
                       <img
-                        src={`http://localhost:4001/Uploads/${post.image}`}
+                        src={getUploadUrl(`Uploads/${post.image}`)}
                         alt={post.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                       />

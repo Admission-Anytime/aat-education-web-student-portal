@@ -262,8 +262,9 @@ const getTagTheme = (tag = '') => {
 const resolveImageUrl = (img) => {
   if (!img) return '/corporate_ai.jpg';
   if (img.startsWith('http') || img.startsWith('data:')) return img;
-  if (img.startsWith('/Uploads/') || img.startsWith('/uploads/')) return `http://localhost:4001${img}`;
-  if (img.startsWith('Uploads/') || img.startsWith('uploads/')) return `http://localhost:4001/${img}`;
+  const backend = import.meta.env.VITE_BACKEND_URL || 'https://aayushinstitute.onrender.com';
+  if (img.startsWith('/Uploads/') || img.startsWith('/uploads/')) return `${backend}${img}`;
+  if (img.startsWith('Uploads/') || img.startsWith('uploads/')) return `${backend}/${img}`;
   if (img.startsWith('/')) return img;
   return `/${img}`;
 };

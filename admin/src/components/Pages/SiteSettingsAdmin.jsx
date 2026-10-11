@@ -133,7 +133,8 @@ export default function SiteSettingsAdmin() {
     }
     if (coverImage.startsWith("/Uploads/") || coverImage.startsWith("Uploads/")) {
       const cleanPath = coverImage.startsWith("/") ? coverImage : `/${coverImage}`;
-      return `http://localhost:4001${cleanPath}`;
+      const backendBase = import.meta.env.VITE_BACKEND_URL || "https://aayushinstitute.onrender.com";
+      return `${backendBase}${cleanPath}`;
     }
     return coverImage.startsWith("/") ? coverImage : `/${coverImage}`;
   };
@@ -2333,7 +2334,7 @@ export default function SiteSettingsAdmin() {
                     <img
                       src={
                         settings.modalWhatsAppEnquiry?.qrImage?.startsWith("/Uploads/")
-                          ? `http://localhost:4001${settings.modalWhatsAppEnquiry?.qrImage}`
+                          ? `${import.meta.env.VITE_BACKEND_URL || "https://aayushinstitute.onrender.com"}${settings.modalWhatsAppEnquiry?.qrImage}`
                           : (settings.modalWhatsAppEnquiry?.qrImage || "/whatsapp_qr.png")
                       }
                       alt="WhatsApp QR Code Preview"

@@ -1,6 +1,7 @@
 //testimonial navbar
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { getUploadUrl } from "../../config";
 
 const TestimonialPage = () => {
   const [testimonials, setTestimonials] = useState([]);
@@ -14,7 +15,7 @@ const TestimonialPage = () => {
         const dataWithUrl = res.data.map((t) => ({
           ...t,
           profileImageUrl: t.profileImage
-            ? `http://localhost:4001${t.profileImage}`
+            ? getUploadUrl(t.profileImage)
             : fallbackImage,
         }));
         setTestimonials(dataWithUrl);

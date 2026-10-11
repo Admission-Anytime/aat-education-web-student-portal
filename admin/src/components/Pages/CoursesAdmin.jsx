@@ -40,6 +40,8 @@ import {
   ArrowLeft
 } from "lucide-react";
 
+import { FALLBACK_INSTITUTE_COURSES } from "../../data/fallbackCourses";
+
 // Default placeholder images matching the exact lab/workstation theme in screenshots
 const DEFAULT_IMAGES = [
   "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80", // UI/UX workstation
@@ -158,12 +160,43 @@ export default function CoursesAdmin({
     }
   };
 
-  // Load courses from backend MongoDB
+  // Load courses from backend MongoDB (with auto-seed & offline resilience)
   const fetchCourses = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("/api/courses");
-      const list = Array.isArray(res.data) ? res.data : res.data?.data || [];
+      let list = [];
+      try {
+        const res = await axios.get("/api/courses");
+        list = Array.isArray(res?.data) ? res.data : res?.data?.data || [];
+      } catch (primaryErr) {
+        console.warn("Primary /api/courses fetch failed, trying direct endpoint:", primaryErr);
+        const isLocal = typeof window !== 'undefined' && 
+          (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+        const fallbackUrl = isLocal 
+          ? "http://localhost:4001/api/courses" 
+          : "https://aayushinstitute.onrender.com/api/courses";
+        try {
+          const fbRes = await axios.get(fallbackUrl);
+          list = Array.isArray(fbRes?.data) ? fbRes.data : fbRes?.data?.data || [];
+        } catch (fbErr) {
+          console.warn("Direct endpoint also failed:", fbErr);
+        }
+      }
+
+      // If backend returned 0 courses, trigger auto-seed
+      if (!list || list.length === 0) {
+        try {
+          const seedRes = await axios.get("/api/courses/seed");
+          list = seedRes?.data?.courses || (Array.isArray(seedRes?.data) ? seedRes.data : []);
+        } catch (seedErr) {
+          console.warn("Auto-seed endpoint error:", seedErr);
+        }
+      }
+
+      // If still empty (e.g. backend sleeping, cold start or offline), use guaranteed fallback courses
+      if (!list || list.length === 0) {
+        list = FALLBACK_INSTITUTE_COURSES;
+      }
 
       // Normalize missing fields to match ERP structure
       const normalized = list.map((c, idx) => {
@@ -225,7 +258,7 @@ export default function CoursesAdmin({
       setCourses(normalized);
     } catch (err) {
       console.error("Failed to load courses:", err);
-      showNotice("error", "Failed to connect to backend database.");
+      setCourses(FALLBACK_INSTITUTE_COURSES);
     } finally {
       setLoading(false);
     }

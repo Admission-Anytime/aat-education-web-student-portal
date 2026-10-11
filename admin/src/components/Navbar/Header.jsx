@@ -3,6 +3,7 @@ import logo_image from "../../assets/img/Logo.jpg";
 import { NavLink } from "react-router-dom";
 import { Menu } from "lucide-react";
 import axios from "axios";
+import { getUploadUrl } from "../../config";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -44,7 +45,7 @@ const Header = () => {
                 {currentInstitute.logo ? (
                   <img
                     className="h-20"
-                    src={`http://localhost:4001/Uploads/${currentInstitute.logo}`}
+                    src={getUploadUrl(`Uploads/${currentInstitute.logo}`)}
                     alt="Institute Logo"
                   />
                 ) : (

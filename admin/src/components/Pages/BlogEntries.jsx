@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AddNewBlog from "./AddNewBlog";
 import axios from "axios";
+import { getUploadUrl } from "../../config";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/solid";
 
 const BlogEntriesPage = () => {
@@ -145,7 +146,7 @@ const BlogEntriesPage = () => {
                     </td>
                     <td className="px-6 py-4">
                       <img
-                        src={`http://localhost:4001/uploads/${entry.sliderImage}` || fallbackImage}
+                        src={entry.sliderImage ? getUploadUrl(`uploads/${entry.sliderImage}`) : fallbackImage}
                         alt={entry.title + " Slider"}
                         className="h-16 w-24 object-cover rounded-md border"
                       />

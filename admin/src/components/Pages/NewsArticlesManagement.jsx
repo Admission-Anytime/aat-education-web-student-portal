@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { getUploadUrl } from "../../config";
 import { PencilSquareIcon, TrashIcon,EyeSlashIcon, EyeIcon } from "@heroicons/react/24/outline";
 import AddNewArticle from "./AddNewArticle";
 function NewsArticlesManagement() {
@@ -202,7 +203,7 @@ const toggleVisibility = async (id) => {
                     </td>
                     <td className="px-4 py-4 text-center">
                       <img
-                        src={`http://localhost:4001/Uploads/${entry.image}`}
+                        src={getUploadUrl(`Uploads/${entry.image}`)}
                         alt={entry.title}
                         className="w-20 h-20 sm:w-16 sm:h-16 object-cover mx-auto rounded"
                       />
@@ -286,7 +287,7 @@ const toggleVisibility = async (id) => {
                 </div>
                 <div className="flex justify-center">
                   <img
-                    src={`http://localhost:4001/Uploads/${entry.image}`}
+                    src={getUploadUrl(`Uploads/${entry.image}`)}
                     alt={entry.title}
                     className="w-32 h-32 object-cover rounded"
                   />

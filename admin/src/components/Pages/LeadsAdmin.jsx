@@ -20,6 +20,17 @@ import {
   Trash2,
   Edit,
   ExternalLink,
+  Eye,
+  Copy,
+  Check,
+  GraduationCap,
+  Briefcase,
+  Calendar,
+  User,
+  FileText,
+  X,
+  Sparkles,
+  MapPin,
 } from "lucide-react";
 
 const LeadsAdmin = () => {
@@ -28,10 +39,19 @@ const LeadsAdmin = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [typeFilter, setTypeFilter] = useState("all"); // "all", "admission", "placement"
-  const [sessionFilter, setSessionFilter] = useState("2024–25");
+  const [sessionFilter, setSessionFilter] = useState("All");
   const [pageSize, setPageSize] = useState(25);
   const [currentPage, setCurrentPage] = useState(1);
   const [activeMenu, setActiveMenu] = useState(null); // { id, record, top, right }
+  const [viewModalRecord, setViewModalRecord] = useState(null);
+  const [copiedField, setCopiedField] = useState(null);
+
+  const copyToClipboard = (text, fieldName) => {
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    setCopiedField(fieldName);
+    setTimeout(() => setCopiedField(null), 2000);
+  };
 
   // Close menu on scroll or resize so it stays locked with UI
   useEffect(() => {
@@ -49,11 +69,12 @@ const LeadsAdmin = () => {
   const [formData, setFormData] = useState({
     name: "",
     fatherName: "",
-    className: "Class 1",
+    className: "Software & Full Stack Development",
     email: "",
     phone: "",
     status: "Pending",
-    session: "2024–25",
+    session: "2026–27",
+    notes: "",
   });
 
   const fetchRecords = async (silent = false) => {
@@ -115,11 +136,12 @@ const LeadsAdmin = () => {
       setFormData({
         name: "",
         fatherName: "",
-        className: "Class 1",
+        className: "Software & Full Stack Development",
         email: "",
         phone: "",
         status: "Pending",
-        session: "2024–25",
+        session: "2026–27",
+        notes: "",
       });
       fetchRecords();
     } catch (err) {
@@ -130,12 +152,12 @@ const LeadsAdmin = () => {
   // Export to CSV
   const handleExportCSV = () => {
     if (records.length === 0) return alert("No records to export");
-    const headers = ["Admission ID", "Student Name", "Father Name", "Class/Course", "Email", "Phone", "Reg. Date", "Status"];
+    const headers = ["Admission ID", "Student Name", "Guardian", "Course / Program", "Email", "Phone", "Reg. Date", "Status"];
     const rows = records.map((r) => [
-      r.admissionId || "N/A",
+      (r.admissionId || "N/A").replace(/ADM-\s+/g, 'ADM-'),
       `"${r.name || ""}"`,
       `"${r.fatherName || ""}"`,
-      `"${r.className || r.course || r.program || ""}"`,
+      `"${r.careerDomain || r.className || r.course || r.program || ""}"`,
       r.email || "",
       r.phone || "",
       r.createdAt ? new Date(r.createdAt).toLocaleDateString("en-GB") : "",
@@ -308,10 +330,10 @@ const LeadsAdmin = () => {
 
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-xs font-bold shadow-md shadow-indigo-600/25 transition transform hover:scale-102 active:scale-98"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-xs font-bold shadow-md shadow-indigo-600/25 transition transform hover:scale-102 active:scale-98 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>+ New Registration</span>
+            <span>New Registration</span>
           </button>
         </div>
       </div>
@@ -408,12 +430,16 @@ const LeadsAdmin = () => {
         <div className="flex items-center gap-3">
           <select
             value={sessionFilter}
-            onChange={(e) => setSessionFilter(e.target.value)}
-            className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 shadow-2xs focus:outline-none"
+            onChange={(e) => {
+              setSessionFilter(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 shadow-2xs focus:outline-none cursor-pointer"
           >
-            <option value="2024–25">2024–25</option>
-            <option value="2025–26">2025–26</option>
+            <option value="All">All Sessions</option>
             <option value="2026–27">2026–27</option>
+            <option value="2025–26">2025–26</option>
+            <option value="2024–25">2024–25</option>
           </select>
 
           <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
@@ -435,16 +461,15 @@ const LeadsAdmin = () => {
         </div>
       </div>
 
-      {/* ── Registration Records Table (Pixel-perfect matching screenshot) ── */}
-      <div className="overflow-x-auto rounded-2xl border border-slate-100 min-h-[160px]">
+      {/* ── Registration Records Table ── */}
+      <div className="overflow-x-auto rounded-2xl border border-slate-200/90 shadow-2xs min-h-[160px]">
         <table className="w-full text-left text-xs border-collapse">
           <thead>
-            <tr className="border-b border-slate-200 bg-slate-50/60 text-slate-400 font-bold uppercase tracking-wider text-[11px]">
-              <th className="py-4 px-4 font-semibold">STUDENT</th>
+            <tr className="border-b border-slate-200 bg-slate-50/80 text-slate-500 font-bold uppercase tracking-wider text-[11px]">
+              <th className="py-4 px-4 font-semibold">STUDENT & GUARDIAN</th>
               <th className="py-4 px-4 font-semibold">ADMISSION ID</th>
-              <th className="py-4 px-4 font-semibold">FATHER NAME</th>
-              <th className="py-4 px-4 font-semibold">CLASS</th>
-              <th className="py-4 px-4 font-semibold">CONTACT</th>
+              <th className="py-4 px-4 font-semibold">COURSE / PROGRAM</th>
+              <th className="py-4 px-4 font-semibold">CONTACT DETAILS</th>
               <th className="py-4 px-4 font-semibold">REG. DATE</th>
               <th className="py-4 px-4 font-semibold">STATUS</th>
               <th className="py-4 px-4 font-semibold text-right">ACTIONS</th>
@@ -453,18 +478,18 @@ const LeadsAdmin = () => {
           <tbody className="divide-y divide-slate-100 font-medium">
             {loading ? (
               <tr>
-                <td colSpan="8" className="py-12 text-center text-slate-400">
+                <td colSpan="7" className="py-12 text-center text-slate-400">
                   <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent mb-2"></div>
                   <p>Loading database registrations...</p>
                 </td>
               </tr>
             ) : paginatedRecords.length === 0 ? (
               <tr>
-                <td colSpan="8" className="py-16 text-center text-slate-400">
+                <td colSpan="7" className="py-16 text-center text-slate-400">
                   <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-3">
                     <FileText className="w-6 h-6" />
                   </div>
-                  <p className="font-bold text-slate-800 text-sm">No Website Submissions Yet</p>
+                  <p className="font-bold text-slate-800 text-sm">No Website Submissions Found</p>
                   <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
                     Real-time admissions and inquiries submitted via the Aayush website will appear here automatically.
                   </p>
@@ -482,43 +507,52 @@ const LeadsAdmin = () => {
                       .toUpperCase()
                   : "ST";
                 const cleanPhone = (r.phone || "").replace(/\D/g, "");
+                const cleanAdmId = (r.admissionId || `ADM-2026-${String(idx + 1).padStart(3, "0")}`).replace(/ADM-\s+/g, "ADM-");
 
                 return (
                   <tr
                     key={r._id || idx}
-                    className="hover:bg-slate-50/80 transition-colors group"
+                    onClick={() => setViewModalRecord(r)}
+                    className="hover:bg-slate-50/90 transition-colors group cursor-pointer"
                   >
-                    {/* 1. Student Avatar + Name */}
+                    {/* 1. Student Avatar + Name + Guardian */}
                     <td className="py-4 px-4">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`w-9 h-9 rounded-full ${colorClass} text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-xs`}
+                          className={`w-9 h-9 rounded-xl ${colorClass} text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-xs`}
                         >
                           {initials}
                         </div>
-                        <span className="font-extrabold text-slate-900 text-sm">
-                          {r.name}
-                        </span>
+                        <div>
+                          <p className="font-extrabold text-slate-900 text-sm group-hover:text-indigo-600 transition-colors">
+                            {r.name}
+                          </p>
+                          {r.fatherName && r.fatherName !== "N/A" ? (
+                            <p className="text-[11px] text-slate-400 font-medium mt-0.5">
+                              Guardian: <span className="text-slate-600 font-semibold">{r.fatherName}</span>
+                            </p>
+                          ) : (
+                            <p className="text-[10.5px] text-slate-400 font-normal">Student Applicant</p>
+                          )}
+                        </div>
                       </div>
                     </td>
 
                     {/* 2. Admission ID */}
-                    <td className="py-4 px-4 text-slate-500 font-medium">
-                      {r.admissionId || `ADM- 2024-${String(idx + 1).padStart(3, "0")}`}
+                    <td className="py-4 px-4">
+                      <span className="inline-flex items-center font-mono text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200/80">
+                        {cleanAdmId}
+                      </span>
                     </td>
 
-                    {/* 3. Father Name */}
-                    <td className="py-4 px-4 text-slate-700 font-semibold">
-                      {r.fatherName || "N/A"}
-                    </td>
-
-                    {/* 4. Class / Course / Placement Pill */}
-                    <td className="py-4 px-4 min-w-[200px]">
+                    {/* 3. Course / Program (Replaces Class) */}
+                    <td className="py-4 px-4 min-w-[210px]" onClick={(e) => e.stopPropagation()}>
                       {r.inquiryType === "Placement Support" || r.careerDomain || (r.className && r.className.includes("Placement")) ? (
                         <div className="space-y-1">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="inline-block px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                              💼 {r.careerDomain || r.preferredRole || "Web Development"}
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 shadow-2xs">
+                              <Briefcase className="w-3 h-3 text-blue-600" />
+                              <span>{r.careerDomain || r.preferredRole || "Web Development"}</span>
                             </span>
                             <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
                               Placement Support
@@ -526,9 +560,9 @@ const LeadsAdmin = () => {
                           </div>
                           {(r.qualification || r.degree || r.passingYear) && (
                             <p className="text-[11px] text-slate-600 font-semibold flex items-center gap-1">
-                              <span>🎓</span>
+                              <GraduationCap className="w-3.5 h-3.5 text-slate-400" />
                               <span>{r.qualification || r.degree || "B.Sc. IT / CS"}</span>
-                              <span>•</span>
+                              <span className="text-slate-300">•</span>
                               <span className="text-slate-500 font-normal">{r.passingYear || "Pursuing Final Year"}</span>
                             </p>
                           )}
@@ -539,74 +573,104 @@ const LeadsAdmin = () => {
                           )}
                         </div>
                       ) : (
-                        <span className="inline-block px-2.5 py-1 rounded-lg text-xs font-bold bg-[#ede9fe] text-[#6d28d9]">
-                          {r.className || r.course || r.program || "Class 1"}
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#ede9fe] text-[#6d28d9] border border-purple-200 shadow-2xs">
+                          <GraduationCap className="w-3.5 h-3.5 text-purple-600" />
+                          <span>{r.className || r.course || r.program || "Course"}</span>
                         </span>
                       )}
                     </td>
 
-                    {/* 5. Contact (Email + Phone) */}
-                    <td className="py-4 px-4">
-                      <div className="space-y-0.5">
-                        <p className="text-slate-700 text-xs">{r.email || "student@aayush.com"}</p>
-                        <p className="text-slate-400 text-[11px] flex items-center gap-1.5">
-                          <span>{r.phone || "+91 98765 43210"}</span>
+                    {/* 4. Contact (Email + Phone with WhatsApp direct link) */}
+                    <td className="py-4 px-4" onClick={(e) => e.stopPropagation()}>
+                      <div className="space-y-1">
+                        <a
+                          href={`mailto:${r.email || ''}`}
+                          className="text-slate-700 hover:text-indigo-600 text-xs font-medium flex items-center gap-1.5 truncate max-w-[190px]"
+                        >
+                          <Mail className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                          <span className="truncate">{r.email || "student@aayush.com"}</span>
+                        </a>
+                        <div className="flex items-center gap-2">
+                          <a
+                            href={`tel:${r.phone || ''}`}
+                            className="text-slate-600 hover:text-indigo-600 text-[11px] font-semibold flex items-center gap-1"
+                          >
+                            <Phone className="w-3 h-3 text-slate-400" />
+                            <span>{r.phone || "+91 98765 43210"}</span>
+                          </a>
                           {cleanPhone && (
                             <a
                               href={`https://wa.me/91${cleanPhone.slice(-10)}`}
                               target="_blank"
                               rel="noreferrer"
                               title="Chat on WhatsApp"
-                              className="text-emerald-500 hover:text-emerald-700"
+                              className="inline-flex items-center justify-center p-1 rounded-md bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 transition"
                             >
-                              <MessageCircle className="w-3 h-3" />
+                              <MessageCircle className="w-3.5 h-3.5" />
                             </a>
                           )}
-                        </p>
+                        </div>
                       </div>
                     </td>
 
-                    {/* 6. Reg Date */}
-                    <td className="py-4 px-4 text-slate-500">
-                      {r.createdAt
-                        ? new Date(r.createdAt).toLocaleDateString("en-GB", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })
-                        : "15 Mar 2024"}
+                    {/* 5. Reg Date */}
+                    <td className="py-4 px-4 text-slate-600 whitespace-nowrap">
+                      <div className="flex items-center gap-1.5 text-xs">
+                        <Calendar className="w-3 h-3 text-slate-400" />
+                        <span>
+                          {r.createdAt
+                            ? new Date(r.createdAt).toLocaleDateString("en-GB", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })
+                            : "3 Oct 2026"}
+                        </span>
+                      </div>
                     </td>
 
-                    {/* 7. Status */}
-                    <td className="py-4 px-4">{getStatusBadge(r.status)}</td>
+                    {/* 6. Status */}
+                    <td className="py-4 px-4 whitespace-nowrap">
+                      {getStatusBadge(r.status)}
+                    </td>
 
-                    {/* 8. Actions (Three Dots Menu) */}
-                    <td className="py-4 px-4 text-right">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (activeMenu?.id === r._id) {
-                            setActiveMenu(null);
-                          } else {
-                            const rect = e.currentTarget.getBoundingClientRect();
-                            const openUpwards = rect.bottom + 270 > window.innerHeight;
-                            setActiveMenu({
-                              id: r._id,
-                              record: r,
-                              top: openUpwards ? Math.max(10, rect.top - 250) : rect.bottom + 6,
-                              right: Math.max(16, window.innerWidth - rect.right),
-                            });
-                          }
-                        }}
-                        className={`p-1.5 rounded-lg transition ${
-                          activeMenu?.id === r._id
-                            ? "bg-indigo-50 text-indigo-700 ring-2 ring-indigo-200"
-                            : "text-slate-400 hover:text-slate-700 hover:bg-slate-100"
-                        }`}
-                        title="Actions"
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
+                    {/* 7. Actions */}
+                    <td className="py-4 px-4 text-right" onClick={(e) => e.stopPropagation()}>
+                      <div className="inline-flex items-center gap-1">
+                        <button
+                          onClick={() => setViewModalRecord(r)}
+                          className="p-1.5 rounded-lg border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 text-slate-500 hover:text-indigo-600 transition cursor-pointer"
+                          title="View Full Details"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                        </button>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (activeMenu?.id === r._id) {
+                              setActiveMenu(null);
+                            } else {
+                              const rect = e.currentTarget.getBoundingClientRect();
+                              const openUpwards = rect.bottom + 270 > window.innerHeight;
+                              setActiveMenu({
+                                id: r._id,
+                                record: r,
+                                top: openUpwards ? Math.max(10, rect.top - 250) : rect.bottom + 6,
+                                right: Math.max(16, window.innerWidth - rect.right),
+                              });
+                            }
+                          }}
+                          className={`p-1.5 rounded-lg transition cursor-pointer ${
+                            activeMenu?.id === r._id
+                              ? "bg-indigo-50 text-indigo-700 ring-2 ring-indigo-200"
+                              : "text-slate-400 hover:text-slate-700 hover:bg-slate-100 border border-slate-200"
+                          }`}
+                          title="Actions"
+                        >
+                          <MoreVertical className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -763,20 +827,25 @@ const LeadsAdmin = () => {
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-              <div>
-                <h3 className="text-lg font-black text-slate-900">
-                  New Student Registration
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Record will automatically sync with MongoDB database
-                </p>
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
+                  <Plus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900">
+                    New Student Registration
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Syncs directly with Aayush Institute database
+                  </p>
+                </div>
               </div>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-slate-400 hover:text-slate-700 p-1.5"
+                className="w-8 h-8 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center transition"
               >
-                ✕
+                <X className="w-4 h-4" />
               </button>
             </div>
 
@@ -791,21 +860,20 @@ const LeadsAdmin = () => {
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="e.g. Aryan Sharma"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="e.g. Rahul Kumar"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
                   />
                 </div>
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">
-                    Father / Guardian Name *
+                    Father / Guardian Name
                   </label>
                   <input
                     type="text"
-                    required
                     value={formData.fatherName}
                     onChange={(e) => setFormData({ ...formData, fatherName: e.target.value })}
-                    placeholder="e.g. Rajesh Sharma"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="e.g. Rajesh Kumar"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
                   />
                 </div>
               </div>
@@ -813,30 +881,42 @@ const LeadsAdmin = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">
-                    Class / Course Enrolled *
+                    Select Course / Program *
                   </label>
                   <input
+                    list="institute-courses-list"
                     type="text"
                     required
                     value={formData.className}
                     onChange={(e) => setFormData({ ...formData, className: e.target.value })}
-                    placeholder="e.g. Class 1 / BCA / MERN"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Choose or type course..."
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
                   />
+                  <datalist id="institute-courses-list">
+                    <option value="Software & Full Stack Development" />
+                    <option value="Web Development (MERN / Next.js)" />
+                    <option value="Cyber Security & Networking" />
+                    <option value="Mobile App Development (Flutter / React Native)" />
+                    <option value="Design, UI/UX & Media" />
+                    <option value="AI, Data Science & Machine Learning" />
+                    <option value="Digital Marketing & E-Commerce" />
+                    <option value="Accounting & Business Skills" />
+                    <option value="Placement Support Program" />
+                  </datalist>
                 </div>
+
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">
-                    Registration Status
+                    Academic Session
                   </label>
                   <select
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                    value={formData.session}
+                    onChange={(e) => setFormData({ ...formData, session: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white font-semibold"
                   >
-                    <option value="Approved">Approved</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Waiting">Waiting</option>
-                    <option value="Rejected">Rejected</option>
+                    <option value="2026–27">2026–27</option>
+                    <option value="2025–26">2025–26</option>
+                    <option value="2024–25">2024–25</option>
                   </select>
                 </div>
               </div>
@@ -851,7 +931,7 @@ const LeadsAdmin = () => {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="student@gmail.com"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
                   />
                 </div>
                 <div>
@@ -864,27 +944,318 @@ const LeadsAdmin = () => {
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="+91 98765 43210"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Registration Status
+                </label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white font-semibold"
+                >
+                  <option value="Pending">Pending</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Waiting">Waiting</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
               </div>
 
               <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 font-bold text-slate-600 hover:bg-slate-50"
+                  className="px-4 py-2 rounded-xl border border-slate-200 font-bold text-slate-600 hover:bg-slate-50 transition cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold shadow-md hover:from-indigo-700 hover:to-purple-700"
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold shadow-md shadow-indigo-600/20 transition cursor-pointer"
                 >
                   Save Registration
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Student Full Details Modal ── */}
+      {viewModalRecord && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-xl w-full border border-slate-200 overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95">
+            {/* Modal Header */}
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 via-indigo-50/30 to-purple-50/20">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-black text-lg flex items-center justify-center shadow-md shadow-indigo-500/20">
+                  {viewModalRecord.name
+                    ? viewModalRecord.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .slice(0, 2)
+                        .toUpperCase()
+                    : "ST"}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-black text-slate-900">
+                      {viewModalRecord.name}
+                    </h3>
+                    {getStatusBadge(viewModalRecord.status)}
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="font-mono text-xs font-bold text-slate-600 bg-white px-2 py-0.5 rounded-md border border-slate-200">
+                      {(viewModalRecord.admissionId || "ADM-2026-001").replace(/ADM-\s+/g, "ADM-")}
+                    </span>
+                    <button
+                      onClick={() =>
+                        copyToClipboard(
+                          (viewModalRecord.admissionId || "ADM-2026-001").replace(/ADM-\s+/g, "ADM-"),
+                          "admId"
+                        )
+                      }
+                      className="text-slate-400 hover:text-indigo-600 p-1 rounded transition"
+                      title="Copy Admission ID"
+                    >
+                      {copiedField === "admId" ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      ) : (
+                        <Copy className="w-3.5 h-3.5" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setViewModalRecord(null)}
+                className="w-8 h-8 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-5 overflow-y-auto text-xs">
+              {/* Quick Status Bar */}
+              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
+                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">
+                  Change Registration Status:
+                </p>
+                <div className="grid grid-cols-4 gap-2">
+                  {["Approved", "Pending", "Waiting", "Rejected"].map((st) => {
+                    const isSelected = (viewModalRecord.status || "Pending").toLowerCase() === st.toLowerCase();
+                    return (
+                      <button
+                        key={st}
+                        onClick={async () => {
+                          await handleStatusChange(viewModalRecord._id, st);
+                          setViewModalRecord((prev) => ({ ...prev, status: st }));
+                        }}
+                        className={`py-1.5 px-2 rounded-xl font-bold text-[11px] border transition cursor-pointer text-center ${
+                          isSelected
+                            ? st === "Approved"
+                              ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
+                              : st === "Pending"
+                              ? "bg-amber-500 text-white border-amber-500 shadow-sm"
+                              : st === "Waiting"
+                              ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                              : "bg-rose-600 text-white border-rose-600 shadow-sm"
+                            : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
+                        }`}
+                      >
+                        {st}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Two Column Details */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* 1. Contact Card */}
+                <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-3">
+                  <p className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <Phone className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Contact Information</span>
+                  </p>
+
+                  <div className="space-y-2">
+                    <div>
+                      <span className="text-slate-400 text-[10px] block">Mobile Phone</span>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="font-bold text-slate-800 text-sm">
+                          {viewModalRecord.phone || "N/A"}
+                        </span>
+                        {viewModalRecord.phone && (
+                          <div className="flex items-center gap-1">
+                            <a
+                              href={`https://wa.me/91${viewModalRecord.phone.replace(/\D/g, "").slice(-10)}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="p-1 rounded-md bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
+                              title="Chat on WhatsApp"
+                            >
+                              <MessageCircle className="w-3.5 h-3.5" />
+                            </a>
+                            <a
+                              href={`tel:${viewModalRecord.phone}`}
+                              className="p-1 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100"
+                              title="Direct Call"
+                            >
+                              <Phone className="w-3.5 h-3.5" />
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <span className="text-slate-400 text-[10px] block">Email Address</span>
+                      <a
+                        href={`mailto:${viewModalRecord.email}`}
+                        className="font-semibold text-indigo-600 hover:underline block truncate mt-0.5"
+                      >
+                        {viewModalRecord.email || "No email provided"}
+                      </a>
+                    </div>
+
+                    {(viewModalRecord.city || viewModalRecord.state) && (
+                      <div>
+                        <span className="text-slate-400 text-[10px] block">Location</span>
+                        <p className="font-semibold text-slate-700 flex items-center gap-1 mt-0.5">
+                          <MapPin className="w-3 h-3 text-slate-400" />
+                          <span>{[viewModalRecord.city, viewModalRecord.state].filter(Boolean).join(", ")}</span>
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 2. Academic & Course Card */}
+                <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-3">
+                  <p className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <GraduationCap className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Course & Academic</span>
+                  </p>
+
+                  <div className="space-y-2">
+                    <div>
+                      <span className="text-slate-400 text-[10px] block">Enrolled Program</span>
+                      <p className="font-bold text-indigo-700 mt-0.5">
+                        {viewModalRecord.careerDomain ||
+                          viewModalRecord.className ||
+                          viewModalRecord.course ||
+                          viewModalRecord.program ||
+                          "General Registration"}
+                      </p>
+                    </div>
+
+                    {viewModalRecord.fatherName && viewModalRecord.fatherName !== "N/A" && (
+                      <div>
+                        <span className="text-slate-400 text-[10px] block">Guardian / Father</span>
+                        <p className="font-semibold text-slate-800 mt-0.5">
+                          {viewModalRecord.fatherName}
+                        </p>
+                      </div>
+                    )}
+
+                    <div>
+                      <span className="text-slate-400 text-[10px] block">Inquiry Type / Track</span>
+                      <p className="font-semibold text-slate-700 mt-0.5">
+                        {viewModalRecord.inquiryType || "Course Admission"}
+                      </p>
+                    </div>
+
+                    {(viewModalRecord.qualification || viewModalRecord.degree || viewModalRecord.passingYear) && (
+                      <div>
+                        <span className="text-slate-400 text-[10px] block">Prior Education / Year</span>
+                        <p className="font-semibold text-slate-700 mt-0.5">
+                          {[viewModalRecord.qualification || viewModalRecord.degree, viewModalRecord.passingYear]
+                            .filter(Boolean)
+                            .join(" • ")}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Student Query / Notes if any */}
+              {(viewModalRecord.notes || viewModalRecord.message) && (
+                <div className="p-4 rounded-2xl bg-indigo-50/50 border border-indigo-100">
+                  <p className="text-[11px] font-extrabold text-indigo-900 mb-1 flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Candidate Inquiry Note:</span>
+                  </p>
+                  <p className="text-xs text-slate-700 italic leading-relaxed">
+                    "{viewModalRecord.notes || viewModalRecord.message}"
+                  </p>
+                </div>
+              )}
+
+              {/* Registration Timestamp */}
+              <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-100">
+                <span className="flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>
+                    Registered on{" "}
+                    {viewModalRecord.createdAt
+                      ? new Date(viewModalRecord.createdAt).toLocaleString("en-GB", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : "3 Oct 2026"}
+                  </span>
+                </span>
+                <span className="font-mono text-[10px]">
+                  MongoDB ID: {viewModalRecord._id?.slice(-8)}
+                </span>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+              <button
+                onClick={() => {
+                  handleDelete(viewModalRecord._id, viewModalRecord.name);
+                  setViewModalRecord(null);
+                }}
+                className="px-3 py-2 rounded-xl text-rose-600 hover:bg-rose-50 font-bold flex items-center gap-1.5 transition cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Delete</span>
+              </button>
+
+              <div className="flex items-center gap-2">
+                {viewModalRecord.phone && (
+                  <a
+                    href={`https://wa.me/91${viewModalRecord.phone.replace(/\D/g, "").slice(-10)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold flex items-center gap-1.5 shadow-sm transition"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" />
+                    <span>WhatsApp</span>
+                  </a>
+                )}
+                <button
+                  onClick={() => setViewModalRecord(null)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 font-bold text-slate-700 transition cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

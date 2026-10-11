@@ -3,6 +3,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Calendar, Clock, ChevronRight } from "lucide-react";
 import axios from "axios";
+import { getUploadUrl } from "../../config";
 
 const categories = [
   "All",
@@ -133,7 +134,7 @@ function News() {
             <div className="bg-white rounded-xl shadow-lg overflow-hidden md:flex">
               <div className="md:w-1/2">
                 <img
-                  src={`http://localhost:4001/Uploads/${featuredNews.image}`}
+                  src={getUploadUrl(`Uploads/${featuredNews.image}`)}
                   alt={featuredNews.title}
                   className="w-full h-64 md:h-full object-cover"
                 />
@@ -191,7 +192,7 @@ function News() {
               >
                 <div className="relative">
                   <img
-                    src={`http://localhost:4001/Uploads/${item.image}`}
+                    src={getUploadUrl(`Uploads/${item.image}`)}
                     alt={item.title}
                     className="w-full h-48 object-cover"
                   />

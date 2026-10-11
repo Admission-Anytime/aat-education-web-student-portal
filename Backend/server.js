@@ -48,30 +48,11 @@ const port = process.env.PORT || 4001;
 const MONGO_URL = process.env.MONGODB_URI || process.env.MONGO_URI;
 //middleware express instantiated
 const app = express();
-//middleware to ftech data
-app.use(express.urlencoded({ extended: true })); // optional for form data 
-/*Routes for SignUp
-app.post("/api/auth/signup", signup);
-app.post("/api/auth/login", login);
-app.post("/api/auth/logout", logout);*/
 
-app.use(express.json());
- 
-app.use("/Uploads", express.static("Uploads"));
-// Courses Routes
-app.use("/api/courses", coursesRoutes);
-app.use("/api/categories", categoryRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/site-settings", siteSettingsRoutes);
- 
-
-
-app.use("/api/subscribers", subscribeRoutes);//subscribe us
-//footer routes 
-app.use('/api/footer', footerRoutes);
-
-//connection with frontend ======CORS======
+//connection with frontend ======CORS & Middleware======
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 const configuredOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim())
@@ -82,6 +63,9 @@ const defaultOrigins = [
   "http://localhost:5174",
   "http://127.0.0.1:5173",
   "http://127.0.0.1:5174",
+  "https://aayushinstitute.com",
+  "https://admin.aayushinstitute.com",
+  "https://www.aayushinstitute.com",
   process.env.FRONTEND_URL,
   process.env.ADMIN_URL,
 ].filter(Boolean);
@@ -106,11 +90,15 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(express.json());
+app.use("/Uploads", express.static("Uploads"));
 
- 
-
- 
+// API Routes
+app.use("/api/courses", coursesRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/site-settings", siteSettingsRoutes);
+app.use("/api/subscribers", subscribeRoutes);
+app.use('/api/footer', footerRoutes);
 app.use("/api/blogs", addnewblog);
 // route
 

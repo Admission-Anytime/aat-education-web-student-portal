@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ChevronRight, Calendar } from "lucide-react";
 import axios from "axios";
+import { getUploadUrl } from "../../config";
 
 function NewsDetail() {
   const { id } = useParams(); // id from URL
@@ -102,7 +103,7 @@ function NewsDetail() {
         {selectedArticle.image && (
           <div className="rounded-xl overflow-hidden mb-8">
             <img
-              src={`http://localhost:4001/Uploads/${selectedArticle.image}`}
+              src={getUploadUrl(`Uploads/${selectedArticle.image}`)}
               alt={selectedArticle.title}
               className="w-full h-80 object-cover rounded-xl shadow-lg"
             />
