@@ -39,7 +39,8 @@ import {
     KeyRound,
     Zap,
     PhoneCall,
-    Briefcase
+    Briefcase,
+    AlertCircle,
 } from 'lucide-react';
 
 const projectCategories = [
@@ -95,255 +96,7 @@ const projectCategories = [
     }
 ];
 
-const liveProjectsData = {
-    web: [
-        {
-            name: "Web Development",
-            subgroup: "Full Stack & Web",
-            icon: <Code className="w-5 h-5" />,
-            popular: true,
-            details: "End-to-end web engineering covering HTML5, CSS3, JavaScript ES6+, backend RESTful APIs, relational database schemas, and live production deployment.",
-            features: ["Interactive Responsive Frontend", "RESTful API Integration", "Authentication & Security", "Git Version Control & Deployment"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "Live Project Training Certificate"
-        },
-        {
-            name: "Python Development",
-            subgroup: "Backend Engineering",
-            icon: <Terminal className="w-5 h-5" />,
-            popular: true,
-            details: "Full-cycle Python backend project using Django or Flask with SQLite/PostgreSQL, CRUD workflows, secure authentication, and automated testing.",
-            features: ["Django / Flask Architecture", "ORM & Database Migrations", "API Endpoints & JWT Auth", "Unit Testing & Deployment"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "Python Project Certification"
-        },
-        {
-            name: "Java Development",
-            subgroup: "Backend Engineering",
-            icon: <Server className="w-5 h-5" />,
-            popular: true,
-            details: "Enterprise Java software development using Spring Boot, Hibernate ORM, MVC design patterns, MySQL integration, and layered microservice architecture.",
-            features: ["Spring Boot Microservice MVC", "Hibernate / JPA Relational Mapping", "Role-Based Access Control", "Swagger API Documentation"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "Java Enterprise Project Certification"
-        },
-        {
-            name: "PHP & MySQL",
-            subgroup: "Backend Engineering",
-            icon: <Database className="w-5 h-5" />,
-            details: "Dynamic web application project utilizing PHP, MySQL, Apache, admin dashboards, data reporting, session security, and payment gateway integration.",
-            features: ["Secure Admin & User Portals", "Relational Database Design", "CRUD & File Upload System", "Payment Gateway & Mailer"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "PHP & Web Project Certificate"
-        },
-        {
-            name: "React JS",
-            subgroup: "Modern Frontend",
-            icon: <Layers className="w-5 h-5" />,
-            popular: true,
-            details: "Modern Single Page Application (SPA) with React Hooks, component lifecycles, global state management (Redux/Zustand), and live REST API consuming.",
-            features: ["Custom React Hooks & Context", "Client-Side Routing & Guards", "State Management & Optimization", "Vite / Webpack Build Production"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "React JS Live Project Certificate"
-        },
-        {
-            name: "Node.js",
-            subgroup: "Backend Engineering",
-            icon: <Terminal className="w-5 h-5" />,
-            details: "High-concurrency backend API server development using Node.js, Express, async event loop, WebSocket live sockets, and secure JWT authentication.",
-            features: ["Asynchronous Non-Blocking IO", "WebSockets Real-time Push", "JWT Token Auth & Rate Limiting", "MongoDB / MySQL Connectivity"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "Node.js Backend Certificate"
-        },
-        {
-            name: "MERN Stack",
-            subgroup: "Full Stack & Web",
-            icon: <Code className="w-5 h-5" />,
-            popular: true,
-            details: "Comprehensive full-stack project incorporating MongoDB, Express.js, React.js, and Node.js with end-to-end authentication, dashboard analytics, and cloud deployment.",
-            features: ["End-to-End MERN Integration", "MongoDB Atlas Cloud Cluster", "Responsive Client + REST Backend", "Live Cloud Host (Render / Vercel)"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "MERN Stack Industrial Certification"
-        }
-    ],
-
-    mobile: [
-        {
-            name: "Android Development",
-            subgroup: "Native Mobile",
-            icon: <Smartphone className="w-5 h-5" />,
-            popular: true,
-            details: "Native Android application using Kotlin / Java, Android Studio, XML/Jetpack Compose layouts, Room SQLite database, and Retrofit HTTP networking.",
-            features: ["Jetpack Compose / XML Layouts", "Room Database Offline Sync", "Retrofit REST API Services", "APK Generation & Signing"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "Android Live Project Certificate"
-        },
-        {
-            name: "Flutter Development",
-            subgroup: "Cross-Platform Mobile",
-            icon: <Smartphone className="w-5 h-5" />,
-            popular: true,
-            details: "Cross-platform mobile app for Android & iOS using Google Flutter, Dart language, Bloc / Provider state management, and Firebase cloud backends.",
-            features: ["Single Dart Codebase for iOS/Android", "Provider / Bloc State Architecture", "Firebase Auth & Cloud Firestore", "Material 3 Fluid UI Animations"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "Flutter Specialist Certificate"
-        },
-        {
-            name: "React Native",
-            subgroup: "Cross-Platform Mobile",
-            icon: <Smartphone className="w-5 h-5" />,
-            popular: true,
-            details: "Hybrid mobile application built with React Native and Expo, utilizing native hardware features (camera, GPS geolocation), push notifications, and Redux.",
-            features: ["Expo & React Native CLI", "Native Camera & GPS Hardware Hooks", "Push Notifications Service", "Redux Toolkit Global State"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "React Native Project Certificate"
-        }
-    ],
-
-    ai: [
-        {
-            name: "Artificial Intelligence",
-            subgroup: "AI & Machine Learning",
-            icon: <Cpu className="w-5 h-5" />,
-            popular: true,
-            details: "Advanced AI application utilizing computer vision, NLP text understanding, neural network architectures, and Python AI frameworks.",
-            features: ["Neural Network Architecture", "Natural Language Processing (NLP)", "Computer Vision / OpenCV Pipelines", "Python AI Engine Integration"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "Artificial Intelligence Project Certificate"
-        },
-        {
-            name: "Generative AI",
-            subgroup: "AI & Machine Learning",
-            icon: <Sparkles className="w-5 h-5" />,
-            popular: true,
-            details: "Build next-gen GenAI systems using LangChain, OpenAI/Claude APIs, Retrieval-Augmented Generation (RAG) vector embeddings, and interactive Streamlit UI.",
-            features: ["LangChain & LlamaIndex Pipelines", "RAG with ChromaDB / Pinecone", "Custom Prompt Engineering Chains", "Streamlit / Gradio Web Demo"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "Generative AI Project Certification"
-        },
-        {
-            name: "Python for Data Science",
-            subgroup: "Data Science & Analytics",
-            icon: <Terminal className="w-5 h-5" />,
-            details: "Comprehensive data science pipeline: data cleansing with Pandas, statistical exploration with NumPy, and visual storytelling with Matplotlib/Seaborn.",
-            features: ["Pandas & NumPy Data Wrangling", "Exploratory Data Analysis (EDA)", "Interactive Jupyter Notebooks", "Statistical Hypothesis Testing"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "Data Science Project Certificate"
-        },
-        {
-            name: "Machine Learning",
-            subgroup: "AI & Machine Learning",
-            icon: <Cpu className="w-5 h-5" />,
-            popular: true,
-            details: "Supervised and unsupervised ML models using Scikit-Learn: classification, regression, clustering, feature engineering, and model accuracy evaluation.",
-            features: ["Feature Selection & Scaling", "Scikit-Learn ML Classifiers", "Model Evaluation & Confusion Matrix", "Pickle Model API Flask/FastAPI"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "Machine Learning Specialist Certificate"
-        },
-        {
-            name: "Data Analytics",
-            subgroup: "Data Science & Analytics",
-            icon: <Layers className="w-5 h-5" />,
-            details: "Real-world business analytics project analyzing customer churn, sales revenue trends, and operational metrics using SQL queries and Python analytics.",
-            features: ["Advanced SQL Analytical Queries", "Business Metric Formulations", "Cohort & Trend Analysis", "Actionable Insight Reporting"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "Data Analytics Project Certificate"
-        },
-        {
-            name: "Power BI",
-            subgroup: "Data Science & Analytics",
-            icon: <Layers className="w-5 h-5" />,
-            popular: true,
-            details: "Interactive enterprise BI reporting system featuring DAX formulas, Power Query ETL pipelines, star-schema data models, and drill-through visual dashboards.",
-            features: ["Power Query Data Transformation", "Complex DAX Measures & KPIs", "Star Schema Relationship Modeling", "Interactive Slicers & Tooltips"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "Power BI Certified Specialist"
-        }
-    ],
-
-    cloud: [
-        {
-            name: "Cloud Computing",
-            subgroup: "Cloud & Infrastructure",
-            icon: <Cloud className="w-5 h-5" />,
-            popular: true,
-            details: "Multi-tier cloud infrastructure deployment on AWS/Azure utilizing EC2 virtual machines, S3 storage buckets, IAM security policies, and load balancers.",
-            features: ["Cloud Architecture Planning", "Compute, VPC & Storage Config", "IAM Roles & Security Groups", "Scalable Load Balancing"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "Cloud Computing Project Certificate"
-        },
-        {
-            name: "DevOps",
-            subgroup: "Cloud & Infrastructure",
-            icon: <GitBranch className="w-5 h-5" />,
-            popular: true,
-            details: "Automated Continuous Integration and Continuous Deployment (CI/CD) pipeline using GitHub Actions, Jenkins, Docker containerization, and Linux hosting.",
-            features: ["GitHub Actions / Jenkins Pipelines", "Docker Container Packaging", "Automated Testing & Build Triggers", "Zero-Downtime Deployment Flow"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "DevOps Project Certification"
-        },
-        {
-            name: "Application Deployment",
-            subgroup: "Cloud & Infrastructure",
-            icon: <Server className="w-5 h-5" />,
-            details: "Real-world production rollout of a full-stack application on VPS/cloud platforms with Nginx reverse proxy, SSL certification, domain DNS, and process monitoring.",
-            features: ["Linux Server Environment Setup", "Nginx Reverse Proxy & SSL Setup", "PM2 / Systemd Process Managers", "Database Backup Automation"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "Application Deployment Certificate"
-        },
-        {
-            name: "Cyber Security",
-            subgroup: "Security & Networking",
-            icon: <Shield className="w-5 h-5" />,
-            popular: true,
-            details: "Vulnerability assessment and penetration testing (VAPT) project inspecting OWASP Top 10 vulnerabilities, network traffic packet sniffing, and secure auth.",
-            features: ["OWASP Top 10 Security Audits", "SQLi & XSS Vulnerability Labs", "Wireshark Packet Analysis", "Security Hardening Recommendations"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "Cyber Security Project Certificate"
-        },
-        {
-            name: "Networking",
-            subgroup: "Security & Networking",
-            icon: <Server className="w-5 h-5" />,
-            details: "Enterprise network topology simulation using Cisco Packet Tracer: VLANs, inter-VLAN routing, OSPF dynamic routing, DHCP servers, and firewall ACLs.",
-            features: ["Cisco Packet Tracer Topologies", "VLAN & Subnet Partitioning", "Routing Protocols (OSPF/RIP)", "Access Control Lists (ACL)"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "Networking Project Certificate"
-        }
-    ],
-
-    design: [
-        {
-            name: "UI/UX Design",
-            subgroup: "Product Design",
-            icon: <Palette className="w-5 h-5" />,
-            popular: true,
-            details: "Full product design lifecycle: user empathy mapping, problem statements, UX research, wireframing, high-fidelity UI design, and clickable user flow prototypes.",
-            features: ["UX Research & User Personas", "Wireframes & Information Architecture", "Design System & UI Component Kits", "Clickable Interactive Prototypes"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "UI/UX Design Project Certificate"
-        },
-        {
-            name: "Figma",
-            subgroup: "Product Design",
-            icon: <Palette className="w-5 h-5" />,
-            popular: true,
-            details: "Mastery of professional Figma workflows: auto-layout 5.0, responsive components, variant properties, micro-interactions, smart animations, and developer handoff specs.",
-            features: ["Advanced Auto-Layout & Variants", "Interactive Micro-Interactions", "Tokenized Color & Typography Styles", "Developer Handoff Inspection"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "Figma Specialist Project Certificate"
-        },
-        {
-            name: "Web & Mobile Interface Design",
-            subgroup: "Product Design",
-            icon: <Smartphone className="w-5 h-5" />,
-            details: "End-to-end design for a responsive web dashboard and companion mobile iOS/Android apps with cohesive branding, iconography, and usability testing.",
-            features: ["Multi-Device Responsive Grids", "Mobile iOS/Android Native Patterns", "Desktop Admin Dashboard Views", "Usability Testing Insights"],
-            duration: "6 Weeks / 3–6 Months",
-            certification: "Interface Design Certificate"
-        }
-    ]
-};
+const liveProjectsData = {};
 
 const whoCanJoinList = [
     'ITI',
@@ -626,12 +379,18 @@ const LiveProject = () => {
     };
 
     // Dynamic Live Projects state backed by live MongoDB & real-time sync
-    const [dbProjects, setDbProjects] = useState(liveProjectsData);
+    const [isBackendDown, setIsBackendDown] = useState(false);
+    const [dbProjects, setDbProjects] = useState({});
 
     const fetchMongoLiveProjects = async () => {
         try {
-            const res = await fetch('/api/courses?programType=liveproject');
-            if (!res.ok) return;
+            const baseUrl = import.meta.env.VITE_ERP_API_BASE_URL || '';
+            const res = await fetch(`${baseUrl}/api/courses?programType=liveproject`);
+            if (!res.ok) {
+                setIsBackendDown(true);
+                setDbProjects({});
+                return;
+            }
             const mongoList = await res.json();
             if (Array.isArray(mongoList) && mongoList.length > 0) {
                 const grouped = {};
@@ -650,10 +409,16 @@ const LiveProject = () => {
                     grouped[cat].sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
                 }
 
-                setDbProjects(prev => ({ ...prev, ...grouped }));
+                setIsBackendDown(false);
+                setDbProjects(grouped);
+            } else {
+                setIsBackendDown(true);
+                setDbProjects({});
             }
         } catch (err) {
-            console.warn('MongoDB live project fetch note:', err);
+            console.warn('[LiveProject] Backend offline, standing by...', err.message);
+            setIsBackendDown(true);
+            setDbProjects({});
         }
     };
 
@@ -666,7 +431,7 @@ const LiveProject = () => {
 
     useEffect(() => {
         fetchMongoLiveProjects();
-        const interval = setInterval(fetchMongoLiveProjects, 4000);
+        const interval = setInterval(fetchMongoLiveProjects, 3000);
 
         const syncProjects = () => {
             fetchMongoLiveProjects();
@@ -1535,11 +1300,30 @@ const LiveProject = () => {
                 </div>
 
                 {/* Course Grid - All live projects of this page kept together in a unified continuous grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-                    {currentCourses.map((course, idx) => (
-                        <CourseCard key={idx} course={course} index={idx} />
-                    ))}
-                </div>
+                {isBackendDown || currentCourses.length === 0 ? (
+                    <div className="text-center py-12 bg-white rounded-2xl border border-amber-200 p-8 max-w-lg mx-auto shadow-xs col-span-full">
+                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-50 text-amber-600 mb-3 border border-amber-200">
+                            <AlertCircle className="w-6 h-6 animate-pulse" />
+                        </div>
+                        <h3 className="text-base font-bold text-slate-800 mb-1">Live Projects Database Disconnected</h3>
+                        <p className="text-xs text-slate-500 mb-4">
+                            All industry capstones and live project tracks are pulled directly from MongoDB. The backend is currently offline. Tracks will load automatically when server reconnects.
+                        </p>
+                        <button
+                            onClick={fetchMongoLiveProjects}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors"
+                        >
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            <span>Reload Live Projects</span>
+                        </button>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+                        {currentCourses.map((course, idx) => (
+                            <CourseCard key={idx} course={course} index={idx} />
+                        ))}
+                    </div>
+                )}
 
                 {/* WHO CAN JOIN? SECTION */}
                 <div className="mt-14 sm:mt-16 bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/20 rounded-3xl p-6 sm:p-8 border border-blue-100/80 shadow-[0_4px_20px_rgba(0,85,255,0.06)] relative overflow-hidden">

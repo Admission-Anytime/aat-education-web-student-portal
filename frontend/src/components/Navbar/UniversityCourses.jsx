@@ -87,338 +87,7 @@ const universityCategories = [
     }
 ];
 
-const universityCoursesData = {
-    distance: [
-        {
-            name: "Management & Business",
-            popular: true,
-            icon: <Briefcase className="w-5 h-5" />,
-            degrees: "BBA, MBA, PGDBM, Executive Business",
-            details: "Comprehensive management curricula covering financial management, marketing strategy, operations, human resources, and business leadership.",
-            features: ["Distance BBA & MBA Streams", "Specializations in HR, Finance & Marketing", "Self-Paced Study Material & LMS", "Annual/Semester University Exams"],
-            duration: "1–3 Years",
-            eligibility: "12th / Graduation"
-        },
-        {
-            name: "Commerce & Finance",
-            popular: true,
-            icon: <Award className="w-5 h-5" />,
-            degrees: "B.Com, M.Com, Financial Accounting",
-            details: "Specialized commerce degrees emphasizing corporate accounting, auditing, commercial law, banking principles, corporate taxation, and financial reporting.",
-            features: ["General & Honours B.Com/M.Com", "Corporate Accounting & Auditing", "Direct & Indirect Tax Modules", "Banking & Insurance Foundations"],
-            duration: "2–3 Years",
-            eligibility: "12th Commerce / B.Com"
-        },
-        {
-            name: "Computer Applications & IT",
-            popular: true,
-            icon: <Cpu className="w-5 h-5" />,
-            degrees: "BCA, MCA, PGDCA, IT Diplomas",
-            details: "Flexible computer science education: software programming, web applications, database management systems, network infrastructure, and system analysis.",
-            features: ["Distance BCA & MCA Programs", "C++, Java & Python Modules", "Database & System Architecture", "Project Submissions & Practical Lab Manuals"],
-            duration: "1–3 Years",
-            eligibility: "12th with Maths / BCA / Any Graduate"
-        },
-        {
-            name: "Arts & Humanities",
-            icon: <BookOpen className="w-5 h-5" />,
-            degrees: "BA, MA (English, History, Sociology, Hindi)",
-            details: "Liberal arts education across English literature, history, sociology, political science, and languages to foster critical analysis and cultural perspective.",
-            features: ["Multiple Major Subject Options", "In-depth Study Material Dispatched", "Assignments & Term-End Examination", "Flexible Preparation Timelines"],
-            duration: "2–3 Years",
-            eligibility: "10+2 / Graduation in Any Stream"
-        },
-        {
-            name: "Science Disciplines",
-            icon: <Compass className="w-5 h-5" />,
-            degrees: "B.Sc, M.Sc (Maths, Physics, Chem, Bio)",
-            details: "Theoretical and experimental science curricula in pure sciences, mathematics, physics, and chemistry with structured academic contact sessions.",
-            features: ["Physics, Chemistry & Math Tracks", "Distance Academic Contact Programs", "Practical Workshops at Partner Centers", "Recognized University Degree"],
-            duration: "2–3 Years",
-            eligibility: "12th Science (PCM/PCB) / B.Sc"
-        },
-        {
-            name: "Education & Teaching",
-            icon: <School className="w-5 h-5" />,
-            degrees: "B.Ed (Distance)*, M.A Education, DElEd",
-            details: "Pedagogical methodologies, child psychology, curriculum planning, educational technology, and school administration for aspiring teachers.",
-            features: ["Educational Philosophy & Psychology", "Classroom Pedagogy & Technology", "Internship & Practice Teaching*", "State & Central University Affiliations"],
-            duration: "1–2 Years",
-            eligibility: "Graduation / Post Graduation"
-        },
-        {
-            name: "Healthcare & Allied Studies",
-            icon: <HeartPulse className="w-5 h-5" />,
-            degrees: "Hospital Administration, Public Health Diplomas",
-            details: "Healthcare management, public health foundations, community healthcare, hospital logistics, medical records management, and health informatics.",
-            features: ["Hospital Operations & Protocols", "Medical Records & Documentation", "Public Health Policy & Sanitation", "Distance Study with Guided Project"],
-            duration: "1–2 Years",
-            eligibility: "12th Science / Any Graduate"
-        },
-        {
-            name: "Other Academic & Professional",
-            icon: <FileText className="w-5 h-5" />,
-            degrees: "BSW, MSW, BLIS, MLIS, Diplomas",
-            details: "Social work (BSW/MSW), library and information science (BLIS/MLIS), journalism, mass communication, and niche professional diplomas.",
-            features: ["Social Work & NGO Management", "Library Information Systems", "Media & Communication Diplomas", "Flexible Weekend Guidance"],
-            duration: "1–2 Years",
-            eligibility: "12th / Graduation in Any Discipline"
-        }
-    ],
-
-    online: [
-        {
-            name: "Online Management & Business",
-            popular: true,
-            icon: <Briefcase className="w-5 h-5" />,
-            degrees: "Online MBA, Online BBA, Global Business",
-            details: "Interactive digital learning with live webinars, recorded video lectures, interactive case studies, and corporate mentor sessions.",
-            features: ["100% Online Classes & E-Books", "Live Faculty Interaction & Q&A", "Digital Proctoring for Exams", "Industry-Aligned Specializations"],
-            duration: "2–3 Years",
-            eligibility: "12th / Graduate with 50% Marks"
-        },
-        {
-            name: "Online Computer Applications & IT",
-            popular: true,
-            icon: <Cpu className="w-5 h-5" />,
-            degrees: "Online BCA, Online MCA, Cloud & AI",
-            details: "Digital-first software engineering, cloud computing, cybersecurity fundamentals, full stack programming, and virtual coding sandbox labs.",
-            features: ["Cloud-Based Coding Labs", "Real-World Capstone Projects", "Mentor-Led Virtual Workshops", "Tech Hiring Partner Connects"],
-            duration: "2–3 Years",
-            eligibility: "12th (Maths/Stats) / BCA / B.Tech / Graduate"
-        },
-        {
-            name: "Online Commerce & Finance",
-            popular: true,
-            icon: <Award className="w-5 h-5" />,
-            degrees: "Online B.Com, Online M.Com, Fintech",
-            details: "Modern commerce programs covering digital banking, international trade, corporate governance, financial technology, and investment analysis.",
-            features: ["Fintech & Digital Banking Modules", "Recorded Lectures on Mobile App", "Self-Assessment Quizzes & Case Studies", "UGC Entitled Online Degrees"],
-            duration: "2–3 Years",
-            eligibility: "10+2 Commerce/Science / B.Com"
-        },
-        {
-            name: "Online Arts & Humanities",
-            icon: <BookOpen className="w-5 h-5" />,
-            degrees: "Online BA, Online MA in Journalism & English",
-            details: "Online humanities with interactive discussion forums, digital libraries, contemporary literary studies, economics, and communication theory.",
-            features: ["24/7 Digital Library Access", "Global Peer Networking Forums", "Flexible Exam Schedule Windows", "Semester-Wise Credit Submissions"],
-            duration: "2–3 Years",
-            eligibility: "10+2 / Bachelor's in Any Field"
-        },
-        {
-            name: "Online Science & Data Disciplines",
-            icon: <Compass className="w-5 h-5" />,
-            degrees: "Online B.Sc / M.Sc Data Science, Applied Math",
-            details: "Modern mathematical modeling, data analytics, scientific computing, statistics, and machine learning principles delivered online.",
-            features: ["Virtual Statistical Tools & R/Python", "Interactive Data Visualizations", "Recorded Problem-Solving Sessions", "Continuous Online Evaluation"],
-            duration: "2–3 Years",
-            eligibility: "12th Science / B.Sc with Mathematics"
-        },
-        {
-            name: "Online Education & Pedagogy",
-            icon: <School className="w-5 h-5" />,
-            degrees: "MA Education, Instructional Design Certifications",
-            details: "Instructional design, educational technology platforms, modern pedagogy, learning analytics, and corporate training design.",
-            features: ["Instructional Design Frameworks", "E-Learning Tool Competency", "Curriculum Strategy & Analytics", "Global Educational Standards"],
-            duration: "1–2 Years",
-            eligibility: "Graduation in Any Subject"
-        },
-        {
-            name: "Online Healthcare & Allied Studies",
-            icon: <HeartPulse className="w-5 h-5" />,
-            degrees: "Online MHA, Health Informatics, Clinical Research",
-            details: "Healthcare leadership, health informatics, telemedicine systems, clinical data management, and hospital workflow optimization.",
-            features: ["Telemedicine & Health IT Systems", "Clinical Trials Data Management", "Hospital Quality Accreditations", "Case-Driven Online Seminars"],
-            duration: "1–2 Years",
-            eligibility: "Graduation (B.Sc / MBBS / BDS / Allied)"
-        },
-        {
-            name: "Online Professional Disciplines",
-            icon: <Layers className="w-5 h-5" />,
-            degrees: "Cyber Law, Corporate Governance, Leadership",
-            details: "Niche executive specializations in intellectual property rights, corporate compliance, cyber law regulations, and organizational leadership.",
-            features: ["Industry Practitioner Guest Lectures", "Digital Law & Compliance Modules", "Executive Certificate Add-ons", "Weekend Discussion Hours"],
-            duration: "6 Months – 1 Year",
-            eligibility: "Graduation / Working Professionals"
-        }
-    ],
-
-    'working-prof': [
-        {
-            name: "Management & Business Administration",
-            popular: true,
-            icon: <Briefcase className="w-5 h-5" />,
-            degrees: "Executive MBA, Post Graduate Diploma in Management",
-            details: "Tailored for working executives: weekend classes, case-based pedagogy, real-time corporate project integration, and leadership frameworks.",
-            features: ["Weekend & Evening Live Batches", "Industry Capstone Applied to Your Job", "Peer Networking with Executives", "Fast-Track Career Progression"],
-            duration: "1–2 Years",
-            eligibility: "Graduation + 1-2 Yrs Work Experience"
-        },
-        {
-            name: "Computer Applications & IT",
-            popular: true,
-            icon: <Cpu className="w-5 h-5" />,
-            degrees: "Executive MCA, B.Tech for Working Professionals*",
-            details: "Advanced software engineering, microservices architecture, cloud infrastructure, DevOps pipelines, and enterprise systems design.",
-            features: ["Flexible Schedule without Job Pause", "Advanced Cloud & Microservices", "Live Virtual Coding & Architecture", "AI & Data Engineering Electives"],
-            duration: "2–3 Years",
-            eligibility: "Diploma / BCA / B.Tech / Working Techs"
-        },
-        {
-            name: "Commerce & Finance",
-            icon: <Award className="w-5 h-5" />,
-            degrees: "Executive M.Com, Corporate Financial Management",
-            details: "Advanced financial modeling, risk analysis, corporate tax strategies, mergers and acquisitions, and strategic capital allocation.",
-            features: ["Corporate Finance & M&A Studies", "IFRS & International Standards", "Balance Sheet Finalization for CFOs", "Flexible Recorded & Live Content"],
-            duration: "1–2 Years",
-            eligibility: "B.Com / BBA / Working in Accounts/Finance"
-        },
-        {
-            name: "Data & Technology",
-            popular: true,
-            icon: <Compass className="w-5 h-5" />,
-            degrees: "PG Diploma in Data Science & Business Analytics",
-            details: "Applied data science for working analysts: Python data stacks, SQL at scale, Power BI business dashboards, and predictive ML models.",
-            features: ["Business Analytics Case Studies", "Power BI & Advanced SQL Mastery", "Predictive Analytics for Managers", "Executive Certificate Credentials"],
-            duration: "1 Year",
-            eligibility: "Graduation with Math/Stats/Technical background"
-        },
-        {
-            name: "Digital Business & Strategy",
-            icon: <Laptop className="w-5 h-5" />,
-            degrees: "Executive Program in Digital Transformation",
-            details: "Empowering business leaders to drive digital transformation, AI adoption, e-commerce channel growth, and customer experience overhauls.",
-            features: ["Digital Transformation Playbooks", "AI & Automation for Leaders", "E-Commerce Strategy & Growth", "Omnichannel Customer Experience"],
-            duration: "6–12 Months",
-            eligibility: "Managers / Business Owners / Professionals"
-        },
-        {
-            name: "Education & Academic Leadership",
-            icon: <School className="w-5 h-5" />,
-            degrees: "PG Diploma in Educational Management",
-            details: "For school teachers, lecturers, and academic heads: institutional governance, accreditation readiness, curriculum design, and teacher evaluation.",
-            features: ["School & College Governance", "Accreditation & Quality Frameworks", "Curriculum Strategy & Pedagogy", "Blended Learning Management"],
-            duration: "1 Year",
-            eligibility: "B.Ed / Teachers / Academic Staff"
-        },
-        {
-            name: "Healthcare & Allied Administration",
-            icon: <HeartPulse className="w-5 h-5" />,
-            degrees: "Executive Healthcare & Hospital Management",
-            details: "Healthcare operations for doctors, administrators, and pharma professionals: NABH standards, medical supply chains, and hospital finance.",
-            features: ["NABH & Quality Accreditation", "Medical Supply Chain & Equipment", "Patient Experience Management", "Health Informatics & EHR Systems"],
-            duration: "1 Year",
-            eligibility: "Medical / Paramedical / Hospital Staff"
-        },
-        {
-            name: "Other Professional Disciplines",
-            icon: <Layers className="w-5 h-5" />,
-            degrees: "Supply Chain, HR Leadership & Operations Diplomas",
-            details: "Logistics and supply chain management, human capital strategy, industrial relations, corporate legal frameworks, and operations optimization.",
-            features: ["Supply Chain & Logistics Strategy", "Talent Acquisition & HR Analytics", "Labor Law Compliance", "Practical Operational Project"],
-            duration: "6 Months – 1 Year",
-            eligibility: "Graduation / Working Professionals"
-        }
-    ],
-
-    'vocational-edu': [
-        {
-            name: "Healthcare & Paramedical",
-            popular: true,
-            icon: <HeartPulse className="w-5 h-5" />,
-            degrees: "B.Sc MLT, B.Sc Radiology, DMLT, Nursing, Allied Health",
-            details: "Paramedical sciences, medical laboratory technology, radiology and medical imaging, dialysis tech, operation theatre, and patient care sciences.",
-            features: ["Medical Laboratory Sciences (B.Sc MLT)", "Radiology & Imaging Sciences", "Allied Health & Nursing Programs", "Hospital Clinical Internship Practical*"],
-            duration: "2–4 Years",
-            eligibility: "10th / 12th PCB / Science Stream"
-        },
-        {
-            name: "Engineering & Technology",
-            popular: true,
-            icon: <Cpu className="w-5 h-5" />,
-            degrees: "B.Tech*, Polytechnic Diploma (CSE, IT, Mech, Civil, Electrical)",
-            details: "Accredited technical qualifications across Computer Science, Information Technology, Electronics, Mechanical, Civil, and Electrical Engineering.",
-            features: ["Computer Science & IT Branches", "Mechanical & Automotive Systems", "Civil Engineering & Structural Design", "Electrical & Electronics Engineering"],
-            duration: "3–4 Years",
-            eligibility: "10th / 12th PCM / ITI Holders"
-        },
-        {
-            name: "Management & Business",
-            popular: true,
-            icon: <Briefcase className="w-5 h-5" />,
-            degrees: "B.Voc Management, BBA, MBA, PGDM",
-            details: "Business administration, marketing management, financial services, human resource management, logistics, and entrepreneurial ventures.",
-            features: ["Dual Specialization Options", "Industry-Aligned NSQF Skill Matrix", "Corporate Internships & Case Work", "Placement & Career Mentorship"],
-            duration: "2–3 Years",
-            eligibility: "10+2 / Any Graduation Stream"
-        },
-        {
-            name: "Computer Applications & IT",
-            popular: true,
-            icon: <Laptop className="w-5 h-5" />,
-            degrees: "B.Voc Software Dev, BCA, MCA, PGDCA",
-            details: "Software development, data technologies, mobile application engineering, web architectures, and full stack computer applications.",
-            features: ["Software Development & Web Tech", "Data & Digital Technologies", "Hands-on Practical Labs", "Industry Recognized University Degrees"],
-            duration: "2–3 Years",
-            eligibility: "10+2 / Any Graduate with Maths"
-        },
-        {
-            name: "Commerce & Finance",
-            icon: <Award className="w-5 h-5" />,
-            degrees: "B.Com (Banking & Insurance), M.Com, Taxation",
-            details: "Professional accounting, GST and corporate taxation, banking operations, investment management, and corporate financial planning.",
-            features: ["Banking & Financial Services", "Direct & Indirect Tax Expertise", "Tally & Computerized Accounting Lab", "Government & Private Sector Career Readiness"],
-            duration: "2–3 Years",
-            eligibility: "10+2 Commerce / Any Stream"
-        },
-        {
-            name: "Arts, Humanities & Social Sciences",
-            icon: <BookOpen className="w-5 h-5" />,
-            degrees: "BA, MA (Psychology, Economics, Sociology, Political Science)",
-            details: "Academic qualifications across clinical psychology, applied economics, public policy, sociological research, and modern social sciences.",
-            features: ["Psychology, Sociology & Economics", "Public Policy & Administration", "Research Methodology & Field Work", "Recognized University Degree"],
-            duration: "2–3 Years",
-            eligibility: "10+2 / Bachelor's Degree"
-        },
-        {
-            name: "Science Disciplines",
-            icon: <Compass className="w-5 h-5" />,
-            degrees: "B.Sc, M.Sc (Biotechnology, Life Sciences, Chemistry, Math)",
-            details: "Advanced laboratory sciences: biotechnology, environmental science, microbiology, industrial chemistry, physics, and mathematical computing.",
-            features: ["Biotechnology & Life Sciences", "Environmental Studies & Chemistry", "Lab Workstations & Practicals", "Research & Industrial Prospects"],
-            duration: "2–3 Years",
-            eligibility: "10+2 Science (PCM/PCB) / B.Sc"
-        },
-        {
-            name: "Education & Teaching",
-            icon: <School className="w-5 h-5" />,
-            degrees: "B.Ed*, B.El.Ed, Early Childhood Education, M.Ed",
-            details: "Teaching qualifications, early childhood care and education (ECCE), educational administration, pedagogical research, and instructional leadership.",
-            features: ["Teaching & Learning Methodologies", "Early Childhood Education (ECCE)", "Curriculum Design & School Admin", "State Approved Affiliations"],
-            duration: "1–2 Years",
-            eligibility: "Graduation / Post Graduation"
-        },
-        {
-            name: "Design & Creative Fields",
-            icon: <Palette className="w-5 h-5" />,
-            degrees: "B.Voc Fashion Design, Interior Design, Graphic & Multimedia",
-            details: "Creative industry degrees: fashion styling and garment construction, interior architecture, 3D visualization, animation, and digital multimedia.",
-            features: ["Fashion & Textile Design", "Interior Architecture & 3D CAD", "Graphic Design & Digital Multimedia", "Design Portfolio Showcases"],
-            duration: "2–3 Years",
-            eligibility: "10+2 Any Stream / Creative Aptitude"
-        },
-        {
-            name: "Hospitality & Other Professional Fields",
-            icon: <Building2 className="w-5 h-5" />,
-            degrees: "B.Voc Hotel Management, Travel & Tourism, Retail Management",
-            details: "Hospitality operations, front office and culinary management, tourism logistics, retail chain administration, and global supply chain systems.",
-            features: ["Hospitality & Hotel Operations", "Travel, Tourism & Ticketing", "Retail & Store Operations", "Logistics & Supply Chain Management"],
-            duration: "2–3 Years",
-            eligibility: "10+2 Any Stream / 10th for Diplomas"
-        }
-    ]
-};
+const universityCoursesData = {};
 
 const learningPaths = [
     {
@@ -558,12 +227,18 @@ const UniversityCourses = () => {
     };
 
     // Dynamic Courses state backed by live MongoDB & real-time sync
-    const [coursesState, setCoursesState] = useState(universityCoursesData);
+    const [isBackendDown, setIsBackendDown] = useState(false);
+    const [coursesState, setCoursesState] = useState({});
 
     const fetchMongoUniversityCourses = async () => {
         try {
-            const res = await fetch('/api/courses?programType=university');
-            if (!res.ok) return;
+            const baseUrl = import.meta.env.VITE_ERP_API_BASE_URL || '';
+            const res = await fetch(`${baseUrl}/api/courses?programType=university`);
+            if (!res.ok) {
+                setIsBackendDown(true);
+                setCoursesState({});
+                return;
+            }
             const mongoList = await res.json();
             if (Array.isArray(mongoList) && mongoList.length > 0) {
                 const grouped = {};
@@ -582,16 +257,22 @@ const UniversityCourses = () => {
                     grouped[cat].sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
                 }
 
-                setCoursesState(prev => ({ ...prev, ...grouped }));
+                setIsBackendDown(false);
+                setCoursesState(grouped);
+            } else {
+                setIsBackendDown(true);
+                setCoursesState({});
             }
         } catch (err) {
-            console.warn('MongoDB university fetch note:', err);
+            console.warn('[UniversityCourses] Backend offline, standing by...', err.message);
+            setIsBackendDown(true);
+            setCoursesState({});
         }
     };
 
     useEffect(() => {
         fetchMongoUniversityCourses();
-        const interval = setInterval(fetchMongoUniversityCourses, 4000);
+        const interval = setInterval(fetchMongoUniversityCourses, 3000);
 
         const syncCourses = () => {
             fetchMongoUniversityCourses();
@@ -1250,11 +931,30 @@ const UniversityCourses = () => {
                 </div>
 
                 {/* Course Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 mt-2">
-                    {currentCourses.map((course, idx) => (
-                        <CourseCard key={idx} course={course} index={idx} />
-                    ))}
-                </div>
+                {isBackendDown || currentCourses.length === 0 ? (
+                    <div className="text-center py-12 bg-white rounded-2xl border border-amber-200 p-8 max-w-lg mx-auto shadow-xs">
+                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-50 text-amber-600 mb-3 border border-amber-200">
+                            <AlertCircle className="w-6 h-6 animate-pulse" />
+                        </div>
+                        <h3 className="text-base font-bold text-slate-800 mb-1">University Programs Database Disconnected</h3>
+                        <p className="text-xs text-slate-500 mb-4">
+                            All degrees and university courses are pulled directly from MongoDB. The backend server is currently offline or reconnecting. Data will appear automatically when connected.
+                        </p>
+                        <button
+                            onClick={fetchMongoUniversityCourses}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors"
+                        >
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            <span>Reload University Programs</span>
+                        </button>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 mt-2">
+                        {currentCourses.map((course, idx) => (
+                            <CourseCard key={idx} course={course} index={idx} />
+                        ))}
+                    </div>
+                )}
 
                 {/* Footnote for Vocational & Professional Category */}
                 {activeCategory === 'vocational-edu' && (
@@ -1346,25 +1046,25 @@ const UniversityCourses = () => {
 
             {/* ── Course Details Modal ── */}
             {isCourseModalOpen && selectedCourse && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 z-50 animate-fadeIn">
-                    <div className="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-100 overflow-hidden">
+                <div className="fixed inset-0 bg-slate-900/65 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 md:p-6 z-50 animate-fadeIn">
+                    <div className="bg-white rounded-2xl sm:rounded-3xl w-[94vw] md:w-[80vw] max-w-[80vw] max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-100 flex flex-col">
                         {/* Course Image Header Banner */}
-                        <div className="relative h-44 sm:h-52 w-full overflow-hidden bg-slate-900 flex-shrink-0">
+                        <div className="relative h-48 sm:h-56 md:h-64 lg:h-72 w-full overflow-hidden bg-slate-900 flex-shrink-0">
                             <img 
                                 src={getUniversityCourseImage(selectedCourse)} 
                                 alt={selectedCourse.name}
                                 className="w-full h-full object-cover object-center"
                                 onError={(e) => { e.target.src = '/university_graduates.jpg'; }}
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-black/30" />
                             
-                            <div className="absolute top-3 right-3 flex items-center gap-2 z-20">
+                            <div className="absolute top-3 sm:top-4 right-3 sm:right-4 flex items-center gap-2 z-20">
                                 {isStaff && (
                                     <>
                                         <button
                                             type="button"
                                             onClick={() => openEditModal(selectedCourse)}
-                                            className="px-3 py-1.5 rounded-full bg-purple-900/90 hover:bg-purple-950 text-purple-100 text-xs font-bold shadow-md border border-purple-400/40 backdrop-blur-md cursor-pointer transition-transform hover:scale-105 flex items-center gap-1.5"
+                                            className="px-3.5 py-1.5 rounded-full bg-purple-900/90 hover:bg-purple-950 text-purple-100 text-xs font-bold shadow-md border border-purple-400/40 backdrop-blur-md cursor-pointer transition-transform hover:scale-105 flex items-center gap-1.5"
                                             title="Edit Program Details (Staff)"
                                         >
                                             <Edit3 className="w-3.5 h-3.5 text-purple-300" />
@@ -1373,7 +1073,7 @@ const UniversityCourses = () => {
                                         <button
                                             type="button"
                                             onClick={() => handleDeleteCourse(selectedCourse)}
-                                            className="px-3 py-1.5 rounded-full bg-rose-600/95 hover:bg-rose-700 text-white text-xs font-bold shadow-md border border-rose-400/40 backdrop-blur-md cursor-pointer transition-transform hover:scale-105 flex items-center gap-1.5"
+                                            className="px-3.5 py-1.5 rounded-full bg-rose-600/95 hover:bg-rose-700 text-white text-xs font-bold shadow-md border border-rose-400/40 backdrop-blur-md cursor-pointer transition-transform hover:scale-105 flex items-center gap-1.5"
                                             title="Delete Program (Staff)"
                                         >
                                             <Trash2 className="w-3.5 h-3.5 text-rose-100" />
@@ -1383,119 +1083,152 @@ const UniversityCourses = () => {
                                 )}
                                 <button
                                     onClick={closeCourseModal}
-                                    className="text-white/90 hover:text-white bg-black/40 hover:bg-black/65 p-2 rounded-full transition-colors cursor-pointer backdrop-blur-md"
+                                    className="text-white hover:text-white bg-black/50 hover:bg-black/75 p-2 sm:p-2.5 rounded-full transition-all cursor-pointer backdrop-blur-md hover:scale-105"
                                     aria-label="Close"
                                 >
-                                    <X className="w-5 h-5" />
+                                    <X className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </button>
                             </div>
 
-                            <div className="absolute bottom-3.5 left-4 right-4 text-white z-10">
-                                <div className="flex items-center gap-2 mb-1.5">
-                                    <span className="px-2.5 py-0.5 rounded-full bg-blue-600/90 text-[10px] font-semibold uppercase tracking-wide">
+                            <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6 text-white z-10">
+                                <div className="flex flex-wrap items-center gap-2 mb-2 sm:mb-2.5">
+                                    <span className="px-3 py-1 rounded-full bg-[#0066ff] text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-sm">
                                         {activeCategoryInfo.label}
                                     </span>
-                                    <span className="px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-semibold flex items-center gap-1 shadow-sm">
-                                        <Star className="w-2.5 h-2.5 fill-slate-950 text-slate-950" />
+                                    <span className="px-3 py-1 rounded-full bg-amber-400 text-slate-950 text-[11px] sm:text-xs font-bold flex items-center gap-1.5 shadow-sm">
+                                        <Star className="w-3 h-3 fill-slate-950 text-slate-950" />
                                         UGC Entitled
                                     </span>
+                                    <span className="hidden sm:inline-flex px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-[11px] sm:text-xs font-semibold">
+                                        Govt. Recognized University Pathway
+                                    </span>
                                 </div>
-                                <h3 className="text-lg sm:text-xl font-bold leading-snug drop-shadow-sm flex items-center gap-2">
-                                    <span>{selectedCourse.name}</span>
+                                <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold leading-tight drop-shadow-md text-white">
+                                    {selectedCourse.name}
                                 </h3>
                             </div>
                         </div>
 
-                        <div className="p-4 sm:p-5 space-y-4">
-                            {selectedCourse.degrees && (
-                                <div className="bg-blue-50/70 border border-blue-100 p-3 rounded-xl">
-                                    <h5 className="font-bold text-[10.5px] uppercase tracking-wider text-blue-900 mb-1">
-                                        Available Degrees & Qualifications
-                                    </h5>
-                                    <p className="text-[#004b93] font-bold text-xs sm:text-[13px]">
-                                        {selectedCourse.degrees}
-                                    </p>
-                                </div>
-                            )}
+                        {/* Modal Body: Responsive 2-Column on LG screens */}
+                        <div className="p-4 sm:p-6 lg:p-8 flex-1">
+                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+                                {/* Left Column: 7 cols */}
+                                <div className="lg:col-span-7 space-y-5">
+                                    {selectedCourse.degrees && (
+                                        <div className="bg-gradient-to-r from-blue-50/90 to-indigo-50/70 border border-blue-100 p-4 rounded-2xl">
+                                            <h5 className="font-bold text-[11px] sm:text-xs uppercase tracking-wider text-blue-900 mb-1 flex items-center gap-2">
+                                                <GraduationCap className="w-4 h-4 text-blue-700" />
+                                                Available Degrees & Qualifications
+                                            </h5>
+                                            <p className="text-[#004b93] font-bold text-sm sm:text-base leading-snug">
+                                                {selectedCourse.degrees}
+                                            </p>
+                                        </div>
+                                    )}
 
-                            <div>
-                                <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-                                    Programme Overview
-                                </h4>
-                                <p className="text-slate-700 leading-relaxed text-xs sm:text-[13px]">
-                                    {selectedCourse.details}
-                                </p>
-                            </div>
+                                    <div>
+                                        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                                            Programme Overview
+                                        </h4>
+                                        <p className="text-slate-700 leading-relaxed text-xs sm:text-sm md:text-[14.5px]">
+                                            {selectedCourse.details}
+                                        </p>
+                                    </div>
 
-                            {selectedCourse.features && (
-                                <div>
-                                    <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
-                                        Academic Highlights & Curricula
-                                    </h4>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                        {selectedCourse.features.map((feature, index) => (
-                                            <div key={index} className="flex items-center gap-2 p-2 rounded-lg bg-slate-50 border border-slate-100">
-                                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
-                                                <span className="text-slate-800 text-xs font-medium">{feature}</span>
+                                    {selectedCourse.features && selectedCourse.features.length > 0 && (
+                                        <div>
+                                            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">
+                                                Academic Highlights & Curricula
+                                            </h4>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                                {selectedCourse.features.map((feature, index) => (
+                                                    <div key={index} className="flex items-start gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-blue-100 transition-colors">
+                                                        <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                                                        <span className="text-slate-800 text-xs sm:text-[13px] font-medium leading-snug">{feature}</span>
+                                                    </div>
+                                                ))}
                                             </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div className="bg-blue-50/70 border border-blue-100/80 p-3 rounded-xl">
-                                    <div className="flex items-center gap-1.5 mb-0.5">
-                                        <Clock className="w-3.5 h-3.5 text-[#0066ff]" />
-                                        <h5 className="font-bold text-[10.5px] uppercase tracking-wider text-blue-900">Duration</h5>
-                                    </div>
-                                    <p className="text-slate-800 font-bold text-xs sm:text-[12.5px]">{selectedCourse.duration}</p>
+                                        </div>
+                                    )}
                                 </div>
 
-                                <div className="bg-emerald-50/70 border border-emerald-100/80 p-3 rounded-xl">
-                                    <div className="flex items-center gap-1.5 mb-0.5">
-                                        <GraduationCap className="w-3.5 h-3.5 text-emerald-600" />
-                                        <h5 className="font-bold text-[10.5px] uppercase tracking-wider text-emerald-900">Eligibility</h5>
-                                    </div>
-                                    <p className="text-slate-800 font-bold text-xs sm:text-[12.5px]">{selectedCourse.eligibility}</p>
-                                </div>
-                            </div>
+                                {/* Right Column: 5 cols */}
+                                <div className="lg:col-span-5 space-y-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
+                                        <div className="bg-blue-50/70 border border-blue-100/80 p-4 rounded-2xl">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <Clock className="w-4 h-4 text-[#0066ff]" />
+                                                <h5 className="font-bold text-[11px] uppercase tracking-wider text-blue-900">Duration</h5>
+                                            </div>
+                                            <p className="text-slate-900 font-bold text-sm sm:text-base">{selectedCourse.duration}</p>
+                                        </div>
 
-                            <div className="bg-amber-50/70 border border-amber-200/70 p-3 rounded-xl flex items-start gap-2.5">
-                                <Users className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                                <div>
-                                    <h5 className="font-bold text-[10.5px] uppercase tracking-wider text-amber-900 mb-0.5">
-                                        Ideal For
-                                    </h5>
-                                    <p className="text-slate-700 text-xs font-medium leading-relaxed">
-                                        {activeCategoryInfo.suitableFor}
-                                    </p>
+                                        <div className="bg-emerald-50/70 border border-emerald-100/80 p-4 rounded-2xl">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <GraduationCap className="w-4 h-4 text-emerald-600" />
+                                                <h5 className="font-bold text-[11px] uppercase tracking-wider text-emerald-900">Eligibility</h5>
+                                            </div>
+                                            <p className="text-slate-900 font-bold text-sm sm:text-base">{selectedCourse.eligibility}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-amber-50/70 border border-amber-200/70 p-4 rounded-2xl flex items-start gap-3">
+                                        <Users className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                                        <div>
+                                            <h5 className="font-bold text-[11px] uppercase tracking-wider text-amber-900 mb-1">
+                                                Ideal For
+                                            </h5>
+                                            <p className="text-slate-700 text-xs sm:text-[13px] font-medium leading-relaxed">
+                                                {activeCategoryInfo.suitableFor}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Direct Helpline Quick Card */}
+                                    <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl">
+                                        <div className="flex items-center justify-between gap-2 mb-2">
+                                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Need Immediate Help?</span>
+                                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">
+                                                Online Now
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-slate-600 mb-3 leading-relaxed">
+                                            Have questions about eligibility, recognized universities, fees, or examination mode?
+                                        </p>
+                                        <a
+                                            href="tel:+916284063840"
+                                            className="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 transition-colors shadow-xs"
+                                        >
+                                            <Phone className="w-3.5 h-3.5 text-[#0066ff]" />
+                                            <span>Call +91-62840 63840</span>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         {/* Modal Footer */}
-                        <div className="p-4 sm:p-5 border-t border-slate-100 bg-slate-50/60 rounded-b-xl sm:rounded-b-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div className="p-4 sm:p-5 lg:p-6 border-t border-slate-100 bg-slate-50/70 rounded-b-2xl sm:rounded-b-3xl flex flex-col sm:flex-row items-center justify-between gap-3">
                             <a
                                 href="tel:+916284063840"
-                                className="text-xs text-slate-500 font-medium hover:text-[#0066ff] flex items-center gap-1.5"
+                                className="text-xs sm:text-sm text-slate-500 font-medium hover:text-[#0066ff] flex items-center gap-2"
                             >
-                                <Phone className="w-3.5 h-3.5 text-[#0066ff]" />
+                                <Phone className="w-4 h-4 text-[#0066ff]" />
                                 <span>Admission Helpline: +91-62840 63840</span>
                             </a>
-                            <div className="flex items-center gap-2 w-full sm:w-auto">
+                            <div className="flex items-center gap-3 w-full sm:w-auto">
                                 <button
                                     onClick={closeCourseModal}
-                                    className="sm:w-auto px-4 py-2 border border-slate-200 text-slate-600 rounded-xl font-semibold text-xs hover:bg-slate-100 transition-colors cursor-pointer"
+                                    className="w-full sm:w-auto px-5 py-2.5 border border-slate-200 text-slate-600 hover:text-slate-800 rounded-xl font-semibold text-xs sm:text-sm hover:bg-slate-100 transition-colors cursor-pointer"
                                 >
                                     Close
                                 </button>
                                 <button
                                     onClick={() => openAdvisorModal(selectedCourse.name)}
-                                    className="flex-1 sm:flex-initial px-5 py-2 bg-[#0066ff] hover:bg-[#0052cc] text-white rounded-xl font-semibold text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                                    className="w-full sm:w-auto px-6 py-2.5 bg-[#0066ff] hover:bg-[#0052cc] text-white rounded-xl font-semibold text-xs sm:text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
                                 >
                                     <span>Get Admission Guidance</span>
-                                    <ArrowRight className="w-3.5 h-3.5" />
+                                    <ArrowRight className="w-4 h-4" />
                                 </button>
                             </div>
                         </div>

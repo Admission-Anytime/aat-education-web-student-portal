@@ -15,10 +15,10 @@ import WhatsAppFloatingBtn from './Common/WhatsAppFloatingBtn'
 const SchoolWebsite = () => {
     const [footerData, setFooterData] = useState(null);
     const [socialLinks, setSocialLinks] = useState({
-        facebook: 'https://facebook.com',
-        instagram: 'https://instagram.com',
-        youtube: 'https://youtube.com',
-        linkedin: 'https://linkedin.com',
+        facebook: '',
+        instagram: '',
+        youtube: '',
+        linkedin: '',
         twitter: '',
         whatsapp: ''
     });
@@ -50,7 +50,10 @@ const SchoolWebsite = () => {
 
         fetchFooter();
         fetchSocial();
-        const poll = setInterval(fetchFooter, 6000);
+        const poll = setInterval(() => {
+            fetchFooter();
+            fetchSocial();
+        }, 3000);
         window.addEventListener('siteSettingsUpdated', fetchSocial);
         window.addEventListener('storage', fetchSocial);
         return () => {
@@ -60,19 +63,10 @@ const SchoolWebsite = () => {
         };
     }, []);
 
-    const defaultQuickLinks = [
-        { text: 'About us', href: '/AboutUs' },
-        { text: 'Contact us', href: '/ContactUs' },
-        { text: 'Terms and Conditions', href: '/terms' },
-        { text: 'Blog', href: '/blogs' },
-        { text: 'Admission', href: '/admission' },
-        { text: 'FAQs', href: '/FAQ' }
-    ];
-
     const excludedLinkNames = ['faculty', 'staff', 'student', 'result'];
     const rawLinks = (footerData?.mainLinks && footerData.mainLinks.length > 0)
         ? footerData.mainLinks
-        : defaultQuickLinks;
+        : [];
     const quickLinks = rawLinks.filter(item => {
         const text = (item.text || item.title || item.label || '').toLowerCase();
         return !excludedLinkNames.some(ex => text.includes(ex));
@@ -93,19 +87,21 @@ const SchoolWebsite = () => {
             <footer className="bg-gradient-to-b from-[#001c44] via-[#001432] to-[#000d22] text-white relative border-t border-blue-400/20 shadow-[0_-8px_30px_rgba(0,18,50,0.25)] pb-20 md:pb-0">
                 
                 {/* 1. Top Quick Links Navigation Bar */}
-                <div className="border-b border-white/10 bg-[#00102b]/60 backdrop-blur-sm py-2">
-                    <div className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10 flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-7 gap-y-1.5 text-xs sm:text-[13px] font-medium text-slate-300">
-                        {quickLinks.map((item, idx) => (
-                            <NavLink
-                                key={idx}
-                                to={item.href || item.to || '#'}
-                                className={({ isActive }) => `transition-colors hover:text-white ${isActive ? 'text-[#fed000] font-semibold' : ''}`}
-                            >
-                                {item.text || item.title || item.label}
-                            </NavLink>
-                        ))}
+                {quickLinks.length > 0 && (
+                    <div className="border-b border-white/10 bg-[#00102b]/60 backdrop-blur-sm py-2">
+                        <div className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10 flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-7 gap-y-1.5 text-xs sm:text-[13px] font-medium text-slate-300">
+                            {quickLinks.map((item, idx) => (
+                                <NavLink
+                                    key={idx}
+                                    to={item.href || item.to || '#'}
+                                    className={({ isActive }) => `transition-colors hover:text-white ${isActive ? 'text-[#fed000] font-semibold' : ''}`}
+                                >
+                                    {item.text || item.title || item.label}
+                                </NavLink>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* 2. Main Footer Body: Compact & Proportionate */}
                 <div className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 xl:px-10 py-7 sm:py-8">
@@ -147,104 +143,40 @@ const SchoolWebsite = () => {
                             </a>
                         </div>
 
-                        {/* Column: Popular Course */}
-                        <div className="col-span-1 md:col-span-2 flex flex-col items-start text-left">
-                            <h4 className="text-white font-semibold text-xs sm:text-[13.5px] mb-2 sm:mb-2.5 tracking-tight border-b-2 border-[#fed000]/60 pb-1 inline-block">
-                                Popular Course
-                            </h4>
-                            <ul className="space-y-1 sm:space-y-1.5 text-xs sm:text-[12px] text-slate-300">
-                                {[
-                                    { title: 'IT & Stack Development', to: '/it-stack-development' },
-                                    { title: 'Web Development', to: '/web-development' },
-                                    { title: 'App Development', to: '/app-development' },
-                                    { title: 'Python Programming', to: '/python-programming' },
-                                    { title: 'UI/UX Design', to: '/ui-ux-design' },
-                                    { title: 'Digital Marketing', to: '/digital-marketing' },
-                                    { title: 'Tally & Accounting', to: '/tally-accounting' },
-                                ].map((item, idx) => (
-                                    <li key={idx}>
-                                        <NavLink
-                                            to={item.to}
-                                            className="hover:text-[#fed000] transition-colors duration-150 block truncate"
-                                        >
-                                            {item.title}
-                                        </NavLink>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+                        {/* Dynamic Columns from MongoDB footerData.sections */}
+                        {footerData?.sections && footerData.sections.length > 0 && (
+                            footerData.sections.map((section, sIdx) => {
+                                const accentColors = [
+                                    { border: 'border-[#fed000]/60', hover: 'hover:text-[#fed000]' },
+                                    { border: 'border-emerald-400/60', hover: 'hover:text-emerald-300' },
+                                    { border: 'border-sky-400/60', hover: 'hover:text-sky-300' },
+                                    { border: 'border-purple-400/60', hover: 'hover:text-purple-300' },
+                                    { border: 'border-rose-400/60', hover: 'hover:text-rose-300' },
+                                    { border: 'border-amber-400/60', hover: 'hover:text-amber-300' }
+                                ];
+                                const theme = accentColors[sIdx % accentColors.length];
 
-                        {/* Column: Admission */}
-                        <div className="col-span-1 md:col-span-2 flex flex-col items-start text-left">
-                            <h4 className="text-white font-semibold text-xs sm:text-[13.5px] mb-2 sm:mb-2.5 tracking-tight border-b-2 border-emerald-400/60 pb-1 inline-block">
-                                Admission
-                            </h4>
-                            <ul className="space-y-1 sm:space-y-1.5 text-xs sm:text-[12px] text-slate-300">
-                                {[
-                                    { title: 'After 10th', to: '/admission' },
-                                    { title: 'After 12th', to: '/admission' },
-                                    { title: 'Graduation', to: '/admission' },
-                                    { title: 'LEET Programs', to: '/UniversityCourses' },
-                                    { title: 'Dual Degree Programs', to: '/UniversityCourses' },
-                                    { title: 'Scholarship', to: '/admission' },
-                                    { title: 'Education Loan', to: '/ContactUs' }
-                                ].map((item, idx) => (
-                                    <li key={idx}>
-                                        <NavLink to={item.to} className="hover:text-emerald-300 transition-colors duration-150 block truncate">
-                                            {item.title}
-                                        </NavLink>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* Column: Career After */}
-                        <div className="col-span-1 md:col-span-2 flex flex-col items-start text-left">
-                            <h4 className="text-white font-semibold text-xs sm:text-[13.5px] mb-2 sm:mb-2.5 tracking-tight border-b-2 border-sky-400/60 pb-1 inline-block">
-                                Career After
-                            </h4>
-                            <ul className="space-y-1 sm:space-y-1.5 text-xs sm:text-[12px] text-slate-300">
-                                {[
-                                    { title: '12th PCM', to: '/Placement' },
-                                    { title: '12th PCB', to: '/Placement' },
-                                    { title: '12th Management', to: '/Placement' },
-                                    { title: '12th Arts and Humanities', to: '/Placement' },
-                                    { title: '12th Commerce', to: '/Placement' },
-                                    { title: 'Top Paramedical Courses', to: '/Placement' },
-                                    { title: 'Vocational Course', to: '/Placement' }
-                                ].map((item, idx) => (
-                                    <li key={idx}>
-                                        <NavLink to={item.to} className="hover:text-sky-300 transition-colors duration-150 block truncate">
-                                            {item.title}
-                                        </NavLink>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* Column: Best Career Options */}
-                        <div className="col-span-1 md:col-span-2 flex flex-col items-start text-left">
-                            <h4 className="text-white font-semibold text-xs sm:text-[13.5px] mb-2 sm:mb-2.5 tracking-tight border-b-2 border-purple-400/60 pb-1 inline-block">
-                                Best Career Options
-                            </h4>
-                            <ul className="space-y-1 sm:space-y-1.5 text-xs sm:text-[12px] text-slate-300">
-                                {[
-                                    { title: 'NEET-UG 2026', to: '/UniversityCourses' },
-                                    { title: 'JEE Main 2026', to: '/UniversityCourses' },
-                                    { title: 'JEE Advance 2026', to: '/UniversityCourses' },
-                                    { title: 'UG CLAT 2026', to: '/UniversityCourses' },
-                                    { title: 'CUET 2026', to: '/UniversityCourses' },
-                                    { title: 'CAT 2026', to: '/UniversityCourses' },
-                                    { title: 'GGS IPU CET 2026', to: '/UniversityCourses' }
-                                ].map((item, idx) => (
-                                    <li key={idx}>
-                                        <NavLink to={item.to} className="hover:text-purple-300 transition-colors duration-150 block truncate">
-                                            {item.title}
-                                        </NavLink>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+                                return (
+                                    <div key={section._id || sIdx} className="col-span-1 md:col-span-2 flex flex-col items-start text-left">
+                                        <h4 className={`text-white font-semibold text-xs sm:text-[13.5px] mb-2 sm:mb-2.5 tracking-tight border-b-2 ${theme.border} pb-1 inline-block`}>
+                                            {section.title}
+                                        </h4>
+                                        <ul className="space-y-1 sm:space-y-1.5 text-xs sm:text-[12px] text-slate-300">
+                                            {(section.links || []).map((item, idx) => (
+                                                <li key={idx}>
+                                                    <NavLink
+                                                        to={item.href || item.to || '#'}
+                                                        className={`${theme.hover} transition-colors duration-150 block truncate`}
+                                                    >
+                                                        {item.text || item.title || item.label}
+                                                    </NavLink>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                );
+                            })
+                        )}
 
                     </div>
                 </div>

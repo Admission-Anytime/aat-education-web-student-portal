@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import aayush_logo from '../../assets/img/aayush_logo_final.png';
 import { authApi } from '../../services/api';
@@ -37,354 +37,119 @@ import {
     Zap,
     Video,
     ShoppingCart,
-    Compass
+    Compass,
+    BookOpen,
+    AlertCircle,
+    RefreshCw
 } from 'lucide-react';
 
-export const courseNavCategories = [
-    {
-        id: 'software',
-        label: 'Software & Web Development',
-        icon: Code,
-        state: { category: 'software' },
-        description: 'Full Stack, Web Development & Mobile Apps',
-        subgroups: [
-            {
-                title: 'Full Stack & Web Engineering',
-                items: [
-                    { label: 'Software & Full Stack Development', to: '/it-stack-development', highlight: 'Programming • Web Development • Full Stack' },
-                    { label: 'Web Designing & Development', to: '/web-development', highlight: 'HTML • CSS • JavaScript • Responsive • React' },
-                    { label: 'Mobile App Development', to: '/app-development', highlight: 'Android • Kotlin • Flutter • React Native' },
-                    { label: 'Python Programming & Backend', to: '/python-programming', highlight: 'Python • OOP • Django • FastAPI • APIs' },
-                ]
-            }
-        ]
-    },
-    {
-        id: 'ai-data',
-        label: 'AI, Data & Cloud',
-        icon: Cpu,
-        state: { category: 'ai-data' },
-        description: 'Generative AI, Data Analytics, Cloud & Security',
-        subgroups: [
-            {
-                title: 'AI & Data Technologies',
-                items: [
-                    { label: 'Artificial Intelligence & Generative AI', to: '/Courses', state: { category: 'ai-data' }, highlight: 'AI • Generative AI • AI Tools • Automation' },
-                    { label: 'Data Science, Data Analytics & BI', to: '/Courses', state: { category: 'ai-data' }, highlight: 'Python • SQL • Power BI • Machine Learning' },
-                    { label: 'Cyber Security & Networking', to: '/Courses', state: { category: 'ai-data' }, highlight: 'Cyber Security • Ethical Hacking • Security' },
-                    { label: 'Cloud Computing & DevOps', to: '/Courses', state: { category: 'ai-data' }, highlight: 'AWS • Azure • Linux • Docker • DevOps' },
-                ]
-            }
-        ]
-    },
-    {
-        id: 'design',
-        label: 'Design, UI/UX & Media',
-        icon: Palette,
-        state: { category: 'design' },
-        description: 'UI/UX Research, Graphic Design & Motion Video',
-        subgroups: [
-            {
-                title: 'Design & Visual Media',
-                items: [
-                    { label: 'UI/UX & Product Design', to: '/ui-ux-design', highlight: 'Figma • UX Research • Prototyping' },
-                    { label: 'Graphic Design & Branding', to: '/Courses', state: { category: 'design' }, highlight: 'Photoshop • Illustrator • CorelDRAW' },
-                    { label: 'Video Editing & Motion Graphics', to: '/Courses', state: { category: 'design' }, highlight: 'Premiere Pro • After Effects • Motion Reels' },
-                ]
-            }
-        ]
-    },
-    {
-        id: 'marketing',
-        label: 'Digital Marketing & E-Commerce',
-        icon: Megaphone,
-        state: { category: 'marketing' },
-        description: 'Performance Marketing, SEO, Social Ads & E-Com',
-        subgroups: [
-            {
-                title: 'Digital Growth & E-Commerce',
-                items: [
-                    { label: 'Digital Marketing & Performance Marketing', to: '/digital-marketing', highlight: 'SEO • Google Ads • Meta Ads • Social Media' },
-                    { label: 'E-Commerce & Digital Business', to: '/Courses', state: { category: 'marketing' }, highlight: 'Shopify • WooCommerce • Marketplaces' },
-                ]
-            }
-        ]
-    },
-    {
-        id: 'business',
-        label: 'Accounting & Business Skills',
-        icon: Calculator,
-        state: { category: 'business' },
-        description: 'TallyPrime, GST Taxation, Excel & Workplace Skills',
-        subgroups: [
-            {
-                title: 'Accounting & Workplace Skills',
-                items: [
-                    { label: 'Accounting, GST & Business Finance', to: '/tally-accounting', highlight: 'Tally Prime • GST • Accounting • Billing • Payroll' },
-                    { label: 'Advanced Office & Business Skills', to: '/Courses', state: { category: 'business' }, highlight: 'MS Office • Advanced Excel • AI Productivity' },
-                ]
-            }
-        ]
-    },
-    {
-        id: 'technical',
-        label: 'Technical CAD & IT Support',
-        icon: Settings,
-        state: { category: 'technical' },
-        description: 'AutoCAD 2D/3D, Hardware & System Administration',
-        subgroups: [
-            {
-                title: 'Technical & Systems',
-                items: [
-                    { label: 'AutoCAD & Technical Design', to: '/Courses', state: { category: 'technical' }, highlight: 'AutoCAD • CAD • Engineering Drawing' },
-                    { label: 'Hardware, IT Support & System Administration', to: '/Courses', state: { category: 'technical' }, highlight: 'Hardware • IT Support • Linux • Troubleshooting' },
-                ]
-            }
-        ]
-    },
-    {
-        id: 'languages',
-        label: 'Foreign Languages & Test Prep',
-        icon: Languages,
-        state: { category: 'languages' },
-        description: 'IELTS, PTE & Global Languages (German, French, Japanese)',
-        subgroups: [
-            {
-                title: 'English Proficiency Tests',
-                items: [
-                    { label: 'IELTS – English Proficiency Test Preparation', to: '/Courses', state: { category: 'languages' }, highlight: 'IELTS Academic • General • L, R, W, S' },
-                    { label: 'PTE – Pearson Test of English', to: '/Courses', state: { category: 'languages' }, highlight: 'PTE Academic • Speaking • Reading • Writing' },
-                ]
-            },
-            {
-                title: 'Foreign Languages',
-                items: [
-                    { label: 'German Language', to: '/Courses', state: { category: 'languages' }, highlight: 'A1 • A2 • B1 • B2 Levels' },
-                    { label: 'French Language', to: '/Courses', state: { category: 'languages' }, highlight: 'A1 • A2 • B1 • B2 Levels' },
-                    { label: 'Japanese Language', to: '/Courses', state: { category: 'languages' }, highlight: 'N5 • N4 • N3 • N2 Levels' },
-                ]
-            }
-        ]
-    },
-    {
-        id: 'shortterm',
-        label: 'Short-Term & Professional Skills',
-        icon: Sparkles,
-        state: { category: 'shortterm' },
-        description: 'Quick Practical Skills & Career Upskilling',
-        subgroups: [
-            {
-                title: 'Professional Upskilling',
-                items: [
-                    { label: 'Short-Term & Professional Skills', to: '/Courses', state: { category: 'shortterm' }, highlight: 'Quick Skills • Career Skills • Professional Upskilling' },
-                ]
-            }
-        ]
+// Backwards-compatibility exports for external consumers
+export const courseNavCategories = [];
+export const coursesCardsColumns = [];
+export const courseFlyoutData = [];
+export const coursesMegaMenuColumns = [];
+
+// Helper to generate SEO-friendly clean URL slug from course title
+export const generateSlug = (text) => {
+    if (!text) return '';
+    return String(text)
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+};
+
+// Dynamic course icon resolution based on name, category, or keywords
+export const getCourseIcon = (course) => {
+    const name = (course?.name || course?.title || '').toLowerCase();
+    const cat = (course?.categoryId || '').toLowerCase();
+
+    if (name.includes('full stack') || name.includes('mern') || name.includes('software') || name.includes('python') || name.includes('java') || name.includes('bca')) return Code;
+    if (name.includes('web') || name.includes('frontend') || name.includes('html')) return Globe;
+    if (name.includes('mobile') || name.includes('app') || name.includes('android') || name.includes('flutter')) return Smartphone;
+    if (name.includes('ai') || name.includes('artificial') || name.includes('generative') || name.includes('prompt')) return Cpu;
+    if (name.includes('data') || name.includes('analytics') || name.includes('bi') || name.includes('sql') || name.includes('power bi')) return BarChart3;
+    if (name.includes('cyber') || name.includes('security') || name.includes('ethical') || name.includes('defense')) return Shield;
+    if (name.includes('cloud') || name.includes('devops') || name.includes('aws') || name.includes('azure') || name.includes('docker')) return Zap;
+    if (name.includes('marketing') || name.includes('seo') || name.includes('ads') || name.includes('social')) return Megaphone;
+    if (name.includes('commerce') || name.includes('shopify') || name.includes('amazon') || name.includes('store')) return ShoppingCart;
+    if (name.includes('ui') || name.includes('ux') || name.includes('product design') || name.includes('figma')) return Palette;
+    if (name.includes('graphic') || name.includes('design') || name.includes('photoshop') || name.includes('illustrator')) return Palette;
+    if (name.includes('video') || name.includes('animation') || name.includes('motion') || name.includes('premiere')) return Video;
+    if (name.includes('tally') || name.includes('gst') || name.includes('accounting') || name.includes('finance') || name.includes('tax')) return Calculator;
+    if (name.includes('excel') || name.includes('office') || name.includes('business')) return Briefcase;
+    if (name.includes('cad') || name.includes('autocad') || name.includes('drafting')) return Compass;
+    if (name.includes('hardware') || name.includes('networking') || name.includes('support') || name.includes('troubleshooting')) return Settings;
+    if (name.includes('ielts')) return Award;
+    if (name.includes('pte') || name.includes('german') || name.includes('french') || name.includes('japanese') || name.includes('language')) return Languages;
+    if (name.includes('bootcamp') || name.includes('short')) return Sparkles;
+
+    if (cat === 'software') return Code;
+    if (cat === 'ai-data') return Cpu;
+    if (cat === 'design') return Palette;
+    if (cat === 'marketing') return Megaphone;
+    if (cat === 'business') return Calculator;
+    if (cat === 'technical') return Settings;
+    if (cat === 'languages') return Languages;
+    if (cat === 'shortterm') return Sparkles;
+
+    return GraduationCap;
+};
+
+// URL resolver generating clean slugs (e.g. /course/web-designing, /course/mern-stack)
+export const getCourseUrl = (course) => {
+    if (course?.path && typeof course.path === 'string' && course.path.startsWith('/')) {
+        return course.path;
     }
-];
+    const rawName = (course?.name || course?.title || '').trim();
+    const slug = course?.slug || generateSlug(rawName);
 
-// All 22 Professional Courses arranged across 4 balanced columns for the 22-Card MegaMenu
-export const coursesCardsColumns = [
-    {
-        colId: 'col-1',
-        sections: [
-            {
-                id: 'software',
-                title: 'Software & Web Dev',
-                icon: Code,
-                iconColor: 'text-blue-600',
-                iconBg: 'bg-blue-100/70',
-                courses: [
-                    { name: 'Full Stack Development', sub: 'MERN, Python & APIs', to: '/it-stack-development', icon: Code, badge: 'Popular' },
-                    { name: 'Web Designing', sub: 'HTML5, CSS3, JS & React', to: '/web-development', icon: Globe },
-                    { name: 'Mobile App Dev', sub: 'Android, Flutter & Native', to: '/app-development', icon: Smartphone },
-                    { name: 'Python & Backend', sub: 'Django, FastAPI & DB', to: '/python-programming', icon: Code },
-                ]
-            },
-            {
-                id: 'shortterm',
-                title: 'Professional Skills',
-                icon: Sparkles,
-                iconColor: 'text-teal-600',
-                iconBg: 'bg-teal-100/70',
-                courses: [
-                    { name: 'Short-Term Bootcamp', sub: 'Career & Interview Prep', to: '/Courses', state: { category: 'shortterm' }, icon: Sparkles, badge: 'Fast-Track' },
-                ]
-            }
-        ]
-    },
-    {
-        colId: 'col-2',
-        sections: [
-            {
-                id: 'ai-data',
-                title: 'AI, Data & Cloud',
-                icon: Cpu,
-                iconColor: 'text-purple-600',
-                iconBg: 'bg-purple-100/70',
-                courses: [
-                    { name: 'AI & Generative AI', sub: 'LLMs, Prompts & Tools', to: '/Courses', state: { category: 'ai-data' }, icon: Cpu, badge: 'Trending' },
-                    { name: 'Data Science & BI', sub: 'Python, SQL & Power BI', to: '/Courses', state: { category: 'ai-data' }, icon: BarChart3 },
-                    { name: 'Cyber Security', sub: 'Ethical Hacking & Defense', to: '/Courses', state: { category: 'ai-data' }, icon: Shield },
-                    { name: 'Cloud & DevOps', sub: 'AWS, Azure, Docker & CI/CD', to: '/Courses', state: { category: 'ai-data' }, icon: Zap },
-                ]
-            },
-            {
-                id: 'marketing',
-                title: 'Marketing & E-Com',
-                icon: Megaphone,
-                iconColor: 'text-amber-600',
-                iconBg: 'bg-amber-100/70',
-                courses: [
-                    { name: 'Digital Marketing', sub: 'SEO, Google & Meta Ads', to: '/digital-marketing', icon: Megaphone, badge: 'Career' },
-                    { name: 'E-Commerce Business', sub: 'Shopify, Amazon & Store Scale', to: '/Courses', state: { category: 'marketing' }, icon: ShoppingCart },
-                ]
-            }
-        ]
-    },
-    {
-        colId: 'col-3',
-        sections: [
-            {
-                id: 'design',
-                title: 'Design & Media',
-                icon: Palette,
-                iconColor: 'text-rose-600',
-                iconBg: 'bg-rose-100/70',
-                courses: [
-                    { name: 'UI/UX Design', sub: 'Figma, Wireframes & UX', to: '/ui-ux-design', icon: Palette, badge: 'Hot' },
-                    { name: 'Graphic Design', sub: 'Photoshop, Illustrator & Brand', to: '/Courses', state: { category: 'design' }, icon: Palette },
-                    { name: 'Video Editing', sub: 'Premiere Pro, VFX & Reels', to: '/Courses', state: { category: 'design' }, icon: Video },
-                ]
-            },
-            {
-                id: 'business',
-                title: 'Accounting & Finance',
-                icon: Calculator,
-                iconColor: 'text-emerald-600',
-                iconBg: 'bg-emerald-100/70',
-                courses: [
-                    { name: 'Accounting & GST', sub: 'TallyPrime, Tax & Payroll', to: '/tally-accounting', icon: Calculator, badge: 'Job-Ready' },
-                    { name: 'Advanced Excel & Office', sub: 'Dashboards, MIS & AI Tools', to: '/Courses', state: { category: 'business' }, icon: Briefcase },
-                ]
-            }
-        ]
-    },
-    {
-        colId: 'col-4',
-        sections: [
-            {
-                id: 'technical',
-                title: 'Technical & CAD',
-                icon: Settings,
-                iconColor: 'text-cyan-600',
-                iconBg: 'bg-cyan-100/70',
-                courses: [
-                    { name: 'AutoCAD 2D/3D', sub: 'Civil, Mechanical & Arch CAD', to: '/Courses', state: { category: 'technical' }, icon: Compass },
-                    { name: 'Hardware & Networking', sub: 'PC Assembly & Troubleshooting', to: '/Courses', state: { category: 'technical' }, icon: Settings },
-                ]
-            },
-            {
-                id: 'languages',
-                title: 'Languages & Test Prep',
-                icon: Languages,
-                iconColor: 'text-indigo-600',
-                iconBg: 'bg-indigo-100/70',
-                courses: [
-                    { name: 'IELTS Preparation', sub: 'Band 7+ Prep & Mock Tests', to: '/Courses', state: { category: 'languages' }, icon: Award },
-                    { name: 'PTE Academic', sub: 'AI Scoring & Mock Practice', to: '/Courses', state: { category: 'languages' }, icon: Languages },
-                    { name: 'German Language', sub: 'A1–B2 CEFR Goethe Prep', to: '/Courses', state: { category: 'languages' }, icon: Languages },
-                    { name: 'French Language', sub: 'DELF & Canada Visa Prep', to: '/Courses', state: { category: 'languages' }, icon: Languages },
-                ]
-            }
-        ]
+    if (slug.includes('full-stack') || slug.includes('mern') || slug.includes('software-full-stack')) {
+        return '/it-stack-development';
     }
-];
+    if (slug === 'web-designing' || slug === 'web-development' || slug.includes('web-design')) {
+        return '/web-development';
+    }
+    if (slug.includes('mobile-app') || slug.includes('app-development') || slug.includes('android')) {
+        return '/app-development';
+    }
+    if (slug.includes('python-full-stack') || slug.includes('python-programming') || slug.includes('django')) {
+        return '/python-programming';
+    }
+    if (slug.includes('ui-ux') || slug.includes('product-design')) {
+        return '/ui-ux-design';
+    }
+    if (slug.includes('digital-marketing')) {
+        return '/digital-marketing';
+    }
+    if (slug.includes('tally') || slug.includes('accounting-gst') || slug.includes('corporate-accounting')) {
+        return '/tally-accounting';
+    }
 
-export const courseFlyoutData = coursesCardsColumns;
-export const coursesMegaMenuColumns = coursesCardsColumns;
+    return '/course/' + slug;
+};
 
-const navItems = [
-    {
-        label: 'Courses',
-        to: '/Courses',
-        dropdown: [
-            { label: 'Software & Web Development', to: '/Courses', state: { category: 'software' } },
-            { label: 'AI, Data & Cloud', to: '/Courses', state: { category: 'ai-data' } },
-            { label: 'Design, UI/UX & Media', to: '/Courses', state: { category: 'design' } },
-            { label: 'Digital Marketing & E-Commerce', to: '/Courses', state: { category: 'marketing' } },
-            { label: 'Accounting & Business Skills', to: '/Courses', state: { category: 'business' } },
-            { label: 'Technical CAD & IT Support', to: '/Courses', state: { category: 'technical' } },
-            { label: 'Foreign Languages & Test Prep', to: '/Courses', state: { category: 'languages' } },
-            { label: 'Short-Term & Professional Skills', to: '/Courses', state: { category: 'shortterm' } },
-        ]
-    },
-    {
-        label: 'Corporate Course',
-        to: '/CorporateTraining',
-        dropdown: [
-            { label: 'AI & Generative AI', to: '/CorporateTraining', state: { category: 'ai' } },
-            { label: 'Advanced Excel & Data Analytics', to: '/CorporateTraining', state: { category: 'excel' } },
-            { label: 'IT & Software Training', to: '/CorporateTraining', state: { category: 'software' } },
-            { label: 'Digital Business Skills', to: '/CorporateTraining', state: { category: 'digital' } },
-            { label: 'Professional & Productivity Skills', to: '/CorporateTraining', state: { category: 'productivity' } },
-        ]
-    },
-    {
-        label: 'University Course',
-        to: '/UniversityCourses',
-        dropdown: [
-            { label: 'Distance Learning Degrees', to: '/UniversityCourses' },
-            { label: 'Online Degree & PG Programs', to: '/UniversityCourses' },
-            { label: 'Working Professional Courses', to: '/UniversityCourses' },
-            { label: 'Vocational & Professional Education', to: '/UniversityCourses' },
-        ]
-    },
-    {
-        label: 'Live Project',
-        to: '/LiveProject',
-        dropdown: [
-            { label: 'Web & Software Development', to: '/LiveProject', state: { category: 'web' } },
-            { label: 'Mobile App Development', to: '/LiveProject', state: { category: 'mobile' } },
-            { label: 'AI, Data & Analytics', to: '/LiveProject', state: { category: 'ai' } },
-            { label: 'Cloud, DevOps & Cyber Security', to: '/LiveProject', state: { category: 'cloud' } },
-            { label: 'UI/UX & Digital Design', to: '/LiveProject', state: { category: 'design' } },
-        ]
-    },
-    {
-        label: 'Placement',
-        to: '/Placement',
-        dropdown: [
-            { label: 'IT & Software', to: '/Placement', state: { category: 'it' } },
-            { label: 'Data, AI & Technology', to: '/Placement', state: { category: 'data' } },
-            { label: 'Digital & Business', to: '/Placement', state: { category: 'digital' } },
-            { label: 'Design & Creative', to: '/Placement', state: { category: 'design' } },
-            { label: 'Technical & IT Support', to: '/Placement', state: { category: 'support' } },
-        ]
-    },
-];
+export const CATEGORY_COLUMN_CONFIG = {
+    'software': { id: 'software', title: 'Software & Web Dev', icon: Code, iconColor: 'text-blue-600', iconBg: 'bg-blue-100/70', colIndex: 0 },
+    'shortterm': { id: 'shortterm', title: 'Professional Skills', icon: Sparkles, iconColor: 'text-teal-600', iconBg: 'bg-teal-100/70', colIndex: 0 },
+    'ai-data': { id: 'ai-data', title: 'AI, Data & Cloud', icon: Cpu, iconColor: 'text-purple-600', iconBg: 'bg-purple-100/70', colIndex: 1 },
+    'marketing': { id: 'marketing', title: 'Marketing & E-Com', icon: Megaphone, iconColor: 'text-amber-600', iconBg: 'bg-amber-100/70', colIndex: 1 },
+    'design': { id: 'design', title: 'Design & Media', icon: Palette, iconColor: 'text-rose-600', iconBg: 'bg-rose-100/70', colIndex: 2 },
+    'business': { id: 'business', title: 'Accounting & Finance', icon: Calculator, iconColor: 'text-emerald-600', iconBg: 'bg-emerald-100/70', colIndex: 2 },
+    'technical': { id: 'technical', title: 'Technical & CAD', icon: Settings, iconColor: 'text-cyan-600', iconBg: 'bg-cyan-100/70', colIndex: 3 },
+    'languages': { id: 'languages', title: 'Languages & Test Prep', icon: Languages, iconColor: 'text-indigo-600', iconBg: 'bg-indigo-100/70', colIndex: 3 }
+};
 
 const defaultSiteSettings = {
     socialLinks: {
-        facebook: 'https://facebook.com',
-        instagram: 'https://instagram.com',
-        youtube: 'https://youtube.com',
-        linkedin: 'https://linkedin.com',
+        facebook: '',
+        instagram: '',
+        youtube: '',
+        linkedin: '',
         twitter: '',
         whatsapp: ''
     },
-    topBar: {
-        enabled: true,
-        sinceYear: '2002',
-        sinceText: '22+ Years of Excellence',
-        admissionsText: 'Admissions Open 2026-27 — New Batches Available',
-        tagline: 'Learn • Build • Grow',
-        placementText: '100% Placement Support • 500+ Corporate Hiring Partners',
-        liveProjectText: '🚀 Live Industry Projects & Practical Mentorship',
-        counsellingText: '🎯 Free Career Counselling & Guidance Daily',
-        phone: '+91-9311050670',
-        email: 'info@aayushinstitute.com'
-    }
+    topBar: null
 };
 
 const Header = () => {
@@ -397,14 +162,215 @@ const Header = () => {
     const location = useLocation();
 
     // Dynamic Site Settings (Social Handles + Top Bar)
-    const [siteSettings, setSiteSettings] = useState(() => {
-        try {
-            const cached = localStorage.getItem('site_settings');
-            return cached ? { ...defaultSiteSettings, ...JSON.parse(cached) } : defaultSiteSettings;
-        } catch {
-            return defaultSiteSettings;
-        }
-    });
+    // Live MongoDB Courses & Categories State
+    const [allDbCourses, setAllDbCourses] = useState([]);
+    const [dbCategoriesList, setDbCategoriesList] = useState([]);
+    const [isCoursesLoading, setIsCoursesLoading] = useState(true);
+
+    useEffect(() => {
+        let isMounted = true;
+        const fetchCoursesAndCategories = async () => {
+            try {
+                const [coursesRes, catsRes] = await Promise.all([
+                    fetch('/api/courses'),
+                    fetch('/api/categories').catch(() => null)
+                ]);
+
+                if (coursesRes.ok) {
+                    const cData = await coursesRes.json();
+                    const list = Array.isArray(cData) ? cData : (cData?.data || []);
+                    if (isMounted) {
+                        setAllDbCourses(list);
+                        setIsCoursesLoading(false);
+                    }
+                }
+                if (catsRes && catsRes.ok) {
+                    const catData = await catsRes.json();
+                    const catList = Array.isArray(catData) ? catData : (catData?.data || []);
+                    if (isMounted && catList.length > 0) {
+                        setDbCategoriesList(catList);
+                    }
+                }
+            } catch (err) {
+                if (isMounted) setIsCoursesLoading(false);
+            }
+        };
+
+        fetchCoursesAndCategories();
+        // 3-second auto-poll: any edit/delete/hide action in Admin Panel reflects instantly
+        const pollInterval = setInterval(fetchCoursesAndCategories, 3000);
+
+        const handleSync = () => fetchCoursesAndCategories();
+        window.addEventListener('coursesUpdated', handleSync);
+        window.addEventListener('storage', handleSync);
+
+        return () => {
+            isMounted = false;
+            clearInterval(pollInterval);
+            window.removeEventListener('coursesUpdated', handleSync);
+            window.removeEventListener('storage', handleSync);
+        };
+    }, []);
+
+    // Filter strictly published standard courses for Mega Menu
+    const activeStandardCourses = useMemo(() => {
+        return allDbCourses.filter(c =>
+            c.visible !== false &&
+            c.status !== 'Draft' &&
+            c.status !== 'Archived' &&
+            (!c.programType || c.programType === 'course')
+        );
+    }, [allDbCourses]);
+
+    const totalCertifiedCourses = activeStandardCourses.length;
+
+    // Dynamically assemble the 4-column MegaMenu layout from live MongoDB courses
+    const megaMenuColumns = useMemo(() => {
+        const cols = [
+            { colId: 'col-1', sections: [] },
+            { colId: 'col-2', sections: [] },
+            { colId: 'col-3', sections: [] },
+            { colId: 'col-4', sections: [] },
+        ];
+
+        // Group courses by categoryId
+        const grouped = {};
+        activeStandardCourses.forEach(c => {
+            const catId = (c.categoryId || 'software').toLowerCase();
+            if (!grouped[catId]) grouped[catId] = [];
+            grouped[catId].push({
+                id: c._id || c.id,
+                name: c.name || c.title,
+                sub: c.subgroup || c.oneLiner || c.duration || 'Certified Professional',
+                to: getCourseUrl(c),
+                icon: getCourseIcon(c),
+                badge: c.badge || (c.popular && activeStandardCourses.filter(x => x.popular).length <= 4 ? 'Popular' : null),
+                state: { category: catId, courseId: c._id || c.id }
+            });
+        });
+
+        // Add sections according to column config
+        Object.keys(CATEGORY_COLUMN_CONFIG).forEach(catId => {
+            const cfg = CATEGORY_COLUMN_CONFIG[catId];
+            const courses = grouped[catId] || [];
+            if (courses.length > 0) {
+                cols[cfg.colIndex].sections.push({
+                    id: catId,
+                    title: cfg.title,
+                    icon: cfg.icon,
+                    iconColor: cfg.iconColor,
+                    iconBg: cfg.iconBg,
+                    courses
+                });
+            }
+        });
+
+        // Custom categories support
+        Object.keys(grouped).forEach(catId => {
+            if (!CATEGORY_COLUMN_CONFIG[catId]) {
+                const courses = grouped[catId];
+                if (courses.length > 0) {
+                    let minCol = cols[0];
+                    cols.forEach(c => { if (c.sections.length < minCol.sections.length) minCol = c; });
+                    minCol.sections.push({
+                        id: catId,
+                        title: catId.replace(/-/g, ' ').toUpperCase(),
+                        icon: BookOpen,
+                        iconColor: 'text-blue-600',
+                        iconBg: 'bg-blue-100/70',
+                        courses
+                    });
+                }
+            }
+        });
+
+        return cols;
+    }, [activeStandardCourses]);
+
+    // Dynamic Navigation Items with live DB courses for all programs
+    const dynamicNavItems = useMemo(() => {
+        const corpCourses = allDbCourses.filter(c => c.programType === 'corporate' && c.visible !== false && c.status !== 'Draft');
+        const corpDropdown = corpCourses.length > 0
+            ? corpCourses.map(c => ({
+                label: c.name || c.title,
+                to: '/CorporateTraining',
+                state: { category: c.categoryId || 'corporate', courseId: c._id || c.id }
+            }))
+            : [
+                { label: 'AI & Generative AI', to: '/CorporateTraining', state: { category: 'ai' } },
+                { label: 'Advanced Excel & Data Analytics', to: '/CorporateTraining', state: { category: 'excel' } },
+                { label: 'IT & Software Training', to: '/CorporateTraining', state: { category: 'software' } },
+                { label: 'Digital Business Skills', to: '/CorporateTraining', state: { category: 'digital' } },
+                { label: 'Professional & Productivity Skills', to: '/CorporateTraining', state: { category: 'productivity' } },
+            ];
+
+        const univCourses = allDbCourses.filter(c => c.programType === 'university' && c.visible !== false && c.status !== 'Draft');
+        const univDropdown = univCourses.length > 0
+            ? univCourses.map(c => ({
+                label: c.name || c.title,
+                to: '/UniversityCourses',
+                state: { category: c.categoryId || 'university', courseId: c._id || c.id }
+            }))
+            : [
+                { label: 'Distance Learning Degrees', to: '/UniversityCourses' },
+                { label: 'Online Degree & PG Programs', to: '/UniversityCourses' },
+                { label: 'Working Professional Courses', to: '/UniversityCourses' },
+                { label: 'Vocational & Professional Education', to: '/UniversityCourses' },
+            ];
+
+        const liveCourses = allDbCourses.filter(c => c.programType === 'liveproject' && c.visible !== false && c.status !== 'Draft');
+        const liveDropdown = liveCourses.length > 0
+            ? liveCourses.map(c => ({
+                label: c.name || c.title,
+                to: '/LiveProject',
+                state: { category: c.categoryId || 'liveproject', courseId: c._id || c.id }
+            }))
+            : [
+                { label: 'Web & Software Development', to: '/LiveProject', state: { category: 'web' } },
+                { label: 'Mobile App Development', to: '/LiveProject', state: { category: 'mobile' } },
+                { label: 'AI, Data & Analytics', to: '/LiveProject', state: { category: 'ai' } },
+                { label: 'Cloud, DevOps & Cyber Security', to: '/LiveProject', state: { category: 'cloud' } },
+                { label: 'UI/UX & Digital Design', to: '/LiveProject', state: { category: 'design' } },
+            ];
+
+        const coursesDropdown = dbCategoriesList.length > 0
+            ? dbCategoriesList.map(cat => ({
+                label: cat.label || cat.name,
+                to: '/Courses',
+                state: { category: cat.categoryId || cat.id }
+            }))
+            : [
+                { label: 'Software & Web Development', to: '/Courses', state: { category: 'software' } },
+                { label: 'AI, Data & Cloud', to: '/Courses', state: { category: 'ai-data' } },
+                { label: 'Design, UI/UX & Media', to: '/Courses', state: { category: 'design' } },
+                { label: 'Digital Marketing & E-Commerce', to: '/Courses', state: { category: 'marketing' } },
+                { label: 'Accounting & Business Skills', to: '/Courses', state: { category: 'business' } },
+                { label: 'Technical CAD & IT Support', to: '/Courses', state: { category: 'technical' } },
+                { label: 'Foreign Languages & Test Prep', to: '/Courses', state: { category: 'languages' } },
+                { label: 'Short-Term & Professional Skills', to: '/Courses', state: { category: 'shortterm' } },
+            ];
+
+        return [
+            { label: 'Courses', to: '/Courses', dropdown: coursesDropdown },
+            { label: 'Corporate Course', to: '/CorporateTraining', dropdown: corpDropdown },
+            { label: 'University Course', to: '/UniversityCourses', dropdown: univDropdown },
+            { label: 'Live Project', to: '/LiveProject', dropdown: liveDropdown },
+            {
+                label: 'Placement',
+                to: '/Placement',
+                dropdown: [
+                    { label: 'IT & Software', to: '/Placement', state: { category: 'it' } },
+                    { label: 'Data, AI & Technology', to: '/Placement', state: { category: 'data' } },
+                    { label: 'Digital & Business', to: '/Placement', state: { category: 'digital' } },
+                    { label: 'Design & Creative', to: '/Placement', state: { category: 'design' } },
+                    { label: 'Technical & IT Support', to: '/Placement', state: { category: 'support' } },
+                ]
+            },
+        ];
+    }, [allDbCourses, dbCategoriesList]);
+
+    const [siteSettings, setSiteSettings] = useState(null);
+    const [isBackendDown, setIsBackendDown] = useState(false);
 
     useEffect(() => {
         let isMounted = true;
@@ -414,23 +380,35 @@ const Header = () => {
                 if (res.ok) {
                     const data = await res.json();
                     const settingsObj = data?.data || data;
-                    if ((settingsObj?.socialLinks || settingsObj?.topBar) && isMounted) {
+                    if (isMounted) {
                         setSiteSettings(settingsObj);
-                        localStorage.setItem('site_settings', JSON.stringify(settingsObj));
+                        setIsBackendDown(false);
+                    }
+                } else {
+                    if (isMounted) {
+                        setSiteSettings(null);
+                        setIsBackendDown(true);
                     }
                 }
             } catch {
-                // Keep default settings
+                if (isMounted) {
+                    setSiteSettings(null);
+                    setIsBackendDown(true);
+                }
             }
         };
 
         fetchSettings();
+
+        // Automatic reload polling when backend starts
+        const autoPoll = setInterval(fetchSettings, 3000);
 
         const handleSync = () => fetchSettings();
         window.addEventListener('siteSettingsUpdated', handleSync);
         window.addEventListener('storage', handleSync);
         return () => {
             isMounted = false;
+            clearInterval(autoPoll);
             window.removeEventListener('siteSettingsUpdated', handleSync);
             window.removeEventListener('storage', handleSync);
         };
@@ -563,8 +541,8 @@ const Header = () => {
 
     return (
         <header className="sticky top-0 z-50 w-full max-w-full shadow-xs bg-white overflow-x-clip">
-            {/* ── 1. Top Bar: Continuous Auto-Sliding Marquee (All Text & Announcements) ── */}
-            {siteSettings?.topBar?.enabled !== false && (
+            {/* ── 1. Top Bar: Continuous Auto-Sliding Marquee (Dynamic from DB with Auto-Reconnect) ── */}
+            {siteSettings?.topBar && siteSettings.topBar.enabled !== false ? (
                 <div className="bg-[#00488f] text-white relative overflow-hidden select-none border-b border-blue-900/30">
                     <div className="max-w-[1440px] mx-auto px-3 sm:px-6 flex items-center justify-between gap-2 h-7 sm:h-8">
                         
@@ -595,7 +573,7 @@ const Header = () => {
                                                 Since {siteSettings.topBar?.sinceYear || '2002'}
                                             </span>
                                             <span className="text-amber-100/90 font-medium text-[10px] sm:text-[11px] tracking-wide">
-                                                • {siteSettings.topBar?.sinceText || '22+ Years of Excellence'}
+                                                • {(siteSettings.topBar?.sinceText || '22+ Years of Excellence').replace(/^Since\s*\d+\s*[•·-]?\s*/i, '')}
                                             </span>
                                         </div>
 
@@ -763,7 +741,27 @@ const Header = () => {
 
                     </div>
                 </div>
-            )}
+            ) : isBackendDown ? (
+                <div className="bg-[#00224d] text-amber-300 text-xs py-1 px-4 flex items-center justify-between border-b border-blue-900/40">
+                    <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                        <span className="text-amber-200 font-medium text-[11px]">
+                            Header Top Bar: Backend Offline — Auto-reconnecting...
+                        </span>
+                    </div>
+                    <button
+                        onClick={() => {
+                            fetch('/api/site-settings').then(r => r.ok && r.json()).then(d => {
+                                if (d) { setSiteSettings(d.data || d); setIsBackendDown(false); }
+                            }).catch(() => {});
+                        }}
+                        className="inline-flex items-center gap-1 text-[11px] text-amber-300 hover:text-white transition-colors cursor-pointer"
+                    >
+                        <RefreshCw className="w-3 h-3" />
+                        <span>Reload</span>
+                    </button>
+                </div>
+            ) : null}
 
             {/* ── 2. Main Navigation Bar: Responsive Layout ── */}
             <div className="bg-white border-b border-gray-100 shadow-xs relative z-40">
@@ -783,7 +781,7 @@ const Header = () => {
 
                     {/* Center: Desktop Navigation Links (>= 1280px / xl) */}
                     <nav className="hidden xl:flex items-center gap-1 xl:gap-1.5">
-                        {navItems.map((item) => {
+                        {dynamicNavItems.map((item) => {
                             const active = isRouteActive(item.to);
                             return (
                                 <div key={item.label} className="relative group py-1">
@@ -810,14 +808,14 @@ const Header = () => {
 
                                     {/* Desktop Dropdowns */}
                                     {item.label === 'Courses' ? (
-                                        <div className="hidden group-hover:block absolute top-full left-0 pt-2 z-50">
-                                            <div className="w-[940px] xl:w-[980px] max-w-[calc(100vw-140px)] bg-white rounded-2xl shadow-[0_24px_60px_-12px_rgba(0,35,90,0.20),0_0_0_1px_rgba(0,35,90,0.06)] border border-slate-100 overflow-hidden animate-in fade-in-50 duration-150">
+                                        <div className="hidden group-hover:block absolute top-full -left-16 xl:-left-36 2xl:-left-20 pt-2 z-50">
+                                            <div className="w-[920px] xl:w-[980px] 2xl:w-[1040px] max-w-[calc(100vw-36px)] max-h-[85vh] flex flex-col bg-white rounded-2xl shadow-[0_24px_60px_-12px_rgba(0,35,90,0.22),0_0_0_1px_rgba(0,35,90,0.08)] border border-slate-100 overflow-hidden animate-in fade-in-50 duration-150">
                                                 {/* 1. Header Bar */}
-                                                <div className="px-5 py-3 bg-gradient-to-r from-blue-50/90 via-indigo-50/40 to-white border-b border-slate-100 flex items-center justify-between">
+                                                <div className="px-5 py-2.5 bg-gradient-to-r from-blue-50/90 via-indigo-50/40 to-white border-b border-slate-100 flex items-center justify-between shrink-0">
                                                     <div className="flex items-center gap-2.5">
                                                         <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#0055ff] text-white shadow-xs">
                                                             <Sparkles className="w-3 h-3 text-amber-300" />
-                                                            Total 22 Certified Courses
+                                                            Total {totalCertifiedCourses} Certified Courses
                                                         </span>
                                                         <span className="text-[12px] font-medium text-slate-600 hidden md:inline">
                                                             Industry-recognized curricula with 100% placement support
@@ -833,8 +831,8 @@ const Header = () => {
                                                 </div>
 
                                                 {/* 2. 4-Column Grid displaying all 22 Cards simultaneously */}
-                                                <div className="p-4 grid grid-cols-4 gap-4 bg-white">
-                                                    {coursesCardsColumns.map((col) => (
+                                                <div className="p-3.5 xl:p-4 grid grid-cols-4 gap-2.5 xl:gap-3.5 bg-white overflow-y-auto flex-1 scrollbar-thin">
+                                                    {megaMenuColumns.map((col) => (
                                                         <div key={col.colId} className="flex flex-col gap-3.5">
                                                             {col.sections.map((sec) => (
                                                                 <div key={sec.id} className="flex flex-col">
@@ -858,7 +856,7 @@ const Header = () => {
                                                                             );
                                                                             return (
                                                                                 <NavLink
-                                                                                    key={course.name}
+                                                                                    key={course.id || course.name}
                                                                                     to={course.to}
                                                                                     state={course.state}
                                                                                     className={`group/card flex items-center gap-2 p-1.5 px-2 rounded-xl border transition-all duration-150 cursor-pointer ${
@@ -879,11 +877,14 @@ const Header = () => {
                                                                                     {/* Content */}
                                                                                     <div className="min-w-0 flex-1">
                                                                                         <div className="flex items-center justify-between gap-1">
-                                                                                            <h5 className={`text-[11.5px] font-semibold truncate transition-colors leading-tight ${
-                                                                                                isCourseActive
-                                                                                                    ? 'text-[#0055ff]'
-                                                                                                    : 'text-slate-800 group-hover/card:text-[#0055ff]'
-                                                                                            }`}>
+                                                                                            <h5 
+                                                                                                className={`text-[11px] xl:text-[11.5px] font-semibold truncate transition-colors leading-tight ${
+                                                                                                    isCourseActive
+                                                                                                        ? 'text-[#0055ff]'
+                                                                                                        : 'text-slate-800 group-hover/card:text-[#0055ff]'
+                                                                                                }`}
+                                                                                                title={course.name}
+                                                                                            >
                                                                                                 {course.name}
                                                                                             </h5>
                                                                                             {course.badge && (
@@ -907,7 +908,7 @@ const Header = () => {
                                                 </div>
 
                                                 {/* 3. Footer Bar */}
-                                                <div className="px-5 py-2.5 bg-slate-50/90 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600">
+                                                <div className="px-5 py-2 bg-slate-50/90 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600 shrink-0">
                                                     <div className="flex items-center gap-3">
                                                         <span className="inline-flex items-center gap-1.5 font-medium">
                                                             <Award className="w-3.5 h-3.5 text-[#0055ff]" />
@@ -1241,7 +1242,7 @@ const Header = () => {
 
                             {/* Scrollable Navigation Items */}
                             <div className="flex-1 overflow-y-auto px-3.5 py-3 divide-y divide-slate-100 space-y-1">
-                                {navItems.map((item) => {
+                                {dynamicNavItems.map((item) => {
                                     const active = isRouteActive(item.to);
                                     const isDropdownOpen = openDropdown === item.label;
 

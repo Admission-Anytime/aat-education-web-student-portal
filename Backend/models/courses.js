@@ -48,6 +48,12 @@ const CourseSchema = new Schema({
   scholarship: { type: String, default: "Up to 50%" },
   batchSchedule: { type: String, default: "Weekday & Weekend Batches" },
 
+  // Course-specific WhatsApp Enquiry & Modal Customization
+  qrCodeImage: { type: String }, // Dedicated QR code uploaded for this course
+  whatsappNumber: { type: String }, // Optional dedicated WhatsApp phone number
+  customWaMessage: { type: String }, // Custom greeting message for this course
+  highlights: [{ type: String }], // Up to 8 course highlight badges for details popup
+
   // Program & Order customization
   order: { type: Number, default: 99 }, // 1 = Top Priority (#1 rank), 2 = 2nd, etc.
   programType: {

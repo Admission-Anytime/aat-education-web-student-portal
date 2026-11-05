@@ -2515,6 +2515,20 @@ export default function SiteSettingsAdmin() {
               />
             </div>
 
+            {/* Since Text Subtitle */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Experience / Years Subtext
+              </label>
+              <input
+                type="text"
+                value={settings.topBar.sinceText || ""}
+                onChange={(e) => handleTopBarChange("sinceText", e.target.value)}
+                placeholder="22+ Years of Excellence"
+                className="w-full px-3 py-1.5 text-xs bg-slate-50 focus:bg-white border border-slate-200 focus:border-indigo-500 rounded-lg text-slate-800 font-semibold outline-none"
+              />
+            </div>
+
             {/* Admissions Banner */}
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">

@@ -1,13 +1,13 @@
 // controllers
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import User from "../models/User.js"; // Make sure you move your User model to a separate file
+import User from "../models/User.js";
 import dotenv from "dotenv";
 dotenv.config();
 
-//HELPER FUNCTIONS 
+// HELPER FUNCTIONS 
 const createToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET_KEY, { expiresIn: "7d" });
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET_KEY || "myscretkey", { expiresIn: "7d" });
 };
 
 const setCookie = (res, token) => {
@@ -27,13 +27,14 @@ export const signup = async (req, res) => {
       return res.status(400).json({ message: "Please fill required fields" });
     }
 
-    const userExists = await User.findOne({ email });
+    const cleanEmail = email.trim().toLowerCase();
+    const userExists = await User.findOne({ email: cleanEmail });
     if (userExists) {
       return res.status(400).json({ message: "User already exists with this email" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ email, password: hashedPassword });
+    const newUser = new User({ email: cleanEmail, password: hashedPassword });
     await newUser.save();
 
     const token = createToken(newUser._id);
@@ -50,13 +51,12 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-     console.log("Received login:", req.body);
-  res.json({ message: "Login received", data: req.body });
     if (!email || !password) {
       return res.status(400).json({ message: "Please fill required fields" });
     }
 
-    const user = await User.findOne({ email }).select("+password");
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: cleanEmail }).select("+password");
     if (!user || !user.password) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
@@ -74,6 +74,8 @@ export const login = async (req, res) => {
       user: {
         _id: user._id,
         email: user.email,
+        role: user.role,
+        name: user.name
       },
       token,
     });

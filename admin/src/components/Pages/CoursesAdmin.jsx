@@ -37,7 +37,9 @@ import {
   Briefcase,
   Tag,
   ArrowRight,
-  ArrowLeft
+  ArrowLeft,
+  MessageSquare,
+  QrCode
 } from "lucide-react";
 
 import { FALLBACK_INSTITUTE_COURSES } from "../../data/fallbackCourses";
@@ -107,6 +109,41 @@ export default function CoursesAdmin({
   const [editingCourse, setEditingCourse] = useState(null);
   const [viewingCourse, setViewingCourse] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [qrUploading, setQrUploading] = useState(false);
+
+  // Upload course-specific QR Code
+  const handleQrUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      showNotice("error", "Please select a valid image file (PNG, JPG, SVG, WebP)");
+      return;
+    }
+
+    setQrUploading(true);
+    const data = new FormData();
+    data.append("image", file);
+
+    try {
+      const res = await axios.post("/api/courses/upload-qr", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      if (res.data?.success && res.data?.url) {
+        setCourseForm((prev) => ({
+          ...prev,
+          qrCodeImage: res.data.url,
+        }));
+        showNotice("success", "Course QR image uploaded successfully!");
+      }
+    } catch (err) {
+      console.error(err);
+      showNotice("error", "Failed to upload QR image. Please try again.");
+    } finally {
+      setQrUploading(false);
+      e.target.value = "";
+    }
+  };
 
   // Default Course Form
   const defaultForm = {
@@ -130,6 +167,10 @@ export default function CoursesAdmin({
     skills: "HTML5, CSS3, JavaScript, Responsive Design",
     careerAreas: "Web Designer, Frontend Specialist, WordPress Developer, UI Layout Designer",
     features: "HTML5 & Modern CSS3 Responsive Layouts\nCore JavaScript, DOM Events & WordPress\nCSS Flexbox & CSS Grid Mastery\nLive Website Deployment",
+    highlights: "",
+    qrCodeImage: "",
+    whatsappNumber: "",
+    customWaMessage: "",
     popular: true,
     order: 1,
     programType: "course",
@@ -497,6 +538,10 @@ export default function CoursesAdmin({
       skills: Array.isArray(course.skills) ? course.skills.join(", ") : course.skills || "",
       careerAreas: course.careerAreas || (Array.isArray(course.career) ? course.career.join(", ") : ""),
       features: Array.isArray(course.features) ? course.features.join("\n") : (course.features || ""),
+      highlights: Array.isArray(course.highlights) ? course.highlights.join("\n") : (course.highlights || ""),
+      qrCodeImage: course.qrCodeImage || "",
+      whatsappNumber: course.whatsappNumber || "",
+      customWaMessage: course.customWaMessage || "",
       popular: !!course.popular,
       order: course.order ?? 1,
       programType: course.programType || "course",
@@ -528,6 +573,9 @@ export default function CoursesAdmin({
       const careerArray = courseForm.careerAreas
         ? String(courseForm.careerAreas).split(",").map((s) => s.trim()).filter(Boolean)
         : [];
+      const highlightsArray = courseForm.highlights
+        ? String(courseForm.highlights).split("\n").map((s) => s.trim()).filter(Boolean)
+        : [];
 
       const payload = {
         title: courseForm.title,
@@ -558,6 +606,10 @@ export default function CoursesAdmin({
         features: featuresArray,
         careerAreas: courseForm.careerAreas,
         career: careerArray,
+        highlights: highlightsArray,
+        qrCodeImage: courseForm.qrCodeImage || "",
+        whatsappNumber: courseForm.whatsappNumber || "",
+        customWaMessage: courseForm.customWaMessage || "",
         popular: !!courseForm.popular,
         order: Number(courseForm.order) || 1,
         programType: courseForm.programType || "course",
@@ -1563,6 +1615,7 @@ export default function CoursesAdmin({
                 { id: "academics", label: "2. Fees & Schedule", icon: DollarSign, color: "text-emerald-600" },
                 { id: "faculty", label: "3. Trainer & Status", icon: Users, color: "text-amber-600" },
                 { id: "curriculum", label: "4. Curriculum & Media", icon: Layers, color: "text-purple-600" },
+                { id: "whatsapp", label: "5. Course WhatsApp & QR", icon: MessageSquare, color: "text-emerald-600" },
               ].map((tab) => {
                 const isActive = modalTab === tab.id;
                 const Icon = tab.icon;
@@ -2058,6 +2111,185 @@ export default function CoursesAdmin({
                 </div>
               </div>
 
+              {/* ========================================================= */}
+              {/* TAB 5: COURSE WHATSAPP & QR CUSTOMIZATION                */}
+              {/* ========================================================= */}
+              <div className={modalTab === "whatsapp" ? "space-y-5 animate-fade-in" : "hidden"}>
+                {/* Information Header */}
+                <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                    <QrCode className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-emerald-950 flex items-center gap-2">
+                      <span>Course-Specific WhatsApp QR & Quick Enquiry</span>
+                      {courseForm.qrCodeImage ? (
+                        <span className="text-[10px] bg-emerald-600 text-white font-bold px-2 py-0.5 rounded-full">
+                          Custom QR Active
+                        </span>
+                      ) : (
+                        <span className="text-[10px] bg-slate-200 text-slate-700 font-semibold px-2 py-0.5 rounded-full">
+                          Default Global QR Active
+                        </span>
+                      )}
+                    </h4>
+                    <p className="text-[11px] text-emerald-800/90 mt-1 leading-relaxed">
+                      Upload a custom WhatsApp QR code generated for this specific course, or paste an external image URL from your QR generator. When configured, this QR will appear in the popup whenever a visitor clicks "Details" for this course.
+                    </p>
+                  </div>
+                </div>
+
+                {/* QR Upload & Preview Card */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 rounded-2xl bg-white border border-slate-200 shadow-xs">
+                  {/* Left Controls (8 cols) */}
+                  <div className="md:col-span-8 space-y-3.5">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Upload QR Image File
+                      </label>
+                      <p className="text-[11px] text-slate-500 mb-2">
+                        Upload a PNG, JPG, or WebP QR code image generated from your website/generator.
+                      </p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <label className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                          qrUploading 
+                            ? "bg-slate-200 text-slate-500 cursor-not-allowed" 
+                            : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm hover:shadow"
+                        }`}>
+                          <Upload className="w-4 h-4" />
+                          <span>{qrUploading ? "Uploading QR Image..." : "Upload QR Image File"}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleQrUpload}
+                            disabled={qrUploading}
+                            className="hidden"
+                          />
+                        </label>
+
+                        {courseForm.qrCodeImage && (
+                          <button
+                            type="button"
+                            onClick={() => setCourseForm({ ...courseForm, qrCodeImage: "" })}
+                            className="px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-rose-200 transition-all cursor-pointer"
+                          >
+                            Reset to Default QR
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="relative flex items-center justify-center my-2">
+                      <div className="w-full border-t border-slate-200" />
+                      <span className="absolute px-2 bg-white text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                        OR PASTE IMAGE URL
+                      </span>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        External QR Code Image URL
+                      </label>
+                      <input
+                        type="text"
+                        value={courseForm.qrCodeImage}
+                        onChange={(e) => setCourseForm({ ...courseForm, qrCodeImage: e.target.value })}
+                        placeholder="https://your-site.com/qr.png or /Uploads/..."
+                        className="w-full px-4 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-slate-800"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Right Preview (4 cols) */}
+                  <div className="md:col-span-4 flex flex-col items-center justify-center p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">
+                      Live Popup Preview
+                    </span>
+                    <div className="relative w-28 h-28 bg-white rounded-2xl p-1.5 border-2 border-emerald-500 shadow-sm flex items-center justify-center">
+                      <img
+                        src={
+                          courseForm.qrCodeImage
+                            ? (courseForm.qrCodeImage.startsWith('http') || courseForm.qrCodeImage.startsWith('/')
+                                ? courseForm.qrCodeImage
+                                : `/Uploads/${courseForm.qrCodeImage}`)
+                            : "/whatsapp_qr.png"
+                        }
+                        alt="Course WhatsApp QR"
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          e.target.src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://wa.me/919311050670";
+                        }}
+                      />
+                      <div className="absolute w-6 h-6 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow border-2 border-white pointer-events-none">
+                        <MessageSquare className="w-3 h-3" />
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-slate-500 mt-2 text-center font-medium">
+                      {courseForm.qrCodeImage ? "Custom Course QR" : "Global Institute QR"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* WhatsApp Phone Number & Custom Prefilled Message */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* WhatsApp Phone Number Override */}
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                      Course Dedicated WhatsApp Number (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={courseForm.whatsappNumber}
+                      onChange={(e) => setCourseForm({ ...courseForm, whatsappNumber: e.target.value })}
+                      placeholder="+919311050670 (leave blank for institute default)"
+                      className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-slate-800"
+                    />
+                    <p className="text-[10.5px] text-slate-400 mt-1">
+                      If left blank, inquiries will go to the institute default WhatsApp number.
+                    </p>
+                  </div>
+
+                  {/* Custom Prefilled WhatsApp Message */}
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                      Prefilled WhatsApp Message (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={courseForm.customWaMessage}
+                      onChange={(e) => setCourseForm({ ...courseForm, customWaMessage: e.target.value })}
+                      placeholder="Hi, I would like to inquire about [Course Name]..."
+                      className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-slate-800"
+                    />
+                    <p className="text-[10.5px] text-slate-400 mt-1">
+                      Use <span className="font-mono text-emerald-600 font-bold">[Course Name]</span> to insert this course title dynamically.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Course Highlights for Popup Left Badges (8 Badges) */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-bold text-slate-700">
+                      Popup Course Highlights (8 Bullet Badges, 1 per line)
+                    </label>
+                    <span className="text-[10px] text-indigo-600 font-semibold">
+                      Shown on Left Column in Details Modal
+                    </span>
+                  </div>
+                  <textarea
+                    rows={4}
+                    value={courseForm.highlights}
+                    onChange={(e) => setCourseForm({ ...courseForm, highlights: e.target.value })}
+                    placeholder="Python for Data Analysis (NumPy, Pandas)\nEnterprise SQL Querying & Aggregations\nPower BI DAX & Interactive Dashboards\nMachine Learning Predictive Modeling\nStatistical Analysis & Exploratory Data...\nReal-World Capstone Project"
+                    className="w-full px-4 py-2.5 text-xs font-mono border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-slate-800"
+                  />
+                  <p className="text-[10.5px] text-slate-400 mt-1">
+                    Each line becomes a distinct colored pill in the "Course Highlights" section of the details poster popup.
+                  </p>
+                </div>
+              </div>
+
               {/* Modal Footer Controls */}
               <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3 shrink-0">
                 <div className="flex items-center gap-2">
@@ -2072,7 +2304,8 @@ export default function CoursesAdmin({
                     <button
                       type="button"
                       onClick={() => {
-                        if (modalTab === "curriculum") setModalTab("faculty");
+                        if (modalTab === "whatsapp") setModalTab("curriculum");
+                        else if (modalTab === "curriculum") setModalTab("faculty");
                         else if (modalTab === "faculty") setModalTab("academics");
                         else if (modalTab === "academics") setModalTab("basic");
                       }}
@@ -2085,13 +2318,14 @@ export default function CoursesAdmin({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  {modalTab !== "curriculum" ? (
+                  {modalTab !== "whatsapp" ? (
                     <button
                       type="button"
                       onClick={() => {
                         if (modalTab === "basic") setModalTab("academics");
                         else if (modalTab === "academics") setModalTab("faculty");
                         else if (modalTab === "faculty") setModalTab("curriculum");
+                        else if (modalTab === "curriculum") setModalTab("whatsapp");
                       }}
                       className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-xl hover:bg-indigo-100 transition-all cursor-pointer"
                     >

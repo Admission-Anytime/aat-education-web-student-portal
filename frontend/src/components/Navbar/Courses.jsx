@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useLocation, NavLink } from 'react-router-dom';
+import { useLocation, useParams, useSearchParams, useNavigate, NavLink } from 'react-router-dom';
 import {
     Clock,
     Award,
@@ -154,643 +154,8 @@ const courseCategories = [
 ];
 
 // All 22 Courses organized with complete rich metadata and exact 1-line descriptions
-const categoryCourses = {
-    // 1. SOFTWARE & WEB DEVELOPMENT (Courses 2, 6, 10 & Frontend UI)
-    software: [
-        {
-            id: 2,
-            name: "Software & Full Stack Development",
-            subgroup: "Full Stack & Web Engineering",
-            oneLiner: "Build modern web applications using programming, frontend, backend, APIs and full stack technologies.",
-            icon: <Code className="w-5 h-5" />,
-            image: '/course_mern.jpg',
-            popular: true,
-            path: "/it-stack-development",
-            skills: ["Programming", "Web Development", "Full Stack", "React", "Node.js", "REST APIs", "SQL/NoSQL"],
-            level: "Beginner to Advanced",
-            duration: "4–6 Months",
-            eligibility: "12th / BCA / B.Tech / MCA / Graduates",
-            careerAreas: "Full Stack Developer, Software Engineer, Backend Engineer, Web Developer",
-            details: "Master end-to-end software development from frontend architecture to backend APIs, database management, and scalable cloud deployment.",
-            features: ["Programming Fundamentals", "Web Development Architecture", "Frontend (React/Next.js)", "Backend & RESTful APIs", "SQL & NoSQL Databases", "Full Stack Capstone Projects"],
-            certification: "Certified Full Stack Software Developer"
-        },
-        {
-            id: 6,
-            name: "Web Designing",
-            subgroup: "Web & Frontend Design",
-            oneLiner: "Create modern, responsive and user-friendly websites using HTML, CSS, JavaScript and modern web tools.",
-            icon: <Globe className="w-5 h-5" />,
-            image: '/course_web_design.jpg',
-            popular: true,
-            path: "/web-development",
-            skills: ["HTML5", "CSS3", "JavaScript", "Responsive Design", "WordPress", "Bootstrap", "Web Hosting"],
-            level: "Beginner to Intermediate",
-            duration: "3–4 Months",
-            eligibility: "10th / 12th / Any Stream / Creative Aspirants",
-            careerAreas: "Web Designer, Frontend Specialist, WordPress Developer, UI Layout Designer",
-            details: "Build dynamic, responsive, and mobile-friendly websites with clean semantic HTML5, CSS3, modern JavaScript, and WordPress CMS themes.",
-            features: ["HTML5 & Modern CSS3 Layouts", "Responsive Mobile-First Design", "Core JavaScript & DOM Events", "CSS Flexbox & CSS Grid Mastery", "WordPress Setup & Theme Customization", "Live Website Deployment"],
-            certification: "Certified Professional Web Designer"
-        },
-        {
-            id: 10,
-            name: "Mobile App Development",
-            subgroup: "Mobile Applications",
-            oneLiner: "Learn to design and develop Android and cross-platform mobile applications using modern technologies.",
-            icon: <Smartphone className="w-5 h-5" />,
-            image: 'https://images.unsplash.com/photo-1551650975-87deedd944c3?auto=format&fit=crop&w=800&q=80',
-            popular: true,
-            path: "/app-development",
-            skills: ["Android", "Kotlin", "Flutter", "React Native", "Firebase", "REST APIs", "Play Store"],
-            level: "Beginner to Advanced",
-            duration: "4–6 Months",
-            eligibility: "12th / IT Diploma / BCA / B.Tech / Enthusiasts",
-            careerAreas: "Mobile App Developer, Flutter Engineer, Android Developer, Cross-Platform Specialist",
-            details: "Create high-performance native Android and cross-platform iOS/Android apps using Kotlin, Flutter, and React Native with Firebase backend integration.",
-            features: ["Android Architecture & Kotlin", "Cross-Platform Flutter & Dart", "React Native Architecture", "State Management & App Lifecycle", "REST APIs & Cloud Database Sync", "Play Store Publishing Workflow"],
-            certification: "Certified Mobile Application Developer"
-        },
-        {
-            id: 101,
-            name: "Python Full Stack & Django Engineering",
-            subgroup: "Backend & Web Architecture",
-            oneLiner: "Build robust, scalable backend web applications, REST APIs, and database-driven portals with Python & Django.",
-            icon: <Code className="w-5 h-5" />,
-            image: "https://images.unsplash.com/photo-1526379095098-d400fd0bf935?auto=format&fit=crop&w=800&q=80",
-            popular: true,
-            path: "/python-programming",
-            skills: ["Python", "Django", "PostgreSQL", "REST APIs", "Docker", "Git", "Celery"],
-            level: "Beginner to Advanced",
-            duration: "4–6 Months",
-            eligibility: "12th / Diploma / BCA / B.Tech / MCA / Graduates",
-            careerAreas: "Python Developer, Backend Engineer, Django Specialist, Full Stack Engineer",
-            details: "Master end-to-end Python web development with the Django framework, ORM database modeling, RESTful API design, authentication, and cloud deployment.",
-            features: ["Python Programming Core & Advanced", "Django Architecture & MVT Pattern", "PostgreSQL Database & Django ORM", "Building & Consuming REST APIs", "Asynchronous Tasks with Celery & Redis", "Cloud Deployment on AWS & Heroku"],
-            certification: "Certified Python Full Stack Engineer"
-        },
-        {
-            id: 102,
-            name: "Java Enterprise Full Stack & Spring Boot",
-            subgroup: "Enterprise Software Engineering",
-            oneLiner: "Master enterprise Java programming, Spring Boot microservices, Hibernate ORM, and full-stack React integration.",
-            icon: <Database className="w-5 h-5" />,
-            image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80",
-            popular: false,
-            skills: ["Core Java", "Spring Boot", "Microservices", "Hibernate", "React", "MySQL", "Kafka"],
-            level: "Intermediate to Advanced",
-            duration: "5–6 Months",
-            eligibility: "Diploma / BCA / B.Tech / MCA / Java Aspirants",
-            careerAreas: "Java Developer, Spring Boot Specialist, Enterprise Software Architect",
-            details: "Build high-concurrency enterprise software with Core & Advanced Java, Spring Boot microservices ecosystem, Hibernate JPA, and scalable database backends.",
-            features: ["OOPs & Java 17+ Modern Features", "Spring Boot Microservices Architecture", "Hibernate JPA & Relational Databases", "Spring Security & JWT Authentication", "Event-Driven Systems with Apache Kafka", "Frontend Integration with Modern React"],
-            certification: "Certified Java Enterprise Architect"
-        },
-        {
-            id: 103,
-            name: "MERN Stack & Next.js 14 Full Stack Specialist",
-            subgroup: "Modern JavaScript Stacks",
-            oneLiner: "Develop cutting-edge full-stack web applications with MongoDB, Express.js, React 18, Node.js and Next.js 14 App Router.",
-            icon: <Rocket className="w-5 h-5" />,
-            image: "/course_mern.jpg",
-            popular: true,
-            skills: ["MongoDB", "Express", "React 18", "Node.js", "Next.js 14", "TypeScript", "Tailwind CSS"],
-            level: "Beginner to Advanced",
-            duration: "4–6 Months",
-            eligibility: "12th / Graduates / BCA / B.Tech / Frontend Developers",
-            careerAreas: "MERN Stack Developer, Next.js Engineer, Full Stack JavaScript Developer",
-            details: "Comprehensive hands-on training covering the modern JavaScript ecosystem from React components and Next.js server actions to Node/Express microservices.",
-            features: ["React 18 Hooks & State Architecture", "Next.js 14 App Router & SSR/SSG", "RESTful & GraphQL API Architecture", "MongoDB NoSQL Aggregation Pipelines", "TypeScript for Production Stacks", "Complete Live Production Deployment"],
-            certification: "Certified MERN & Next.js Specialist"
-        }
-    ],
+const categoryCourses = {};
 
-    // 2. AI, DATA & CLOUD (Courses 1, 3, 4, 5)
-    'ai-data': [
-        {
-            id: 1,
-            name: "Artificial Intelligence & Generative AI",
-            subgroup: "Artificial Intelligence",
-            oneLiner: "Learn Generative AI, AI tools, prompt engineering and practical AI applications for modern work and business.",
-            icon: <Cpu className="w-5 h-5" />,
-            image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=800&q=80',
-            popular: true,
-            skills: ["AI", "Generative AI", "AI Tools", "Automation", "Prompt Engineering", "LLMs", "Custom GPTs"],
-            level: "Beginner to Advanced",
-            duration: "3–6 Months",
-            eligibility: "12th / BCA / B.Tech / Working Professionals / Business Owners",
-            careerAreas: "AI Specialist, Prompt Engineer, AI Automation Consultant, AI Product Lead",
-            details: "Comprehensive hands-on training on large language models (LLMs), prompt engineering frameworks, OpenAI APIs, workflow automations, and practical generative tools.",
-            features: ["Generative AI & LLM Architecture", "Advanced Prompt Engineering Frameworks", "AI Workflow Automation (Make/Zapier)", "OpenAI APIs & Custom GPT Development", "AI Image & Video Generation Tools", "Enterprise AI Implementation Use Cases"],
-            certification: "Certified Generative AI & Automation Specialist"
-        },
-        {
-            id: 3,
-            name: "Data Science, Data Analytics & Business Intelligence",
-            subgroup: "Data Science & BI",
-            oneLiner: "Learn Python, SQL, Power BI, data visualization and analytics to turn data into useful business insights.",
-            icon: <BarChart3 className="w-5 h-5" />,
-            image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
-            popular: true,
-            skills: ["Python", "SQL", "Power BI", "Data Analytics", "Machine Learning", "Pandas", "Excel"],
-            level: "Beginner to Advanced",
-            duration: "4–6 Months",
-            eligibility: "Graduates / B.Sc / B.Com / BCA / B.Tech / Analysts",
-            careerAreas: "Data Analyst, BI Developer, Data Scientist, Business Analytics Specialist",
-            details: "Transform complex enterprise data into decision-ready business intelligence through Python data science stacks, advanced SQL queries, and Power BI interactive reports.",
-            features: ["Python for Data Analysis (NumPy, Pandas)", "Enterprise SQL Querying & Aggregations", "Power BI DAX & Interactive Dashboards", "Statistical Analysis & EDA Techniques", "Intro to Machine Learning Models", "Real-World Business Intelligence Projects"],
-            certification: "Certified Data Science & BI Professional"
-        },
-        {
-            id: 4,
-            name: "Cyber Security & Networking",
-            subgroup: "Security & Networking",
-            oneLiner: "Build foundational skills in networking, cyber security, ethical hacking concepts and digital protection.",
-            icon: <Shield className="w-5 h-5" />,
-            image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80',
-            popular: true,
-            skills: ["Cyber Security", "Ethical Hacking", "Networking", "Security", "Firewalls", "Wireshark", "Kali Linux"],
-            level: "Beginner to Advanced",
-            duration: "4–6 Months",
-            eligibility: "12th / IT Diploma / BCA / B.Tech / Tech Enthusiasts",
-            careerAreas: "Cyber Security Analyst, Network Security Engineer, Ethical Hacker, SOC Analyst",
-            details: "Master cybersecurity principles, network protocols, defensive architecture, ethical hacking penetration tools, and threat protection best practices.",
-            features: ["Network Protocols & TCP/IP Architecture", "Ethical Hacking & Penetration Testing", "Kali Linux & Vulnerability Scanning", "Firewalls, VPNs & IDS/IPS Systems", "Threat Detection & SOC Fundamentals", "Web Application Security (OWASP Top 10)"],
-            certification: "Certified Cyber Security & Network Defense Specialist"
-        },
-        {
-            id: 5,
-            name: "Cloud Computing & DevOps",
-            subgroup: "Cloud & Infrastructure",
-            oneLiner: "Learn cloud platforms, Linux, Docker, deployment, CI/CD and essential DevOps practices.",
-            icon: <Zap className="w-5 h-5" />,
-            image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80',
-            popular: true,
-            skills: ["AWS", "Azure", "Linux", "Docker", "DevOps", "Cloud", "CI/CD", "Kubernetes"],
-            level: "Intermediate to Advanced",
-            duration: "4–6 Months",
-            eligibility: "Diploma / BCA / B.Tech / SysAdmins / Developers",
-            careerAreas: "Cloud Engineer, DevOps Engineer, AWS Solutions Specialist, Site Reliability Engineer",
-            details: "Design and orchestrate resilient cloud architectures on AWS and Azure with Docker containerization, Linux sysadmin fundamentals, and CI/CD pipelines.",
-            features: ["AWS & Azure Cloud Architecture", "Linux Administration & Bash Scripting", "Docker Containerization & Multi-Stage Builds", "Kubernetes Cluster Orchestration", "CI/CD Pipeline Automation (GitHub Actions/Jenkins)", "Infrastructure as Code (IaC) & Cloud Security"],
-            certification: "Certified Cloud Architect & DevOps Practitioner"
-        },
-        {
-            id: 104,
-            name: "Machine Learning & Deep Learning Specialist",
-            subgroup: "Machine Learning & Neural Networks",
-            oneLiner: "Master predictive modeling, deep learning architectures, CNNs, NLP, PyTorch, and TensorFlow from scratch.",
-            icon: <Cpu className="w-5 h-5" />,
-            image: "https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&w=800&q=80",
-            popular: true,
-            skills: ["Machine Learning", "Deep Learning", "TensorFlow", "PyTorch", "Computer Vision", "NLP", "Scikit-Learn"],
-            level: "Intermediate to Advanced",
-            duration: "4–6 Months",
-            eligibility: "BCA / B.Tech / B.Sc / Math or Tech Graduates / Programmers",
-            careerAreas: "Machine Learning Engineer, Deep Learning Specialist, NLP Developer, Computer Vision Engineer",
-            details: "Hands-on implementation of machine learning algorithms, deep neural network architectures, image classification with CNNs, natural language processing with Transformers, and model deployment.",
-            features: ["Supervised & Unsupervised Machine Learning", "Neural Networks & Backpropagation Math", "TensorFlow & PyTorch Deep Learning Pipelines", "Computer Vision & Object Detection (YOLO/OpenCV)", "NLP & Transformers (BERT/HuggingFace)", "MLOps Model Deployment & Monitoring"],
-            certification: "Certified Machine Learning & Deep Learning Specialist"
-        },
-        {
-            id: 105,
-            name: "Big Data Engineering & Apache Spark",
-            subgroup: "Data Engineering Architecture",
-            oneLiner: "Design distributed data pipelines, ETL workflows, data lakes, and streaming architectures with Spark and Hadoop.",
-            icon: <Database className="w-5 h-5" />,
-            image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80",
-            popular: false,
-            skills: ["Apache Spark", "Hadoop", "PySpark", "Kafka", "Data Warehousing", "Snowflake", "ETL Pipelines"],
-            level: "Advanced",
-            duration: "4–5 Months",
-            eligibility: "Software Developers, Data Analysts, SysAdmins, B.Tech / MCA",
-            careerAreas: "Big Data Engineer, Data Platform Architect, PySpark Developer, ETL Consultant",
-            details: "Master distributed computing architectures to process massive enterprise data streams with Hadoop HDFS, PySpark DataFrames, real-time Kafka event streaming, and cloud data warehouses.",
-            features: ["Hadoop Ecosystem & Distributed Storage", "Apache Spark Core & PySpark DataFrames", "Real-Time Streaming with Apache Kafka", "Data Lakehouse Architecture (Delta Lake/Snowflake)", "Airflow Orchestration & Automated ETL", "Enterprise Big Data Capstone Implementation"],
-            certification: "Certified Big Data & Distributed Systems Engineer"
-        }
-    ],
-
-    // 3. DESIGN, UI/UX & MEDIA (Courses 7, 8, 9 & Motion Graphics)
-    design: [
-        {
-            id: 7,
-            name: "UI/UX & Product Design",
-            subgroup: "Product & Interface Design",
-            oneLiner: "Design intuitive websites and mobile products through UX research, Figma, wireframing and prototyping.",
-            icon: <Palette className="w-5 h-5" />,
-            image: '/course_ui_ux.jpg',
-            popular: true,
-            path: "/ui-ux-design",
-            skills: ["Figma", "UX Research", "Wireframing", "Prototyping", "Product Design", "Design Systems", "Usability Testing"],
-            level: "Beginner to Advanced",
-            duration: "3–4 Months",
-            eligibility: "10th / 12th / Any Stream / Creative Design Aspirants",
-            careerAreas: "UI/UX Designer, Product Designer, Interaction Designer, Figma Specialist",
-            details: "Transform complex user problems into intuitive digital experiences using industry-standard design thinking, Figma auto-layouts, micro-interactions, and design systems.",
-            features: ["User Research & Empathy Mapping", "Information Architecture & User Journeys", "Wireframing & Low/High Fidelity UI", "Interactive Prototyping in Figma", "Building Scalable Design Systems", "Usability Testing & Real Client Case Studies"],
-            certification: "Certified UI/UX Product Designer"
-        },
-        {
-            id: 8,
-            name: "Graphic Design & Branding",
-            subgroup: "Visual & Brand Identity",
-            oneLiner: "Develop professional visual communication skills in Photoshop, Illustrator, CorelDRAW, branding and digital design.",
-            icon: <Palette className="w-5 h-5" />,
-            image: '/course_graphic_design.jpg',
-            popular: true,
-            skills: ["Photoshop", "Illustrator", "CorelDRAW", "Branding", "Creative Design", "Typography", "Print Media"],
-            level: "Beginner to Intermediate",
-            duration: "3–4 Months",
-            eligibility: "10th / 12th / Any Graduate / Creative Aspirants",
-            careerAreas: "Graphic Designer, Brand Identity Designer, Visual Communicator, Print Production Lead",
-            details: "Master digital aesthetics, vector typography, brand style guides, photo manipulation, social media banners, and commercial print design.",
-            features: ["Adobe Photoshop Photo Manipulation", "Adobe Illustrator Vector Graphic Art", "CorelDRAW Vector & Print Layouts", "Brand Identity & Logo Creation", "Social Media Creatives & Ad Assets", "Commercial Print Production Guidelines"],
-            certification: "Certified Graphic & Brand Designer"
-        },
-        {
-            id: 9,
-            name: "Video Editing & Motion Graphics",
-            subgroup: "Video & Motion Media",
-            oneLiner: "Create professional videos, reels, motion graphics and digital content using modern editing tools.",
-            icon: <Video className="w-5 h-5" />,
-            image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=800&q=80',
-            popular: true,
-            skills: ["Premiere Pro", "After Effects", "Motion Graphics", "Reels", "Color Grading", "Sound Design", "VFX"],
-            level: "Beginner to Intermediate",
-            duration: "3–4 Months",
-            eligibility: "10th / 12th / Content Creators / Media Enthusiasts",
-            careerAreas: "Video Editor, Motion Graphics Artist, YouTube Content Creator, Reels & Video Producer",
-            details: "Produce viral short-form social reels, YouTube productions, motion typography, and corporate video packages with Adobe Premiere Pro and After Effects.",
-            features: ["Adobe Premiere Pro Timeline Editing", "Adobe After Effects Motion Animations", "Color Grading & Cinematic LUTs", "Sound Design & Audio Mastering", "Kinetic Typography & Lower Thirds", "Short-Form Reels & Long-Form Video Projects"],
-            certification: "Certified Video Editor & Motion Artist"
-        },
-        {
-            id: 106,
-            name: "3D Animation & Visual Effects (VFX)",
-            subgroup: "3D Art & CGI Media",
-            oneLiner: "Create photorealistic 3D models, character animation, CGI environments, and visual effects using Blender and Maya.",
-            icon: <Sparkles className="w-5 h-5" />,
-            image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
-            popular: true,
-            skills: ["Blender", "Autodesk Maya", "3D Modeling", "Texturing", "Character Animation", "VFX Compositing"],
-            level: "Beginner to Advanced",
-            duration: "4–6 Months",
-            eligibility: "10th / 12th / Creative Aspirants / Designers / Animators",
-            careerAreas: "3D Modeler, Character Animator, VFX Artist, Lighting & Rendering Specialist",
-            details: "Master digital 3D sculpting, polygon modeling, PBR texturing, rigging, character keyframing, dynamic fluid simulations, and cinematic VFX compositing in Blender and Autodesk Maya.",
-            features: ["Hard Surface & Organic 3D Modeling", "PBR Shading, UV Unwrapping & Substance Textures", "Biped Character Rigging & Weight Painting", "Keyframe Animation & Walk Cycles", "Particle Simulations, Smoke & Fire Dynamics", "Cycles & Arnold Lighting and Final Rendering"],
-            certification: "Certified 3D Animation & VFX Artist"
-        }
-    ],
-
-    // 4. DIGITAL MARKETING & E-COMMERCE (Courses 11, 12 & Social/SEO)
-    marketing: [
-        {
-            id: 11,
-            name: "Digital Marketing & Performance Marketing",
-            subgroup: "Performance & Digital Marketing",
-            oneLiner: "Learn SEO, Google Ads, Meta Ads, social media, content and performance marketing for digital growth.",
-            icon: <Megaphone className="w-5 h-5" />,
-            image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
-            popular: true,
-            path: "/digital-marketing",
-            skills: ["SEO", "Google Ads", "Meta Ads", "Social Media", "Performance Marketing", "Content Strategy", "Analytics"],
-            level: "Beginner to Advanced",
-            duration: "3–5 Months",
-            eligibility: "12th / Graduates / Marketing Enthusiasts / Business Owners",
-            careerAreas: "Performance Marketer, SEO Specialist, PPC Campaign Manager, Digital Growth Strategist",
-            details: "Execute ROI-driven growth marketing campaigns across Google Search, Meta Ads, organic search engine optimization, content funnels, and web analytics.",
-            features: ["Search Engine Optimization (On-Page & Off-Page)", "Google Search, Display & Video Ads", "Meta (Facebook & Instagram) Ad Campaigns", "Social Media Strategy & Content Marketing", "Conversion Rate Optimization (CRO)", "Google Analytics 4 & Tag Manager Tracking"],
-            certification: "Certified Performance Marketing Specialist"
-        },
-        {
-            id: 12,
-            name: "E-Commerce & Digital Business",
-            subgroup: "E-Commerce & Marketplaces",
-            oneLiner: "Learn Shopify, WooCommerce, marketplace operations, e-commerce marketing and online business fundamentals.",
-            icon: <ShoppingCart className="w-5 h-5" />,
-            image: 'https://images.unsplash.com/photo-1556742049-0a67c5574f73?auto=format&fit=crop&w=800&q=80',
-            popular: true,
-            skills: ["Shopify", "WooCommerce", "Marketplaces", "E-Commerce Marketing", "Amazon", "Product Listing", "Dropshipping"],
-            level: "Beginner to Intermediate",
-            duration: "2–3 Months",
-            eligibility: "12th / Graduates / Entrepreneurs / Business Owners",
-            careerAreas: "E-Commerce Manager, Shopify Store Specialist, Marketplace Operations Executive, D2C Brand Builder",
-            details: "Build, launch, and scale profitable digital stores on Shopify, WooCommerce, and leading marketplaces like Amazon with automated payment gateways and logistics.",
-            features: ["Shopify Store Setup & Optimization", "WooCommerce WordPress Store Development", "Amazon & Flipkart Marketplace Listing", "Inventory, Logistics & Payment Gateways", "E-Commerce Ad Strategies & ROAS Scaling", "Dropshipping & Direct-to-Consumer (D2C) Basics"],
-            certification: "Certified E-Commerce Business Executive"
-        },
-        {
-            id: 107,
-            name: "Growth Hacking & Performance Scaling",
-            subgroup: "Growth Marketing & Viral Strategy",
-            oneLiner: "Scale digital brands through viral content strategies, influencer outreach, funnel optimization, and high-ROAS marketing.",
-            icon: <Megaphone className="w-5 h-5" />,
-            image: "https://images.unsplash.com/photo-1533750516457-a7f992034fec?auto=format&fit=crop&w=800&q=80",
-            popular: true,
-            skills: ["Growth Hacking", "Social Media Funnels", "Influencer Marketing", "Viral Video Strategy", "Brand Scaling", "Google Analytics 4"],
-            level: "Beginner to Intermediate",
-            duration: "2–3 Months",
-            eligibility: "12th / Graduates / Marketing Aspirants / E-Commerce Founders",
-            careerAreas: "Growth Hacker, Social Media Strategist, Influencer Marketer, Viral Content Lead",
-            details: "Master rapid experimentation across marketing funnels, viral reels frameworks, algorithmic social distribution, and data-driven customer acquisition.",
-            features: ["AARRR Pirate Funnel Implementation", "Viral Short-Form Content Creation Workflows", "Influencer Campaign Negotiation & Tracking", "High-ROAS Meta Ads & Performance Max Setup", "Retention Marketing & Email Automation (Klaviyo)", "Omnichannel Analytics & Heatmap Optimization"],
-            certification: "Certified Growth Marketing Strategist"
-        }
-    ],
-
-    // 5. ACCOUNTING, GST & BUSINESS FINANCE (Courses 13, 14 & MIS/Taxation)
-    business: [
-        {
-            id: 14,
-            name: "Accounting, GST & Business Finance",
-            subgroup: "Accounting & GST Taxation",
-            oneLiner: "Learn Tally Prime, computerized accounting, GST, billing, payroll and essential business finance skills.",
-            icon: <Calculator className="w-5 h-5" />,
-            image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80',
-            popular: true,
-            path: "/tally-accounting",
-            skills: ["Tally Prime", "GST", "Accounting", "Billing", "Payroll", "TDS", "Balance Sheet"],
-            level: "Beginner to Advanced",
-            duration: "3–4 Months",
-            eligibility: "10th / 12th / B.Com / Non-Commerce / Office Executives",
-            careerAreas: "Accountant, GST Practitioner, Tally Executive, Tax Compliance Associate",
-            details: "Hands-on computerized corporate accounting with TallyPrime, GST filing, e-way bills, inventory tracking, TDS deductions, and financial statement finalization.",
-            features: ["Computerized Accounting with TallyPrime", "GST Computation, Invoicing & GSTR Filing", "TDS & TCS Statutory Compliance", "Inventory Valuation & Stock Management", "Payroll Processing & Employee Records", "Bank Reconciliation & Final Balance Sheets"],
-            certification: "Certified Corporate Accountant & GST Specialist"
-        },
-        {
-            id: 13,
-            name: "Advanced Office & Business Skills",
-            subgroup: "Office Productivity & Analytics",
-            oneLiner: "Build practical workplace skills in MS Office, Advanced Excel, digital productivity and professional communication.",
-            icon: <Briefcase className="w-5 h-5" />,
-            image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80',
-            popular: true,
-            skills: ["MS Office", "Advanced Excel", "AI Productivity", "Workplace Skills", "PowerPoint", "Word", "Email Etiquette"],
-            level: "Beginner to Intermediate",
-            duration: "2–3 Months",
-            eligibility: "10th / 12th / Graduates / Job Seekers / Office Staff",
-            careerAreas: "MIS Executive, Office Administrator, Executive Assistant, Operations Associate",
-            details: "Master enterprise office productivity using Advanced Excel (XLOOKUP, Pivot Tables, Dashboards), professional business presentations, and AI-assisted workflows.",
-            features: ["Advanced Excel (XLOOKUP, Formulas, Arrays)", "Dynamic Pivot Tables & Executive Dashboards", "Professional MS Word Business Formatting", "High-Impact MS PowerPoint Presentations", "AI Productivity Tools for Corporate Operations", "Workplace Email Etiquette & Communication"],
-            certification: "Certified Advanced Business & Office Specialist"
-        },
-        {
-            id: 108,
-            name: "Financial Modeling & Corporate Valuation",
-            subgroup: "Corporate Finance & Analytics",
-            oneLiner: "Build dynamic 3-statement financial models, DCF valuations, and executive investment analysis dashboards in Excel.",
-            icon: <Calculator className="w-5 h-5" />,
-            image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
-            popular: true,
-            skills: ["Financial Modeling", "DCF Valuation", "M&A Analysis", "Excel Analytics", "Corporate Finance", "Sensitivity Analysis"],
-            level: "Intermediate to Advanced",
-            duration: "3–4 Months",
-            eligibility: "B.Com / BBA / MBA / Finance Aspirants / Accounting Professionals",
-            careerAreas: "Financial Analyst, Equity Research Associate, Investment Banking Analyst, Corporate Finance Executive",
-            details: "Practical hands-on financial statement modeling, discounted cash flow (DCF) company valuations, leveraged buyout (LBO) fundamentals, and scenario forecasting.",
-            features: ["Dynamic 3-Statement Financial Forecasting", "Discounted Cash Flow (DCF) Company Valuation", "Comparable Company & Precedent Transaction Analysis", "Sensitivity Matrices & Scenario Planning", "Executive Pitch Decks & Data Visualization", "Real-World M&A Deal Case Studies"],
-            certification: "Certified Financial Modeling & Valuation Analyst"
-        }
-    ],
-
-    // 6. TECHNICAL CAD & IT SUPPORT (Courses 15, 16 & 3D CAD/Networking)
-    technical: [
-        {
-            id: 15,
-            name: "AutoCAD & Technical Design",
-            subgroup: "Engineering Drafting & CAD",
-            oneLiner: "Develop practical CAD and technical drawing skills for engineering, architecture and technical design applications.",
-            icon: <Compass className="w-5 h-5" />,
-            image: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80',
-            popular: true,
-            skills: ["AutoCAD", "CAD", "Engineering Drawing", "Technical Design", "2D Drafting", "3D Modeling", "Civil/Mechanical"],
-            level: "Beginner to Advanced",
-            duration: "2–4 Months",
-            eligibility: "ITI / Polytechnic / Diploma / B.Tech / 12th with Technical Interest",
-            careerAreas: "CAD Drafter, Architectural CAD Designer, Civil/Mechanical CAD Technician",
-            details: "Industry-standard precision CAD drafting for civil, mechanical, and architectural layouts: 2D floor plans, elevations, section views, and 3D modeling fundamentals.",
-            features: ["AutoCAD 2D Precision Drafting & Coordinates", "Layer Management, Dimensions & Blocks", "Architectural Floor Plans & Elevations", "Mechanical Engineering Component Drawings", "3D Solid Modeling & Isometrics", "Plotting, Scale Standards & Construction Sheets"],
-            certification: "Certified AutoCAD Technical Draftsman"
-        },
-        {
-            id: 16,
-            name: "Hardware, IT Support & System Administration",
-            subgroup: "Hardware & IT Support",
-            oneLiner: "Learn computer hardware, operating systems, troubleshooting, networking and essential IT support skills.",
-            icon: <Settings className="w-5 h-5" />,
-            image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80',
-            popular: true,
-            skills: ["Hardware", "IT Support", "Linux", "Windows", "Troubleshooting", "Networking", "System Admin"],
-            level: "Beginner to Intermediate",
-            duration: "3–4 Months",
-            eligibility: "10th / 12th / Diploma / Tech Enthusiasts",
-            careerAreas: "IT Support Engineer, Desktop Support Technician, Hardware Specialist, Network Admin",
-            details: "Learn practical computer hardware assembly, OS installation (Windows & Linux), peripheral troubleshooting, LAN networking, and helpdesk support ticketing.",
-            features: ["Computer Hardware Architecture & Assembly", "BIOS/UEFI & OS Installation (Windows/Linux)", "Peripheral Configuration & Hardware Diagnostics", "LAN Setup, Crimping, Routers & Switches", "Active Directory & User Permissions", "Enterprise Helpdesk & Troubleshooting Methods"],
-            certification: "Certified IT Support & System Administrator"
-        },
-        {
-            id: 109,
-            name: "Revit Architecture & BIM 3D Modeling",
-            subgroup: "Architectural BIM & Construction",
-            oneLiner: "Learn building information modeling (BIM), parametric architectural drafting, schedules, and 3D detailing with Autodesk Revit.",
-            icon: <Compass className="w-5 h-5" />,
-            image: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
-            popular: true,
-            skills: ["Autodesk Revit", "BIM Modeling", "Architectural 3D", "Structural Detailing", "Rendering", "Quantity Takeoffs"],
-            level: "Beginner to Advanced",
-            duration: "3–4 Months",
-            eligibility: "Civil / Architecture Diploma, ITI Drafters, B.Tech, Design Students",
-            careerAreas: "BIM Modeler, Revit Architectural Drafter, BIM Coordinator, 3D Building Visualizer",
-            details: "Master parametric building information modeling (BIM) workflows: intelligent walls, curtain systems, structural framing, MEP coordination, component schedules, and realistic renderings.",
-            features: ["Revit Parametric Modeling Fundamentals", "Architectural Floor Plans, Elevations & Sections", "Families Creation & Custom Component Design", "Automated Schedules & Material Quantity Takeoffs", "Enscape / V-Ray Photorealistic Rendering", "BIM Collaboration & Worksharing Standards"],
-            certification: "Certified Revit Architecture & BIM Specialist"
-        }
-    ],
-
-    // 7. FOREIGN LANGUAGES & TEST PREPARATION (Courses 17, 18, 19, 20, 21)
-    languages: [
-        {
-            id: 17,
-            name: "IELTS – English Proficiency Test Preparation",
-            subgroup: "English Proficiency Tests",
-            oneLiner: "Develop Listening, Reading, Writing and Speaking skills with structured IELTS preparation and mock practice.",
-            icon: <Award className="w-5 h-5" />,
-            image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80',
-            popular: true,
-            skills: ["IELTS Academic", "IELTS General", "Listening", "Reading", "Writing", "Speaking", "Mock Tests"],
-            level: "Structured Exam Preparation",
-            duration: "1–3 Months",
-            eligibility: "Students, Study-Abroad Aspirants, Work Visa Seekers",
-            careerAreas: "Study Abroad (UK, Canada, Australia, US), Immigration, Global Careers",
-            details: "Comprehensive preparation for both IELTS Academic & General tests covering all four modules: Listening, Reading, Writing (Task 1 & 2), and Speaking interview readiness.",
-            features: ["Listening Section Strategies & Accent Training", "Skimming & Scanning Academic Reading Passages", "Task 1 (Reports/Letters) & Task 2 Essay Writing", "1-on-1 Interactive Speaking Mock Interviews", "Band Score Improvement Techniques", "Official Cambridge Mock Tests & Detailed Feedback"],
-            certification: "IELTS Exam Readiness Certificate"
-        },
-        {
-            id: 18,
-            name: "PTE – Pearson Test of English",
-            subgroup: "English Proficiency Tests",
-            oneLiner: "Prepare for PTE Academic with focused practice in Speaking, Writing, Reading and Listening skills.",
-            icon: <Languages className="w-5 h-5" />,
-            image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80',
-            popular: true,
-            skills: ["PTE Academic", "Speaking", "Reading", "Writing", "Listening", "AI Scoring", "Mock Tests"],
-            level: "Structured Exam Preparation",
-            duration: "1–2 Months",
-            eligibility: "Students, Working Professionals, Visa Aspirants",
-            careerAreas: "International Higher Education, Overseas Work Permits, PR Applications",
-            details: "Master the computer-delivered PTE Academic test with AI scoring algorithms, templates, oral fluency drills, and scored full-length mock tests.",
-            features: ["Read Aloud, Repeat Sentence & Pronunciation", "Summarize Written Text & Structured Essays", "Re-order Paragraphs & Fill in the Blanks", "Write from Dictation & Listening Drills", "AI Scoring Strategies & Time Management", "Computer Lab Mock Exams with Analysis"],
-            certification: "PTE Academic Prep Certificate"
-        },
-        {
-            id: 19,
-            name: "German Language",
-            subgroup: "Foreign Languages",
-            oneLiner: "Learn German from A1 to B2 with structured training in communication, grammar, vocabulary and practical language skills.",
-            icon: <Languages className="w-5 h-5" />,
-            image: 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=800&q=80',
-            popular: true,
-            skills: ["A1 Level", "A2 Level", "B1 Level", "B2 Level", "German Grammar", "Spoken German", "Goethe Prep"],
-            level: "A1 to B2 (Common European Framework)",
-            duration: "2–6 Months (Per Level / Package)",
-            eligibility: "Students aiming for Germany, Job Seekers, Nurses & Engineers",
-            careerAreas: "Higher Education in Germany, EU Work Opportunities, Translation, Bilingual Specialist",
-            details: "Structured CEFR-aligned German language program from beginner A1 to advanced B2 with emphasis on everyday conversational fluency, German grammar, and Goethe-Zertifikat exam prep.",
-            features: ["A1 Beginner (Basic Sentences, Self-Intro, Daily Routines)", "A2 Elementary (Social Conversations, Work Situations)", "B1 Intermediate (Independent Communication, Job Interviews)", "B2 Upper-Intermediate (Fluent Workplace & Academic German)", "Goethe & Telc Examination Preparation", "Interactive Speaking Practice & Audio Sessions"],
-            certification: "German Language CEFR Certificate (A1–B2)"
-        },
-        {
-            id: 20,
-            name: "French Language",
-            subgroup: "Foreign Languages",
-            oneLiner: "Develop French language skills from A1 to B2 through practical speaking, listening, reading and writing practice.",
-            icon: <Languages className="w-5 h-5" />,
-            image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80',
-            popular: true,
-            skills: ["A1 Level", "A2 Level", "B1 Level", "B2 Level", "DELF Prep", "French Phonetics", "Conversation"],
-            level: "A1 to B2 (CEFR Aligned)",
-            duration: "2–6 Months (Per Level / Package)",
-            eligibility: "Canada Immigration (TEF/TCF), European Studies, Enthusiasts",
-            careerAreas: "Canada PR Aspirants (Express Entry), International Diplomacy, Hospitality, MNC Careers",
-            details: "Learn the language of international culture, business, and diplomacy. Complete training covering DELF exam formats, French phonetics, sentence structuring, and fluent conversations.",
-            features: ["A1-A2 Foundational French Grammar & Phonetics", "B1-B2 Professional French for Corporate & Diplomatic Use", "Listening Comprehension with Native Audio Clips", "French Writing, Essay Formats & Email Drafting", "DELF / TEF / TCF Canada Exam Orientation", "Cultural Insights & Interactive Role-Plays"],
-            certification: "French Language CEFR Certificate (A1–B2)"
-        },
-        {
-            id: 21,
-            name: "Japanese Language",
-            subgroup: "Foreign Languages",
-            oneLiner: "Learn Japanese from N5 to N2 with structured training in communication, grammar, vocabulary, Kanji and practical Japanese.",
-            icon: <Languages className="w-5 h-5" />,
-            image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80',
-            popular: true,
-            skills: ["N5 Level", "N4 Level", "N3 Level", "N2 Level", "Hiragana", "Katakana", "Kanji", "JLPT Prep"],
-            level: "N5 to N2 (JLPT Aligned)",
-            duration: "3–6 Months (Per Level)",
-            eligibility: "IT Professionals, Japan Career Aspirants, Manga & Anime Enthusiasts",
-            careerAreas: "IT Careers in Tokyo, Japanese MNCs, Technical Translation, Bilingual Coordinator",
-            details: "Master Japanese script (Hiragana, Katakana, Kanji), grammar particles, polite corporate speech (Keigo), and preparation for the worldwide JLPT (Japanese Language Proficiency Test).",
-            features: ["Hiragana & Katakana Script Mastery", "Essential Kanji Characters & Vocabulary Stacks", "Japanese Sentence Construction & Particles", "JLPT Exam Preparation (N5, N4, N3, N2 Levels)", "Conversational Practice for Japan Work Visas", "Japanese Business Etiquette & Culture"],
-            certification: "Japanese Language JLPT Prep Certificate (N5–N2)"
-        },
-        {
-            id: 110,
-            name: "Spanish Language (DELE A1–B2)",
-            subgroup: "Foreign Languages",
-            oneLiner: "Learn conversational and professional Spanish from A1 to B2 aligned with official Instituto Cervantes DELE standards.",
-            icon: <Languages className="w-5 h-5" />,
-            image: "https://images.unsplash.com/photo-1543783207-ec64e4d95325?auto=format&fit=crop&w=800&q=80",
-            popular: true,
-            skills: ["Spanish A1", "Spanish A2", "Spanish B1", "DELE Prep", "Spoken Spanish", "Grammar", "Phonetics"],
-            level: "A1 to B2 (CEFR Aligned)",
-            duration: "3–6 Months",
-            eligibility: "Open to All Students, Travel Enthusiasts, Latin America Career Seekers",
-            careerAreas: "International Trade, Bilingual Customer Support, Translation, Tourism & Hospitality",
-            details: "Comprehensive Spanish training covering Spanish phonetics, verb conjugations (present, past, subjunctive), conversational vocabulary, and official DELE exam preparation.",
-            features: ["A1-A2 Everyday Conversational Spanish", "B1-B2 Business & Academic Spanish Fluency", "Listening Comprehension with Native Podcasts", "Spanish Writing & Corporate Email Drafting", "DELE Exam Strategy & Mock Tests", "Cultural Immersion & Interactive Role-Plays"],
-            certification: "Spanish Language CEFR Certificate (A1–B2)"
-        }
-    ],
-
-    // 8. SHORT-TERM & PROFESSIONAL SKILLS (Course 22 & Targeted Rapid Tracks)
-    shortterm: [
-        {
-            id: 22,
-            name: "Short-Term & Professional Skills",
-            subgroup: "Professional Upskilling Bootcamp",
-            oneLiner: "Upgrade your career with focused short-term training in digital, office, communication, AI and professional skills.",
-            icon: <Briefcase className="w-5 h-5" />,
-            image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
-            popular: true,
-            skills: ["Quick Skills", "Career Skills", "Professional Upskilling", "Interview Prep", "AI Productivity", "Communication"],
-            level: "All Levels (Rapid Bootcamps)",
-            duration: "2–4 Weeks",
-            eligibility: "Job Seekers, College Students, Working Professionals, Career Starters",
-            careerAreas: "Immediate Job Readiness, Career Transition, Enhanced Workplace Productivity",
-            details: "Accelerated skill development bootcamps designed for job seekers, working professionals, and students needing rapid career upskilling.",
-            features: ["Quick Practical Technical Skills", "Interview & CV Preparation", "Corporate Workplace Communication", "Digital Productivity Tools", "Professional Upskilling Certifications"],
-            certification: "Professional Skill Certificate"
-        },
-        {
-            id: 23,
-            name: "AI Productivity & Office Automation Bootcamp",
-            subgroup: "AI Workplace Tools",
-            oneLiner: "Master ChatGPT, Copilot, prompt frameworks, and smart automation to speed up daily office and business workflows.",
-            icon: <Cpu className="w-5 h-5" />,
-            image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
-            popular: true,
-            skills: ["ChatGPT", "MS Copilot", "Prompting", "Workflow Automation", "Canva AI", "Excel AI"],
-            level: "Beginner to Intermediate",
-            duration: "2–4 Weeks",
-            eligibility: "Students, Working Professionals, Business Owners, Freelancers",
-            careerAreas: "AI-Powered Workplace Efficiency, Smart Automation, Modern Executive Assistant",
-            details: "Supercharge your productivity with practical hands-on generative AI tools, prompt engineering templates, and automated workflows for everyday office tasks.",
-            features: ["ChatGPT & Copilot for Business Documents", "Data Analysis & Presentation Automation", "AI Email Drafting & Minutes of Meeting", "Custom AI Prompts for Faster Workflows", "AI Image & Graphic Generation Tools"],
-            certification: "Certified AI Workplace Productivity Specialist"
-        },
-        {
-            id: 24,
-            name: "Executive Communication & Interview Mastery",
-            subgroup: "Career Acceleration",
-            oneLiner: "Sharpen corporate communication, dynamic public speaking, resume optimization, and high-impact interview skills.",
-            icon: <Users className="w-5 h-5" />,
-            image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80',
-            popular: true,
-            skills: ["Corporate Communication", "Interview Mastery", "Resume ATS", "Public Speaking", "Email Etiquette"],
-            level: "All Levels",
-            duration: "2–3 Weeks",
-            eligibility: "Fresh Graduates, Job Aspirants, Corporate Employees, Team Leads",
-            careerAreas: "MNC Placement Readiness, Leadership Presence, Confident Professional Communication",
-            details: "Intensive career preparation bootcamp featuring mock interviews, personalized body language coaching, ATS resume building, and corporate verbal fluency.",
-            features: ["1-on-1 Mock Interviews & Feedback", "ATS-Friendly Resume & LinkedIn Optimization", "Corporate Email & Meeting Etiquette", "Public Speaking & Presentation Skills", "Salary Negotiation & Offer Evaluation"],
-            certification: "Certified Professional Communication & Interview Specialist"
-        },
-        {
-            id: 111,
-            name: "Agile Scrum Master & Product Management Sprint",
-            subgroup: "Agile Leadership & Tech Management",
-            oneLiner: "Learn Scrum frameworks, agile sprint ceremonies, user story mapping, JIRA backlog management, and PSM I exam preparation.",
-            icon: <Target className="w-5 h-5" />,
-            image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80",
-            popular: true,
-            skills: ["Scrum Master", "Agile Methodology", "JIRA", "Sprint Planning", "Product Backlog", "Kanban", "User Stories"],
-            level: "All Levels (Professional Bootcamp)",
-            duration: "3–4 Weeks",
-            eligibility: "Software Engineers, Team Leads, QA Engineers, Aspiring Scrum Masters",
-            careerAreas: "Scrum Master, Agile Project Manager, Product Owner Associate, Agile Coach",
-            details: "Intensive career-ready certification training in Scrum theory, daily standups, sprint reviews, retrospectives, story point estimation, and real enterprise JIRA project simulations.",
-            features: ["Scrum Artifacts & Ceremonies in Practice", "JIRA & Confluence Agile Project Management", "User Story Mapping & Acceptance Criteria", "Sprint Velocity & Burndown Chart Tracking", "PSM I & CSM Certification Exam Prep", "Real Agile Team Role-Playing Simulations"],
-            certification: "Certified Agile & Scrum Master Practitioner"
-        }
-    ]
-};
-
-// In-Depth Category Spotlight, Practical Training Highlights & Covered Tools
 const categorySpotlights = {
     software: {
         tag: "Software Engineering & Full Stack Track",
@@ -1166,42 +531,8 @@ const Courses = () => {
 
     // Dynamic Database State (Initialized with default high-quality data + saved customizations)
     const [dbCategories, setDbCategories] = useState(courseCategories);
-    const [dbCategoryCourses, setDbCategoryCourses] = useState(() => {
-        try {
-            const deletedIds = getDeletedCourseIds();
-            const saved = localStorage.getItem('aayush_custom_courses');
-            let merged = { ...categoryCourses };
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                const cleanParsed = {};
-                for (const [k, list] of Object.entries(parsed)) {
-                    if (Array.isArray(list)) {
-                        cleanParsed[k] = list.map(c => {
-                            const { icon, ...rest } = c;
-                            return rest;
-                        });
-                    }
-                }
-                merged = { ...categoryCourses, ...cleanParsed };
-            }
-            // Filter out any deleted courses
-            const filtered = {};
-            for (const [catKey, list] of Object.entries(merged)) {
-                if (Array.isArray(list)) {
-                    filtered[catKey] = list.filter(c => 
-                        !deletedIds.includes(String(c.id)) && 
-                        !deletedIds.includes(String(c._id))
-                    );
-                } else {
-                    filtered[catKey] = list;
-                }
-            }
-            return filtered;
-        } catch (e) {
-            console.warn('Could not load custom courses from localStorage', e);
-        }
-        return categoryCourses;
-    });
+    const [isBackendDown, setIsBackendDown] = useState(false);
+    const [dbCategoryCourses, setDbCategoryCourses] = useState({});
     const [isDbLoaded, setIsDbLoaded] = useState(false);
 
     // Staff mode disabled
@@ -1471,10 +802,18 @@ const Courses = () => {
                 }
 
                 // If DB courses returned, group them by categoryId
+                if (!coursesRes || !coursesRes.data || coursesRes.data.length === 0) {
+                    setIsBackendDown(true);
+                    setDbCategoryCourses({});
+                    return;
+                }
+                setIsBackendDown(false);
                 if (coursesRes && coursesRes.data && coursesRes.data.length > 0) {
                     const grouped = {};
                     coursesRes.data.forEach(course => {
-                        if (course.visible === false) return; // Hide unpublished courses
+                        if (course.visible === false) return;
+                        if (course.status === 'Draft' || course.status === 'Archived') return;
+                        if (course.programType && course.programType !== 'course') return;
                         const cId = course.categoryId || (course.type && course.type.toLowerCase()) || 'software';
                         if (!grouped[cId]) grouped[cId] = [];
                         
@@ -1524,10 +863,12 @@ const Courses = () => {
         };
 
         fetchDbData();
-        const pollTimer = setInterval(fetchDbData, 4000);
+        const pollTimer = setInterval(fetchDbData, 3000);
+        window.addEventListener('coursesUpdated', fetchDbData);
         return () => { 
             isMounted = false; 
             clearInterval(pollTimer);
+            window.removeEventListener('coursesUpdated', fetchDbData);
         };
     }, []);
 
@@ -1805,7 +1146,7 @@ const Courses = () => {
                         {isStaff && (
                             <button
                                 type="button"
-                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); openEditModal(course); }}
+                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); openEditModal(activeCourse); }}
                                 className="pointer-events-auto px-2 py-1 bg-purple-900/90 hover:bg-purple-950 text-purple-100 text-[10px] font-bold rounded-full flex items-center gap-1 shadow-md border border-purple-400/40 backdrop-blur-md cursor-pointer transition-transform hover:scale-105"
                                 title="Edit Course (Staff)"
                             >
@@ -1900,7 +1241,7 @@ const Courses = () => {
                                         <span>Edit</span>
                                     </button>
                                     <button
-                                        onClick={(e) => { e.stopPropagation(); handleDeleteCourse(course.id || course._id, course.name); }}
+                                        onClick={(e) => { e.stopPropagation(); handleDeleteCourse(activeCourse.id || activeCourse._id, activeCourse.name || activeCourse.title); }}
                                         aria-label={`Delete ${course.name}`}
                                         className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 text-[11px] font-bold border border-rose-300 shadow-2xs hover:shadow-xs transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95"
                                         title="Delete Course (Staff)"
@@ -1960,9 +1301,42 @@ const Courses = () => {
     const CourseDetailsPoster = ({ course, isModal = false, onClose, onSelectCourse }) => {
         if (!course) return null;
 
+        const [currentCourse, setCurrentCourse] = useState(course);
         const [otherCourses, setOtherCourses] = useState([]);
         const [loadingOtherCourses, setLoadingOtherCourses] = useState(false);
         const [enquirySettings, setEnquirySettings] = useState(null);
+
+        // Keep currentCourse in sync when prop changes
+        useEffect(() => {
+            setCurrentCourse(course);
+        }, [course]);
+
+        // Real-time polling for course updates from MongoDB
+        useEffect(() => {
+            let isMounted = true;
+            const targetId = course?._id || course?.id;
+            if (!targetId) return;
+
+            const pollLatestCourse = async () => {
+                try {
+                    const res = await fetch(`/api/courses/${targetId}`);
+                    if (res.ok) {
+                        const fresh = await res.json();
+                        if (isMounted && fresh && (fresh._id || fresh.id)) {
+                            setCurrentCourse(fresh);
+                        }
+                    }
+                } catch (e) {
+                    // ignore background fetch error
+                }
+            };
+
+            const interval = setInterval(pollLatestCourse, 2500);
+            return () => {
+                isMounted = false;
+                clearInterval(interval);
+            };
+        }, [course?._id, course?.id]);
 
         useEffect(() => {
             let isMounted = true;
@@ -2000,39 +1374,52 @@ const Courses = () => {
 
             fetchCourses();
             fetchEnquirySettings();
-            return () => { isMounted = false; };
+            const pollInterval = setInterval(fetchEnquirySettings, 3000);
+            return () => {
+                isMounted = false;
+                clearInterval(pollInterval);
+            };
         }, []);
 
+        const activeCourse = currentCourse || course;
+
         const highlightItems = [];
-        if (course.id === 1 || course.name.toLowerCase().includes('artificial intelligence')) {
-            highlightItems.push(
-                "Artificial Intelligence Fundamentals",
-                "AI Automation & Workflows",
-                "Generative AI & ChatGPT",
-                "AI Applications for Business",
-                "Prompt Engineering",
-                "AI Agents & Agentic AI Fundamentals",
-                "AI Tools & Productivity",
-                "Practical AI Projects"
-            );
+        if (Array.isArray(activeCourse.highlights) && activeCourse.highlights.length > 0) {
+            highlightItems.push(...activeCourse.highlights);
+        } else if (typeof activeCourse.highlights === 'string' && activeCourse.highlights.trim()) {
+            highlightItems.push(...activeCourse.highlights.split('\n').map(s => s.trim()).filter(Boolean));
         } else {
-            if (course.features && course.features.length > 0) {
-                highlightItems.push(...course.features);
+            if (Array.isArray(activeCourse.features) && activeCourse.features.length > 0) {
+                highlightItems.push(...activeCourse.features);
             }
-            if (course.skills && course.skills.length > 0) {
-                course.skills.forEach(s => {
+            if (Array.isArray(activeCourse.skills) && activeCourse.skills.length > 0) {
+                activeCourse.skills.forEach(s => {
                     if (highlightItems.length < 8 && !highlightItems.includes(s)) {
                         highlightItems.push(s);
                     }
                 });
             }
-            while (highlightItems.length < 8) {
-                highlightItems.push(`Practical ${course.name} Case Studies`);
+            if (Array.isArray(activeCourse.modules) && activeCourse.modules.length > 0) {
+                activeCourse.modules.forEach(m => {
+                    const modTitle = typeof m === 'string' ? m : (m?.title || m?.name);
+                    if (modTitle && highlightItems.length < 8 && !highlightItems.includes(modTitle)) {
+                        highlightItems.push(modTitle);
+                    }
+                });
             }
         }
-        const finalHighlights = (Array.isArray(course.highlights) && course.highlights.length > 0)
-            ? course.highlights.slice(0, 8)
-            : highlightItems.slice(0, 8);
+        const finalHighlights = highlightItems.length > 0
+            ? highlightItems.slice(0, 8)
+            : [
+                `${activeCourse.name || activeCourse.title || 'Core'} Fundamentals`,
+                "Hands-on Industry Curriculum",
+                "Live Projects & Case Studies",
+                "Career Guidance & Mentorship",
+                "Practical Lab Sessions",
+                "Tools & Best Practices",
+                "Resume & Portfolio Review",
+                "Certificate of Completion"
+            ];
 
         const highlightColors = [
             { bg: 'bg-[#0066ff] text-white', icon: <Cpu className="w-3.5 h-3.5" /> },
@@ -2046,16 +1433,20 @@ const Courses = () => {
         ];
 
         const getFeeString = () => {
-            if (course.fee) return course.fee;
-            if (course.id === 1 || course.name?.toLowerCase().includes('artificial intelligence')) return '₹ 75,000/- (Inclusive of all taxes)';
-            if (course.duration?.toLowerCase().includes('week') || course.id === 22) return '₹ 15,000/- (Inclusive of all taxes)';
-            if (course.duration?.includes('1–2') || course.duration?.includes('2–3')) return '₹ 25,000/- (Inclusive of all taxes)';
-            return '₹ 45,000/- (Inclusive of all taxes)';
+            return activeCourse.fees || activeCourse.fee || 'Contact for fee';
         };
 
-        const dynamicWaRaw = enquirySettings?.whatsappNumber || course?.whatsappNumber || "919311050670";
+        // Course-specific WhatsApp overrides have highest priority, then fallback to global site settings
+        const dynamicWaRaw = (activeCourse?.whatsappNumber && String(activeCourse.whatsappNumber).trim())
+            ? activeCourse.whatsappNumber
+            : (enquirySettings?.whatsappNumber || "919311050670");
         const dynamicWaClean = String(dynamicWaRaw).replace(/[^0-9]/g, '') || "919311050670";
-        const waLink = `https://wa.me/${dynamicWaClean}?text=${encodeURIComponent(`Hi, I would like to inquire about the ${course.name} course.`)}`;
+
+        const rawMsg = (activeCourse?.customWaMessage && String(activeCourse.customWaMessage).trim())
+            ? activeCourse.customWaMessage
+            : (enquirySettings?.prefilledMessage || "Hi, I would like to inquire about the [Course Name] course.");
+        const finalMsg = rawMsg.replace(/\[Course Name\]/gi, activeCourse.name || activeCourse.title || 'this');
+        const waLink = `https://wa.me/${dynamicWaClean}?text=${encodeURIComponent(finalMsg)}`;
 
         const titlePrefix = enquirySettings?.titlePrefix || "Quick Enquiry on";
         const titleHighlight = enquirySettings?.titleHighlight || "WhatsApp";
@@ -2072,18 +1463,24 @@ const Courses = () => {
                 "Syllabus",
                 "Career Guidance"
             ];
-        const qrImageSrc = enquirySettings?.qrImage || course?.qrCodeImage || "/whatsapp_qr.png";
+        
+        // Course-specific QR code has highest priority, then fallback to global site settings QR
+        const rawQr = (activeCourse?.qrCodeImage && String(activeCourse.qrCodeImage).trim())
+            ? activeCourse.qrCodeImage.trim()
+            : (enquirySettings?.qrImage || "/whatsapp_qr.png");
+        const qrImageSrc = rawQr.startsWith('http') || rawQr.startsWith('/') ? rawQr : `/Uploads/${rawQr}`;
+
         const buttonText = enquirySettings?.buttonText || "Chat on WhatsApp";
         const counsellorNote = enquirySettings?.counsellorNote || "Or click the button to chat directly with our counsellor.";
 
         const courseBadgeNumber = (() => {
-            if (typeof course.order === 'number' && !isNaN(course.order) && course.order > 0 && course.order < 100) {
-                return String(course.order).padStart(2, '0');
+            if (typeof activeCourse.order === 'number' && !isNaN(activeCourse.order) && activeCourse.order > 0 && activeCourse.order < 100) {
+                return String(activeCourse.order).padStart(2, '0');
             }
-            if (typeof course.displayOrder === 'number' && !isNaN(course.displayOrder) && course.displayOrder > 0 && course.displayOrder < 100) {
-                return String(course.displayOrder).padStart(2, '0');
+            if (typeof activeCourse.displayOrder === 'number' && !isNaN(activeCourse.displayOrder) && activeCourse.displayOrder > 0 && activeCourse.displayOrder < 100) {
+                return String(activeCourse.displayOrder).padStart(2, '0');
             }
-            const num = Number(course.id);
+            const num = Number(activeCourse.id);
             if (!isNaN(num) && num > 0 && num < 1000) {
                 return String(num).padStart(2, '0');
             }
@@ -2091,10 +1488,9 @@ const Courses = () => {
         })();
 
         const filteredCourses = otherCourses.filter(c => 
-            String(c._id || c.id) !== String(course?._id || course?.id) &&
-            (c.name || c.title || '').toLowerCase() !== (course.name || course.title || '').toLowerCase()
+            String(c._id || c.id) !== String(activeCourse?._id || activeCourse?.id) &&
+            (c.name || c.title || '').toLowerCase() !== (activeCourse.name || activeCourse.title || '').toLowerCase()
         );
-
         return (
             <div className="w-full bg-[#f4f8fc] rounded-3xl p-3.5 sm:p-5 md:p-6 text-slate-800 relative">
                 {/* Top Action buttons when in modal */}
@@ -2115,7 +1511,7 @@ const Courses = () => {
                             <button
                                 type="button"
                                 onClick={() => {
-                                    handleDeleteCourse(course.id || course._id, course.name);
+                                    handleDeleteCourse(activeCourse.id || activeCourse._id, activeCourse.name);
                                     if (onClose) onClose();
                                 }}
                                 className="px-3 py-1.5 rounded-full bg-rose-900/90 hover:bg-rose-950 text-rose-100 text-xs font-bold shadow-md border border-rose-400/40 backdrop-blur-md cursor-pointer transition-transform hover:scale-105 flex items-center gap-1.5"
@@ -2171,12 +1567,12 @@ const Courses = () => {
 
                                 {/* Main Title */}
                                 <h2 className="text-xl sm:text-2xl md:text-[23px] lg:text-[26px] font-bold text-[#0a2540] tracking-tight leading-tight mb-1.5 sm:mb-2">
-                                    {course.name}
+                                    {activeCourse.name}
                                 </h2>
 
                                 {/* Description */}
                                 <p className="text-slate-600 text-[11px] sm:text-xs md:text-[12px] lg:text-[12.5px] leading-relaxed mb-3 sm:mb-3.5 font-normal max-w-md">
-                                    {course.details || course.oneLiner}
+                                    {activeCourse.details || activeCourse.oneLiner}
                                 </p>
 
                                 {/* 3 Circular Feature Badges with clean spacing */}
@@ -2207,7 +1603,7 @@ const Courses = () => {
                             <div className="w-full max-w-[340px] sm:max-w-sm overflow-hidden rounded-2xl border border-white/90 shadow-md bg-white/95 p-1.5 sm:p-2">
                                 <img
                                     src="/course_card_girl_mobile.png"
-                                    alt={course.name}
+                                    alt={activeCourse.name}
                                     className="w-full h-auto aspect-[4/3] sm:aspect-[16/10] object-cover object-center rounded-xl"
                                 />
                             </div>
@@ -2273,7 +1669,7 @@ const Courses = () => {
                                         {/* Course Icon Card */}
                                         <div className="w-16 min-h-[68px] rounded-xl bg-gradient-to-br from-[#0055cc] to-[#3388ff] text-white flex flex-col items-center justify-center flex-shrink-0 shadow-md p-1">
                                             <span className="text-[8px] font-semibold uppercase tracking-wider leading-tight text-center text-blue-200 mb-0.5">
-                                                {course.name.split(' ').length > 3 ? course.name.split(' ').slice(0, 2).join(' ') : course.name.split(' ')[0]}
+                                                {activeCourse.name.split(' ').length > 3 ? activeCourse.name.split(' ').slice(0, 2).join(' ') : activeCourse.name.split(' ')[0]}
                                             </span>
                                             <span className="text-[8px] font-medium text-blue-100 leading-tight text-center">Course Syllabus</span>
                                             <div className="mt-1">{renderCourseIcon(course, "w-3.5 h-3.5 text-cyan-300")}</div>
@@ -2291,7 +1687,7 @@ const Courses = () => {
 
                                     {/* Download Button - Responsive on Mobile */}
                                     <NavLink
-                                        to={course.path ? course.path : "/ContactUs"}
+                                        to={activeCourse.path ? activeCourse.path : "/ContactUs"}
                                         className="w-full sm:w-fit inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0a2540] hover:bg-[#0d3055] text-white text-xs font-semibold shadow-md transition-all mt-1"
                                     >
                                         <Download className="w-3.5 h-3.5" />
@@ -2328,7 +1724,7 @@ const Courses = () => {
                                                     <span className="font-medium text-[#0a2540] text-[11px] sm:text-[11.5px]">Course Duration</span>
                                                 </div>
                                                 <div className="col-span-7 py-1 px-2.5 sm:py-1.5 sm:px-3 flex items-center">
-                                                    <span className="font-semibold text-[#003882] text-[11.5px] sm:text-xs">{course.duration}</span>
+                                                    <span className="font-semibold text-[#003882] text-[11.5px] sm:text-xs">{activeCourse.duration}</span>
                                                 </div>
                                             </div>
 
@@ -2342,7 +1738,7 @@ const Courses = () => {
                                                 </div>
                                                 <div className="col-span-7 py-1 px-2.5 sm:py-1.5 sm:px-3 flex flex-col justify-center">
                                                     <span className="font-semibold text-[#0a2540] text-[11.5px] sm:text-xs leading-tight">
-                                                        {course.fee || (course.id === 1 || course.name?.toLowerCase().includes('artificial intelligence') ? '₹ 75,000/-' : (course.duration?.toLowerCase().includes('week') ? '₹ 15,000/-' : '₹ 45,000/-'))}
+                                                        {activeCourse.fees || activeCourse.fee || 'Contact for fee'}
                                                     </span>
                                                     <span className="text-[9.5px] text-slate-500 font-normal leading-none mt-0.5">
                                                         (Inclusive of all taxes)
@@ -2360,7 +1756,7 @@ const Courses = () => {
                                                 </div>
                                                 <div className="col-span-7 py-1 px-2.5 sm:py-1.5 sm:px-3 flex flex-col justify-center">
                                                     <span className="font-semibold text-[#0f766e] text-[11.5px] sm:text-xs leading-tight">
-                                                        {course.scholarship || 'Up to 50%'}
+                                                        {activeCourse.scholarship || 'Up to 50%'}
                                                     </span>
                                                     <span className="text-[9px] text-slate-500 font-normal leading-tight mt-0.5">
                                                         (Based on academic performance &amp; interview)
@@ -2378,7 +1774,7 @@ const Courses = () => {
                                                 </div>
                                                 <div className="col-span-7 py-1 px-2.5 sm:py-1.5 sm:px-3 flex items-center">
                                                     <span className="font-normal text-[#0a2540] text-[11px] sm:text-[11.5px]">
-                                                        {course.mode || 'Classroom / Online / Hybrid'}
+                                                        {activeCourse.mode || 'Classroom / Online / Hybrid'}
                                                     </span>
                                                 </div>
                                             </div>
@@ -2393,7 +1789,7 @@ const Courses = () => {
                                                 </div>
                                                 <div className="col-span-7 py-1 px-2.5 sm:py-1.5 sm:px-3 flex items-center">
                                                     <span className="font-normal text-[#0a2540] text-[10.5px] sm:text-[11px] leading-snug">
-                                                        {course.eligibility || '12th / Graduates / BCA / B.Tech / Frontend Developers'}
+                                                        {activeCourse.eligibility || 'Graduates / 12th Pass / Working Professionals'}
                                                     </span>
                                                 </div>
                                             </div>
@@ -2408,7 +1804,7 @@ const Courses = () => {
                                                 </div>
                                                 <div className="col-span-7 py-1 px-2.5 sm:py-1.5 sm:px-3 flex items-center">
                                                     <span className="font-normal text-[#0a2540] text-[10.5px] sm:text-[11px] leading-snug">
-                                                        {course.certification ? (course.certification.startsWith('Certificate') ? course.certification : `Certificate in ${course.certification.replace('Certified ', '')}`) : `Certificate in ${course.name}`}
+                                                        {activeCourse.certification ? (activeCourse.certification.startsWith('Certificate') ? activeCourse.certification : `Certificate in ${activeCourse.certification.replace('Certified ', '')}`) : `Certificate in ${activeCourse.name}`}
                                                     </span>
                                                 </div>
                                             </div>
@@ -2423,7 +1819,7 @@ const Courses = () => {
                                                 </div>
                                                 <div className="col-span-7 py-1 px-2.5 sm:py-1.5 sm:px-3 flex items-center">
                                                     <span className="font-normal text-[#0a2540] text-[11px] sm:text-[11.5px]">
-                                                        {course.batchSchedule || 'Weekday & Weekend Batches'}
+                                                        {activeCourse.batchSchedule || 'Weekday & Weekend Batches'}
                                                     </span>
                                                 </div>
                                             </div>
@@ -2514,7 +1910,7 @@ const Courses = () => {
                             </div>
 
                         {/* ── 3. CAREER FOCUS SECTION (Full Width of Left 9 Cols) ── */}
-                        {course.careerAreas && (
+                        {activeCourse.careerAreas && (
                             <div className="bg-white rounded-2xl p-4 sm:p-4.5 border border-slate-200/80 shadow-xs">
                                 <div className="flex items-center gap-2 mb-2">
                                     <div className="w-6 h-6 rounded-lg bg-blue-50 text-[#0066ff] flex items-center justify-center flex-shrink-0">
@@ -2526,7 +1922,7 @@ const Courses = () => {
                                     </div>
                                 </div>
                                 <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                                    {course.careerAreas.split(',').map((role, rIdx) => (
+                                    {activeCourse.careerAreas.split(',').map((role, rIdx) => (
                                         <span key={rIdx} className="px-2.5 py-0.5 rounded-full bg-[#eef5ff] text-[#0055cc] text-[10.5px] font-medium border border-blue-200/80 hover:bg-blue-100 transition-colors">
                                             {role.trim()}
                                         </span>
@@ -2547,7 +1943,7 @@ const Courses = () => {
                                         Learn Today, Lead Tomorrow
                                     </h4>
                                     <p className="text-[10.5px] text-sky-200/90 leading-snug mt-0.5 font-normal">
-                                        Master {course.name}. Build In-Demand Skills. Shape Your Future.
+                                        Master {activeCourse.name}. Build In-Demand Skills. Shape Your Future.
                                     </p>
                                 </div>
                             </div>
@@ -2571,7 +1967,7 @@ const Courses = () => {
                             {/* Right: 2 Action Buttons */}
                             <div className="flex items-center gap-2 flex-shrink-0">
                                 <NavLink
-                                    to={course.path ? course.path : "/ContactUs"}
+                                    to={activeCourse.path ? activeCourse.path : "/ContactUs"}
                                     className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-[#0a2540] text-[11px] font-semibold shadow-md transition-all"
                                 >
                                     <Download className="w-3 h-3" />
@@ -3041,7 +2437,24 @@ const CourseModal = () => {
                 </div>
 
                 {/* ── 3. 22 COURSES CARDS GRID (WITH COMPLETE DETAILS) ── */}
-                {displayedCourses.length === 0 ? (
+                {isBackendDown || (!isDbLoaded && displayedCourses.length === 0) ? (
+                    <div className="text-center py-12 bg-white rounded-2xl border border-amber-200 p-8 max-w-lg mx-auto shadow-xs">
+                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-50 text-amber-600 mb-3 border border-amber-200">
+                            <AlertCircle className="w-6 h-6 animate-pulse" />
+                        </div>
+                        <h3 className="text-base font-bold text-slate-800 mb-1">Courses Database Disconnected</h3>
+                        <p className="text-xs text-slate-500 mb-4">
+                            Live course catalog is strictly served from MongoDB. The backend server is currently offline. All courses will load dynamically within 3 seconds of server start.
+                        </p>
+                        <button
+                            onClick={() => window.location.reload()}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors"
+                        >
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            <span>Reload Courses</span>
+                        </button>
+                    </div>
+                ) : displayedCourses.length === 0 ? (
                     <div className="text-center py-10 sm:py-12 bg-white rounded-2xl border border-slate-100 p-6 max-w-lg mx-auto shadow-xs">
                         <BookOpen className="w-10 h-10 text-slate-300 mx-auto mb-3" />
                         <h3 className="text-base font-bold text-slate-700 mb-1">No courses found matching "{searchQuery}"</h3>

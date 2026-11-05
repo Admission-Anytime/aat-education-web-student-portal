@@ -1,9 +1,42 @@
 import { Router } from "express";
 import mongoose from "mongoose";
+import fs from "fs";
 import Course from "../models/courses.js";
 import { initialCourses } from "../seedData.js";
+import multer from "multer";
+import path from "path";
+
+const uploadsDir = path.join(process.cwd(), "Uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadsDir),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `course_qr_${Date.now()}${ext}`);
+  },
+});
+const upload = multer({ storage });
 
 const router = Router();
+
+// @route   POST /api/courses/upload-qr
+// @desc    Upload course-specific WhatsApp QR code image
+router.post("/upload-qr", upload.single("image"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ success: false, message: "No image file uploaded" });
+  }
+  const relativePath = `/Uploads/${req.file.filename}`;
+  res.json({
+    success: true,
+    message: "Course QR Code uploaded successfully",
+    url: relativePath,
+    filename: req.file.filename,
+    fullUrl: `http://localhost:4001${relativePath}`,
+  });
+});
 
 // @route   GET /api/courses/seed
 // @desc    Seed initial 22 courses into MongoDB

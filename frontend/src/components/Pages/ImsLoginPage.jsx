@@ -1,16 +1,35 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useSearchParams, NavLink, useNavigate } from 'react-router-dom';
-import { GraduationCap, Award, UserPlus, Eye, EyeOff, BookOpen, CheckCircle2, Lock, Mail, Phone, User, Calendar, Briefcase, ShieldCheck, Sparkles, KeyRound, AlertCircle, X, Loader2, Shield } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import {
+    GraduationCap,
+    Award,
+    UserPlus,
+    Eye,
+    EyeOff,
+    CheckCircle2,
+    Lock,
+    Mail,
+    Phone,
+    User,
+    Calendar,
+    Briefcase,
+    ShieldCheck,
+    Sparkles,
+    KeyRound,
+    AlertCircle,
+    X,
+    Loader2
+} from 'lucide-react';
 import { authApi } from '../../services/api';
 
 const ImsLoginPage = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const [loginType, setLoginType] = useState('student');
+    const [loginType, setLoginType] = useState('student'); // 'student' | 'staff' | 'alumni' | 'signup'
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [statusMsg, setStatusMsg] = useState({ type: '', text: '' });
-    
+
     // Forgot Password Modal State
     const [showForgotModal, setShowForgotModal] = useState(false);
     const [forgotStep, setForgotStep] = useState(1); // 1: Email, 2: Code & New Password
@@ -18,18 +37,8 @@ const ImsLoginPage = () => {
     const [forgotLoading, setForgotLoading] = useState(false);
     const [forgotMsg, setForgotMsg] = useState({ type: '', text: '' });
 
-    // Staff PIN Gate State
-    const STAFF_ACCESS_PIN = '2580'; // Secret 4-digit PIN required to authenticate staff login or create staff accounts
-    const [staffLoginPin, setStaffLoginPin] = useState('');
-    const [showStaffPinModal, setShowStaffPinModal] = useState(false);
-    const [staffPinInput, setStaffPinInput] = useState(['', '', '', '']);
-    const [staffPinError, setStaffPinError] = useState('');
-    const [staffPinLoading, setStaffPinLoading] = useState(false);
-    const pinRefs = [useRef(null), useRef(null), useRef(null), useRef(null)];
-
-    // Staff Account Creation Verification State
+    // Staff Account Creation Role
     const [signupRole, setSignupRole] = useState('student'); // 'student' | 'staff'
-    const [staffVerificationPin, setStaffVerificationPin] = useState('');
 
     const [formData, setFormData] = useState({
         name: '',
@@ -50,125 +59,12 @@ const ImsLoginPage = () => {
         }
     }, [searchParams]);
 
-    const handleStaffPinDigit = (value, idx) => {
-        const digit = value.replace(/\D/, '').slice(-1);
-        const newPin = [...staffPinInput];
-        newPin[idx] = digit;
-        setStaffPinInput(newPin);
-        setStaffPinError('');
-        if (digit && idx < 3) {
-            pinRefs[idx + 1].current?.focus();
-        }
-        // Auto-submit when last digit is filled
-        if (idx === 3 && digit) {
-            const fullPin = [...newPin.slice(0, 3), digit].join('');
-            verifyStaffPin(fullPin);
-        }
-    };
-
-    const handleStaffPinKeyDown = (e, idx) => {
-        if (e.key === 'Backspace' && !staffPinInput[idx] && idx > 0) {
-            pinRefs[idx - 1].current?.focus();
-        }
-    };
-
-    const executeStaffLogin = async (pinValue = staffLoginPin) => {
-        setLoading(true);
-        setStatusMsg({ type: '', text: '' });
-        try {
-            const identifier = formData.staffId || formData.email;
-            const res = await authApi.login({
-                identifier,
-                email: formData.email,
-                password: formData.password,
-                loginType: 'staff'
-            });
-
-            if (res.token) {
-                localStorage.setItem('aayush_token', res.token);
-                localStorage.setItem('aayush_user', JSON.stringify(res.user));
-                window.dispatchEvent(new Event('authChange'));
-            }
-
-            setStatusMsg({
-                type: 'success',
-                text: `Hi ${res.user?.name || 'Staff Member'}, Staff Security Verified! Welcome!`
-            });
-
-            const adminUrl = import.meta.env.VITE_ADMIN_PANEL_URL || 'http://localhost:5173';
-            setTimeout(() => {
-                window.location.href = `${adminUrl}/panel`;
-            }, 1200);
-        } catch (err) {
-            setStatusMsg({
-                type: 'error',
-                text: err.message || 'Staff authentication failed. Please check your credentials.'
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const verifyStaffPin = (pin) => {
-        setStaffPinLoading(true);
-        setTimeout(async () => {
-            if (pin === STAFF_ACCESS_PIN) {
-                setShowStaffPinModal(false);
-                setStaffLoginPin(pin);
-                setStaffPinInput(['', '', '', '']);
-                setStaffPinError('');
-                await executeStaffLogin(pin);
-            } else {
-                setStaffPinError('Incorrect 4-digit PIN. Authorized faculty and staff only.');
-                setStaffPinInput(['', '', '', '']);
-                setTimeout(() => pinRefs[0].current?.focus(), 50);
-            }
-            setStaffPinLoading(false);
-        }, 600);
-    };
-
     const handleInputChange = (e) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value
         });
         if (statusMsg.text) setStatusMsg({ type: '', text: '' });
-    };
-
-    const fillDemoCredentials = () => {
-        if (statusMsg.text) setStatusMsg({ type: '', text: '' });
-        if (loginType === 'student') {
-            setFormData(prev => ({
-                ...prev,
-                studentId: 'AAY-2024-1082',
-                email: 'student@aayush.com',
-                password: 'password123'
-            }));
-        } else if (loginType === 'staff') {
-            setFormData(prev => ({
-                ...prev,
-                staffId: 'STF-001',
-                email: 'staff@aayush.com',
-                password: 'password123'
-            }));
-            setStaffLoginPin('2580');
-        } else if (loginType === 'alumni') {
-            setFormData(prev => ({
-                ...prev,
-                alumniId: 'ALM-2022',
-                email: 'alumni@aayush.com',
-                password: 'password123'
-            }));
-        } else if (loginType === 'signup') {
-            setFormData(prev => ({
-                ...prev,
-                name: 'Priya Sharma',
-                phone: '9876543210',
-                email: 'priya.sharma@example.com',
-                course: 'MERN Stack Development',
-                password: 'password123'
-            }));
-        }
     };
 
     const handleSubmit = async (e) => {
@@ -178,97 +74,58 @@ const ImsLoginPage = () => {
 
         try {
             if (loginType === 'signup') {
-                // If creating staff account, require valid authorization PIN
-                if (signupRole === 'staff') {
-                    if (staffVerificationPin.trim() !== STAFF_ACCESS_PIN) {
-                        setStatusMsg({
-                            type: 'error',
-                            text: 'Security verification failed: Valid 4-digit Staff PIN is required to create a Faculty/Staff account.'
-                        });
-                        setLoading(false);
-                        return;
-                    }
-                }
-
-                // Register / Sign Up
+                const targetRole = signupRole === 'staff' ? 'staff' : 'student';
                 const res = await authApi.register({
                     name: formData.name,
                     email: formData.email,
                     phone: formData.phone,
                     password: formData.password,
-                    course: signupRole === 'student' ? formData.course : undefined,
-                    department: signupRole === 'staff' ? formData.department : undefined,
-                    role: signupRole === 'staff' ? 'staff' : 'student'
+                    course: targetRole === 'student' ? formData.course : undefined,
+                    department: targetRole === 'staff' ? formData.department : undefined,
+                    role: targetRole
                 });
 
-                if (res.token) {
-                    localStorage.setItem('aayush_token', res.token);
-                    localStorage.setItem('aayush_user', JSON.stringify(res.user));
-                    window.dispatchEvent(new Event('authChange'));
-                }
-
-                setStatusMsg({
-                    type: 'success',
-                    text: `Hi ${res.user?.name || formData.name || 'User'}, Account Verified & Created!`
-                });
-
-                setTimeout(() => {
-                    if (signupRole === 'staff' || res.user?.role === 'staff' || res.user?.role === 'admin') {
-                        navigate('/courses');
-                    } else {
-                        navigate('/profile');
-                    }
-                }, 1500);
-
-            } else if (loginType === 'staff') {
-                // When logging in as staff: verify 4-digit PIN lock
-                if (!staffLoginPin || staffLoginPin.length !== 4) {
-                    setStaffPinInput(['', '', '', '']);
-                    setStaffPinError('');
-                    setShowStaffPinModal(true);
-                    setLoading(false);
-                    return;
-                }
-                if (staffLoginPin.trim() !== STAFF_ACCESS_PIN) {
+                if (targetRole === 'staff') {
                     setStatusMsg({
-                        type: 'error',
-                        text: 'Security verification failed: Valid 4-digit Staff PIN is required to log in.'
+                        type: 'success',
+                        text: res.message || 'Staff registration submitted! Awaiting administrator approval.'
                     });
-                    setLoading(false);
-                    return;
+                    setTimeout(() => {
+                        setLoginType('staff');
+                    }, 2500);
+                } else {
+                    setStatusMsg({
+                        type: 'success',
+                        text: `Welcome, ${res.user?.name || formData.name}! Account created successfully.`
+                    });
+                    setTimeout(() => {
+                        navigate('/profile');
+                    }, 1200);
                 }
-                await executeStaffLogin(staffLoginPin);
-                return;
+
             } else {
-                // Sign In (student, alumni)
-                let identifier = formData.email;
-                if (loginType === 'student' && formData.studentId) identifier = formData.studentId;
-                if (loginType === 'alumni' && formData.alumniId) identifier = formData.alumniId;
+                // Sign In (student, staff, alumni)
+                const cleanId = (formData.email || '').trim();
 
                 const res = await authApi.login({
-                    identifier,
-                    email: formData.email,
+                    identifier: cleanId,
+                    email: cleanId,
                     password: formData.password,
                     loginType
                 });
 
-                if (res.token) {
-                    localStorage.setItem('aayush_token', res.token);
-                    localStorage.setItem('aayush_user', JSON.stringify(res.user));
-                    window.dispatchEvent(new Event('authChange'));
-                }
+                window.dispatchEvent(new Event('authChange'));
 
                 setStatusMsg({
                     type: 'success',
-                    text: `Hi ${res.user?.name || 'User'}, Welcome!`
+                    text: `Hi ${res.user?.name || 'User'}, login successful!`
                 });
 
                 const adminUrl = import.meta.env.VITE_ADMIN_PANEL_URL || 'http://localhost:5173';
                 setTimeout(() => {
-                    if (loginType === 'staff' || res.user?.role === 'staff' || res.user?.role === 'admin') {
+                    if (loginType === 'staff' || res.user?.role === 'staff' || res.user?.role === 'admin' || res.role === 'admin') {
                         window.location.href = `${adminUrl}/panel`;
                     } else {
-                        // 🎓 Student & Alumni navigate to their Student Profile on School-Web
                         navigate('/profile');
                     }
                 }, 800);
@@ -294,16 +151,16 @@ const ImsLoginPage = () => {
             const res = await authApi.forgotPassword(forgotData.email);
             setForgotMsg({
                 type: 'success',
-                text: `${res.message} ${res.resetCode ? `(Testing Code: ${res.resetCode})` : ''}`
+                text: res.message || 'Password reset link generated.'
             });
-            if (res.resetCode) {
-                setForgotData(prev => ({ ...prev, code: res.resetCode }));
+            if (res.resetToken) {
+                setForgotData(prev => ({ ...prev, code: res.resetToken }));
             }
             setForgotStep(2);
         } catch (err) {
             setForgotMsg({
                 type: 'error',
-                text: err.message || 'Failed to request password reset code.'
+                text: err.message || 'Failed to request password reset.'
             });
         } finally {
             setForgotLoading(false);
@@ -320,7 +177,7 @@ const ImsLoginPage = () => {
         try {
             const res = await authApi.resetPassword({
                 email: forgotData.email,
-                resetCode: forgotData.code,
+                resetToken: forgotData.code,
                 newPassword: forgotData.newPassword
             });
 
@@ -341,7 +198,7 @@ const ImsLoginPage = () => {
         } catch (err) {
             setForgotMsg({
                 type: 'error',
-                text: err.message || 'Failed to reset password. Please check your code.'
+                text: err.message || 'Failed to reset password. Please check your token or try again.'
             });
         } finally {
             setForgotLoading(false);
@@ -412,7 +269,7 @@ const ImsLoginPage = () => {
                             <Award className={`w-6 h-6 mb-2 ${loginType === 'alumni' ? 'text-white' : 'text-amber-600'}`} />
                             <h4 className="font-semibold text-sm mb-0.5">Alumni</h4>
                             <p className={`text-[11px] leading-tight ${loginType === 'alumni' ? 'text-amber-100' : 'text-slate-500'}`}>
-                                Career networking &amp; events
+                                Professional networking &amp; guidance
                             </p>
                         </div>
 
@@ -426,9 +283,9 @@ const ImsLoginPage = () => {
                             }`}
                         >
                             <UserPlus className={`w-6 h-6 mb-2 ${loginType === 'signup' ? 'text-white' : 'text-emerald-600'}`} />
-                            <h4 className="font-semibold text-sm mb-0.5">Sign Up</h4>
+                            <h4 className="font-semibold text-sm mb-0.5">New Registration</h4>
                             <p className={`text-[11px] leading-tight ${loginType === 'signup' ? 'text-emerald-100' : 'text-slate-500'}`}>
-                                New admission &amp; enrollment
+                                Enroll for courses or faculty access
                             </p>
                         </div>
                     </div>
@@ -533,21 +390,6 @@ const ImsLoginPage = () => {
                             </button>
                         </div>
 
-                        {/* Demo Credentials Quick Autofill Pill */}
-                        <div className="mb-4 px-3 py-2 bg-blue-50/80 border border-blue-200/70 rounded-xl flex items-center justify-between text-[11px] text-[#003882]">
-                            <span className="flex items-center gap-1.5 font-medium">
-                                <KeyRound className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
-                                <span>Demo credentials ready</span>
-                            </span>
-                            <button
-                                type="button"
-                                onClick={fillDemoCredentials}
-                                className="px-2.5 py-1 bg-white hover:bg-blue-100/70 text-[#0055cc] font-semibold text-[10.5px] rounded-lg border border-blue-200 shadow-2xs transition-colors cursor-pointer"
-                            >
-                                Auto-fill Details
-                            </button>
-                        </div>
-
                         {statusMsg.text && (
                             <div className={`mb-5 p-3.5 rounded-xl border text-xs flex items-center gap-2 ${
                                 statusMsg.type === 'error'
@@ -577,7 +419,7 @@ const ImsLoginPage = () => {
                                         <div className="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-xl">
                                             <button
                                                 type="button"
-                                                onClick={() => { setSignupRole('student'); setStaffVerificationPin(''); }}
+                                                onClick={() => setSignupRole('student')}
                                                 className={`py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                                                     signupRole === 'student'
                                                         ? 'bg-white text-emerald-600 shadow-xs'
@@ -590,7 +432,7 @@ const ImsLoginPage = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => setSignupRole('staff')}
-                                                className={`py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer relative ${
+                                                className={`py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                                                     signupRole === 'staff'
                                                         ? 'bg-white text-purple-700 shadow-xs'
                                                         : 'text-slate-600 hover:text-slate-900'
@@ -598,40 +440,9 @@ const ImsLoginPage = () => {
                                             >
                                                 <Briefcase className="w-3.5 h-3.5 text-purple-600" />
                                                 <span>Faculty / Staff</span>
-                                                <Lock className="w-2.5 h-2.5 text-purple-500 absolute top-1.5 right-1.5" />
                                             </button>
                                         </div>
                                     </div>
-
-                                    {/* If Faculty / Staff Account: Require Verification PIN */}
-                                    {signupRole === 'staff' && (
-                                        <div className="p-3 bg-purple-50/90 border border-purple-200 rounded-xl space-y-2.5">
-                                            <div className="flex items-center justify-between">
-                                                <label className="block text-xs font-bold text-purple-900 flex items-center gap-1">
-                                                    <Shield className="w-3.5 h-3.5 text-purple-600" />
-                                                    <span>Staff Verification PIN *</span>
-                                                </label>
-                                                <span className="text-[10px] text-purple-600 font-semibold bg-purple-100/80 px-2 py-0.5 rounded-full">
-                                                    Required
-                                                </span>
-                                            </div>
-                                            <div className="relative">
-                                                <input
-                                                    type="password"
-                                                    maxLength={4}
-                                                    required
-                                                    value={staffVerificationPin}
-                                                    onChange={(e) => setStaffVerificationPin(e.target.value)}
-                                                    placeholder="Enter 4-digit Security PIN"
-                                                    className="w-full pl-9 pr-3 py-2 text-xs font-bold tracking-widest bg-white border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all text-purple-800"
-                                                />
-                                                <Lock className="w-4 h-4 text-purple-500 absolute left-3 top-1/2 -translate-y-1/2" />
-                                            </div>
-                                            <p className="text-[10.5px] text-purple-600/90 leading-tight">
-                                                Institute staff registration is restricted. Enter the 4-digit authorization PIN provided by administration.
-                                            </p>
-                                        </div>
-                                    )}
 
                                     <div>
                                         <label className="block text-xs font-semibold text-gray-700 mb-1">
@@ -719,143 +530,27 @@ const ImsLoginPage = () => {
                                 </>
                             )}
 
-                            {/* Student Specific ID */}
-                            {loginType === 'student' && (
-                                <div>
-                                    <label className="block text-xs font-semibold text-gray-700 mb-1">
-                                        Student ID / Roll Number
-                                    </label>
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            name="studentId"
-                                            value={formData.studentId}
-                                            onChange={handleInputChange}
-                                            placeholder="e.g. AAY-2024-1082"
-                                            className="w-full pl-9 pr-3 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                                        />
-                                        <GraduationCap className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Staff Specific ID, Department & Security PIN */}
-                            {loginType === 'staff' && (
-                                <>
-                                    <div>
-                                        <label className="block text-xs font-semibold text-gray-700 mb-1">
-                                            Staff ID / Employee Code
-                                        </label>
-                                        <div className="relative">
-                                            <input
-                                                type="text"
-                                                name="staffId"
-                                                value={formData.staffId}
-                                                onChange={handleInputChange}
-                                                placeholder="e.g. AAY-FAC-104 or STF-001"
-                                                className="w-full pl-9 pr-3 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
-                                            />
-                                            <Briefcase className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-semibold text-gray-700 mb-1">
-                                            Department / Role
-                                        </label>
-                                        <select
-                                            name="department"
-                                            value={formData.department}
-                                            onChange={handleInputChange}
-                                            className="w-full px-3 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all text-gray-700"
-                                        >
-                                            <option value="Faculty / Instructor">Faculty / Instructor</option>
-                                            <option value="Administration">Administration</option>
-                                            <option value="Admission & Counselling">Admission &amp; Counselling</option>
-                                            <option value="Examination & Records">Examination &amp; Records</option>
-                                            <option value="Placement Cell">Placement Cell</option>
-                                        </select>
-                                    </div>
-
-                                    {/* Staff Security PIN Field */}
-                                    <div className="p-3 bg-purple-50/80 border border-purple-200/90 rounded-xl space-y-1.5">
-                                        <div className="flex items-center justify-between">
-                                            <label className="block text-xs font-bold text-purple-900 flex items-center gap-1.5">
-                                                <Shield className="w-3.5 h-3.5 text-purple-600" />
-                                                <span>Staff Security PIN *</span>
-                                            </label>
-                                            <span className="text-[10px] text-purple-700 font-semibold bg-purple-100/90 px-2 py-0.5 rounded-full border border-purple-300/60">
-                                                PIN Required
-                                            </span>
-                                        </div>
-                                        <div className="relative">
-                                            <input
-                                                type="password"
-                                                maxLength={4}
-                                                name="staffLoginPin"
-                                                value={staffLoginPin}
-                                                onChange={(e) => {
-                                                    setStaffLoginPin(e.target.value.replace(/\D/g, ''));
-                                                    if (statusMsg.text) setStatusMsg({ type: '', text: '' });
-                                                }}
-                                                placeholder="Enter 4-digit Security PIN (2580)"
-                                                className="w-full pl-9 pr-3 py-2 text-xs font-bold tracking-widest bg-white border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all text-purple-900 placeholder:tracking-normal placeholder:font-normal"
-                                            />
-                                            <Lock className="w-4 h-4 text-purple-500 absolute left-3 top-1/2 -translate-y-1/2" />
-                                        </div>
-                                        <p className="text-[10.5px] text-purple-600/90 leading-tight">
-                                            Security lock: Authorized 4-digit PIN is required to complete staff login.
-                                        </p>
-                                    </div>
-
-                                    <div className="flex justify-end pt-0.5">
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                setLoginType('signup');
-                                                setSignupRole('staff');
-                                            }}
-                                            className="text-[11px] font-semibold text-purple-600 hover:text-purple-800 hover:underline flex items-center gap-1 cursor-pointer"
-                                        >
-                                            <Lock className="w-3 h-3 text-purple-500" />
-                                            <span>New Faculty? Register with Staff PIN</span>
-                                        </button>
-                                    </div>
-                                </>
-                            )}
-
-                            {/* Alumni Specific ID / Year */}
-                            {loginType === 'alumni' && (
-                                <div>
-                                    <label className="block text-xs font-semibold text-gray-700 mb-1">
-                                        Alumni ID / Graduation Year
-                                    </label>
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            name="alumniId"
-                                            value={formData.alumniId}
-                                            onChange={handleInputChange}
-                                            placeholder="e.g. ALM-2022 or Year"
-                                            className="w-full pl-9 pr-3 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition-all"
-                                        />
-                                        <Calendar className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Common Email Field */}
+                            {/* Common Email / User ID Field */}
                             <div>
                                 <label className="block text-xs font-semibold text-gray-700 mb-1">
-                                    Email Address
+                                    {loginType === 'signup' ? 'Email Address' : 'Email Address / User ID'}
                                 </label>
                                 <div className="relative">
                                     <input
-                                        type="email"
+                                        type={loginType === 'signup' ? 'email' : 'text'}
                                         name="email"
                                         required
                                         value={formData.email}
                                         onChange={handleInputChange}
-                                        placeholder={loginType === 'staff' ? 'staff@aayushinstitute.in' : 'yourname@email.com'}
+                                        placeholder={
+                                            loginType === 'signup'
+                                                ? 'yourname@email.com'
+                                                : loginType === 'staff'
+                                                ? 'Staff email or employee code'
+                                                : loginType === 'student'
+                                                ? 'Student email or Student ID'
+                                                : 'Alumni email or ID'
+                                        }
                                         className={`w-full pl-9 pr-3 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 ${
                                             loginType === 'signup' ? 'focus:ring-emerald-500' :
                                             loginType === 'staff' ? 'focus:ring-purple-500' :
@@ -1005,8 +700,8 @@ const ImsLoginPage = () => {
                                 <h3 className="text-lg font-bold text-slate-900">Forgot Password</h3>
                                 <p className="text-xs text-slate-500">
                                     {forgotStep === 1
-                                        ? 'Enter your email to receive a password reset verification code.'
-                                        : 'Enter verification code and choose a new password.'}
+                                        ? 'Enter your email to receive a password reset verification token.'
+                                        : 'Enter verification token and choose a new password.'}
                                 </p>
                             </div>
                         </div>
@@ -1038,7 +733,7 @@ const ImsLoginPage = () => {
                                             required
                                             value={forgotData.email}
                                             onChange={(e) => setForgotData({ ...forgotData, email: e.target.value })}
-                                            placeholder="Enter your registered email"
+                                            placeholder="yourname@email.com"
                                             className="w-full pl-9 pr-3 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                                         />
                                         <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -1049,7 +744,7 @@ const ImsLoginPage = () => {
                                     <button
                                         type="button"
                                         onClick={() => setShowForgotModal(false)}
-                                        className="flex-1 py-2.5 px-4 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
+                                        className="py-2.5 px-3 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
                                     >
                                         Cancel
                                     </button>
@@ -1059,7 +754,7 @@ const ImsLoginPage = () => {
                                         className="flex-1 py-2.5 px-4 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-md disabled:opacity-70"
                                     >
                                         {forgotLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                                        <span>Send Reset Code</span>
+                                        <span>Send Reset Token</span>
                                     </button>
                                 </div>
                             </form>
@@ -1067,15 +762,15 @@ const ImsLoginPage = () => {
                             <form onSubmit={handleResetPasswordSubmit} className="space-y-4">
                                 <div>
                                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                                        6-Digit Verification Code
+                                        Reset Token
                                     </label>
                                     <input
                                         type="text"
                                         required
                                         value={forgotData.code}
                                         onChange={(e) => setForgotData({ ...forgotData, code: e.target.value })}
-                                        placeholder="e.g. 123456"
-                                        className="w-full px-3 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all font-mono tracking-wider text-center text-sm font-bold"
+                                        placeholder="Paste reset token here"
+                                        className="w-full px-3 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all font-mono tracking-wider text-center text-xs font-bold"
                                     />
                                 </div>
 
@@ -1116,76 +811,6 @@ const ImsLoginPage = () => {
                                 </div>
                             </form>
                         )}
-                    </div>
-                </div>
-            )}
-
-            {/* ===== STAFF PIN ACCESS MODAL ===== */}
-            {showStaffPinModal && (
-                <div className="fixed inset-0 z-[999] flex items-center justify-center p-4" style={{backdropFilter:'blur(12px)', background:'rgba(0,0,0,0.55)'}}>
-                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-7 relative border border-purple-100 animate-in fade-in zoom-in duration-200">
-                        {/* Close */}
-                        <button
-                            onClick={() => setShowStaffPinModal(false)}
-                            className="absolute top-4 right-4 w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer"
-                        >
-                            <X className="w-4 h-4 text-slate-500" />
-                        </button>
-
-                        {/* Icon & Heading */}
-                        <div className="flex flex-col items-center text-center mb-6">
-                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-violet-700 flex items-center justify-center shadow-lg shadow-purple-500/25 mb-3">
-                                <Shield className="w-7 h-7 text-white" />
-                            </div>
-                            <h3 className="text-lg font-bold text-[#00285e]">Staff Login Authorization</h3>
-                            <p className="text-xs text-slate-500 mt-1 max-w-[240px] leading-relaxed">
-                                Enter your 4-digit Staff Security PIN to authorize this faculty login session.
-                            </p>
-                        </div>
-
-                        {/* 4-Digit PIN Inputs */}
-                        <div className="flex items-center justify-center gap-3 mb-4">
-                            {[0, 1, 2, 3].map((idx) => (
-                                <input
-                                    key={idx}
-                                    ref={pinRefs[idx]}
-                                    type="password"
-                                    inputMode="numeric"
-                                    maxLength={1}
-                                    value={staffPinInput[idx]}
-                                    onChange={(e) => handleStaffPinDigit(e.target.value, idx)}
-                                    onKeyDown={(e) => handleStaffPinKeyDown(e, idx)}
-                                    autoFocus={idx === 0}
-                                    className={`w-13 h-13 text-center text-xl font-bold rounded-xl border-2 outline-none transition-all duration-200 bg-purple-50/60 focus:bg-white
-                                        ${staffPinError ? 'border-rose-400 focus:border-rose-500 text-rose-600' : 'border-purple-200 focus:border-purple-500 text-purple-700'}
-                                    `}
-                                    style={{width:'52px', height:'52px'}}
-                                />
-                            ))}
-                        </div>
-
-                        {/* Error Message */}
-                        {staffPinError && (
-                            <div className="flex items-center justify-center gap-1.5 text-rose-600 text-xs font-medium mb-3">
-                                <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
-                                <span>{staffPinError}</span>
-                            </div>
-                        )}
-
-                        {/* Manual Submit Button */}
-                        <button
-                            type="button"
-                            disabled={staffPinLoading || staffPinInput.some(d => !d)}
-                            onClick={() => verifyStaffPin(staffPinInput.join(''))}
-                            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 text-white font-bold text-sm shadow-md shadow-purple-500/25 hover:from-purple-700 hover:to-violet-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
-                        >
-                            {staffPinLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-                            {staffPinLoading ? 'Verifying...' : 'Authorize & Sign In'}
-                        </button>
-
-                        <p className="text-center text-[10.5px] text-slate-400 mt-3">
-                            This PIN is provided only to authorized Aayush Institute faculty &amp; staff.
-                        </p>
                     </div>
                 </div>
             )}

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
     Terminal,
@@ -36,6 +36,9 @@ import {
     Laptop,
     HelpCircle,
     X
+,
+    AlertCircle,
+    RefreshCw
 } from 'lucide-react';
 
 const technologyTracks = [
@@ -574,6 +577,48 @@ const faqItems = [
 ];
 
 export default function PythonDevelopment() {
+
+    // ── Dynamic MongoDB REST API Connection with 3s Standby Engine ──
+    const [courseData, setCourseData] = useState(null);
+    const [isBackendDown, setIsBackendDown] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    const fetchCourseData = async () => {
+        try {
+            const baseUrl = import.meta.env.VITE_ERP_API_BASE_URL || '';
+            const res = await fetch(`${baseUrl}/api/courses`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const list = await res.json();
+            const match = Array.isArray(list) ? list.find(c => {
+                const n = ((c.name || c.title || '')).toLowerCase();
+                return n.includes('python') || c.path === '/python-programming' || c.path === '/python';
+            }) : null;
+
+            if (match) {
+                setCourseData(match);
+                setIsBackendDown(false);
+            } else if (Array.isArray(list) && list.length > 0) {
+                setCourseData(list[0]);
+                setIsBackendDown(false);
+            } else {
+                setIsBackendDown(true);
+                setCourseData(null);
+            }
+        } catch (err) {
+            console.warn('[PythonDevelopment] Backend offline, standing by...', err.message);
+            setIsBackendDown(true);
+            setCourseData(null);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchCourseData();
+        const poll = setInterval(fetchCourseData, 3000);
+        return () => clearInterval(poll);
+    }, []);
+
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [openModule, setOpenModule] = useState('01');
@@ -612,6 +657,24 @@ export default function PythonDevelopment() {
 
     return (
         <div className="min-h-screen bg-[#f4f8fc]">
+            {/* Top Standby Alert Banner */}
+            {isBackendDown && (
+                <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 text-amber-900 text-xs flex items-center justify-between sticky top-0 z-40 shadow-xs">
+                    <div className="flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 animate-pulse" />
+                        <span>
+                            <strong>Backend Offline:</strong> Course curriculum and live enrollment data are in standby mode. Auto-reconnecting every 3 seconds...
+                        </span>
+                    </div>
+                    <button
+                        onClick={fetchCourseData}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded text-xs font-medium transition cursor-pointer"
+                    >
+                        <RefreshCw className="w-3 h-3" />
+                        <span>Reload Data</span>
+                    </button>
+                </div>
+            )}
             {/* ── 1. HERO SECTION (Light Sky-Blue Matching Standard Layout) ── */}
             <div
                 className="relative overflow-hidden bg-no-repeat bg-cover bg-right md:bg-center min-h-[260px] sm:min-h-[280px] lg:min-h-[300px] flex items-center"
@@ -905,7 +968,24 @@ export default function PythonDevelopment() {
 
                         {/* Colorful Module Accordion List in 1*2 Responsive Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4 items-start">
-                            {filteredModules.length === 0 ? (
+                            {isBackendDown ? (
+                                <div className="col-span-full text-center py-12 bg-amber-50/70 rounded-2xl border-2 border-dashed border-amber-200 p-6">
+                                    <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-3 border border-amber-200">
+                                        <AlertCircle className="w-6 h-6 animate-pulse" />
+                                    </div>
+                                    <h3 className="text-base font-bold text-slate-800 mb-1">Course Curriculum in Standby Mode</h3>
+                                    <p className="text-xs text-slate-600 max-w-md mx-auto mb-4 font-normal">
+                                        Curriculum modules, fee structures, and batch enrollments are dynamically connected to MongoDB. Start the backend (<code>npm start</code>) to automatically populate live data.
+                                    </p>
+                                    <button
+                                        onClick={fetchCourseData}
+                                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                                    >
+                                        <RefreshCw className="w-3.5 h-3.5" />
+                                        <span>Reload Course Curriculum</span>
+                                    </button>
+                                </div>
+                            ) : filteredModules.length === 0 ? (
                                 <div className="col-span-full text-center py-12 bg-slate-50 rounded-2xl border border-slate-200">
                                     <Search className="w-8 h-8 text-slate-300 mx-auto mb-2" />
                                     <p className="text-sm font-semibold text-slate-700">No modules match &ldquo;{searchQuery}&rdquo;</p>

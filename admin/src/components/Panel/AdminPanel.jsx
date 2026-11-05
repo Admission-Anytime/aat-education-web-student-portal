@@ -17,13 +17,15 @@ import {
   MessageSquare,
   Sliders,
   Share2,
-  Globe
+  Globe,
+  LayoutGrid
 } from "lucide-react";
 
 import DashboardHome from "../Pages/DashboardHome";
 import CoursesAdmin from "../Pages/CoursesAdmin";
 import LeadsAdmin from "../Pages/LeadsAdmin";
 import SiteSettingsAdmin from "../Pages/SiteSettingsAdmin";
+import HomepageCmsAdmin from "../Pages/HomepageCmsAdmin";
 import AdminUsersManagement from "../Pages/AdminUsersManagement";
 import NewsArticlesManagement from "../Pages/NewsArticlesManagement";
 import Testimonial from "../Pages/Testimonial";
@@ -85,7 +87,6 @@ const AdminPanel = () => {
       id: "testimonials",
       label: "Student Testimonials",
       icon: MessageSquare,
-      badge: "LIVE",
     },
     {
       id: "leads",
@@ -93,9 +94,19 @@ const AdminPanel = () => {
       icon: ClipboardList,
     },
     {
+      id: "homepage-cms",
+      label: "Homepage Sections CMS",
+      icon: LayoutGrid,
+    },
+    {
       id: "social-settings",
       label: "Website & Blogs CMS",
       icon: Globe,
+    },
+    {
+      id: "footer",
+      label: "Footer Links CMS",
+      icon: Sliders,
     },
 
     {
@@ -375,6 +386,7 @@ const AdminPanel = () => {
             />
           )}
           {activeTab === "leads" && <LeadsAdmin />}
+          {activeTab === "homepage-cms" && <HomepageCmsAdmin />}
           {activeTab === "social-settings" && <SiteSettingsAdmin />}
           {activeTab === "news" && <NewsArticlesManagement />}
           {activeTab === "testimonials" && <Testimonial />}
