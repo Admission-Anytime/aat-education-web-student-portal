@@ -27,6 +27,7 @@ import {
     ShieldCheck,
     Lock,
     KeyRound,
+    AlertCircle,
     RefreshCw,
     ExternalLink
 } from 'lucide-react';
@@ -101,262 +102,7 @@ const newsCategories = [
     }
 ];
 
-const newsArticles = [
-    {
-        id: 1,
-        title: "Spring 2026 Batch Admissions Open: Full Stack, AI & Data Analytics",
-        excerpt: "Admissions are now open for industry-certified diploma and fast-track certificate programmes. Get 100% practical lab training with industry capstone projects.",
-        content: "Aayush Institute of Professional Studies announces new batch registrations for Full Stack Web Development (MERN), Artificial Intelligence & Machine Learning, and Data Analytics. The upcoming batches feature hands-on live project exposure, individual mentor guidance, and comprehensive placement support for graduates and career changers.",
-        category: "Batches",
-        date: "March 20, 2026",
-        readTime: "3 min read",
-        author: "Academic Cell",
-        featured: true,
-        image: "/corporate_ai.jpg",
-        tags: ["Admissions", "Full Stack", "AI & ML", "March Batch"],
-        theme: {
-            badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
-            border: "border-emerald-200 hover:border-emerald-400",
-            glow: "from-emerald-500/15"
-        }
-    },
-    {
-        id: 2,
-        title: "Campus Placement Drive 2026: 25+ Tech & Corporate Recruiters Participating",
-        excerpt: "Annual placement initiative connects students with leading IT firms, digital marketing agencies, and accounting enterprises with package up to 7.5 LPA.",
-        content: "The Placement Cell is organizing a massive career drive for passing-out candidates across Web Development, Python, Digital Marketing, and Tally GST. Participating employers include top IT solutions providers, creative design studios, and corporate enterprises offering full-time and internship opportunities.",
-        category: "Placements",
-        date: "March 18, 2026",
-        readTime: "4 min read",
-        author: "Placement Cell",
-        featured: true,
-        image: "/corporate_data.jpg",
-        tags: ["Placement", "Job Fair", "Campus Drive", "Hiring"],
-        theme: {
-            badge: "bg-purple-50 text-purple-700 border-purple-200",
-            border: "border-purple-200 hover:border-purple-400",
-            glow: "from-purple-500/15"
-        }
-    },
-    {
-        id: 3,
-        title: "Hands-On Workshop: Building Enterprise Apps with Generative AI & Next.js",
-        excerpt: "A dedicated weekend practical workshop for developers and students exploring LLM APIs, prompt engineering, and modern web architectures.",
-        content: "Join our expert software faculty for an intensive, practical workshop. Participants will build a full-stack AI-driven web application from scratch using modern React/Next.js, LangChain concepts, and vector embeddings. All participants receive verified workshop certificates.",
-        category: "Workshops",
-        date: "March 14, 2026",
-        readTime: "2 min read",
-        author: "Tech Innovations Lab",
-        featured: false,
-        image: "/course_mern.jpg",
-        tags: ["Workshop", "Gen AI", "React", "Next.js"],
-        theme: {
-            badge: "bg-amber-50 text-amber-700 border-amber-200",
-            border: "border-amber-200 hover:border-amber-400",
-            glow: "from-amber-500/15"
-        }
-    },
-    {
-        id: 4,
-        title: "University Distance & Online Degree Examination Schedules Announced",
-        excerpt: "Timetables for UG and PG Distance Education programmes (BCA, MCA, BBA, MBA, B.Com) released by partner UGC-entitled universities.",
-        content: "Students enrolled in Distance and Online degree programmes through Aayush Institute are advised to review the upcoming term-end examination datesheet and submission deadlines for internal assignments. Student support desks are active for admit card assistance.",
-        category: "University",
-        date: "March 10, 2026",
-        readTime: "3 min read",
-        author: "University Advisory",
-        featured: false,
-        image: "/university_graduates.jpg",
-        tags: ["University", "Distance Exam", "BCA", "MBA"],
-        theme: {
-            badge: "bg-rose-50 text-rose-700 border-rose-200",
-            border: "border-rose-200 hover:border-rose-400",
-            glow: "from-rose-500/15"
-        }
-    },
-    {
-        id: 5,
-        title: "Live Capstone Project Showcase: Student Software Solutions & Live Demos",
-        excerpt: "Students from Web & Mobile Development batches presented complete production applications to industry evaluators and senior engineers.",
-        content: "The quarterly Project Defense & Showcase event concluded successfully with 40+ student software prototypes demonstrated live, spanning E-Commerce portals, Healthcare ERPs, and Mobile Delivery Apps. Evaluators praised the practical coding standards and database structures.",
-        category: "Workshops",
-        date: "March 05, 2026",
-        readTime: "4 min read",
-        author: "Project Coordinator",
-        featured: false,
-        image: "/laptop_live_projects.jpg",
-        tags: ["Live Projects", "Showcase", "Capstone", "Portfolio"],
-        theme: {
-            badge: "bg-blue-50 text-blue-700 border-blue-200",
-            border: "border-blue-200 hover:border-blue-400",
-            glow: "from-blue-500/15"
-        }
-    },
-    {
-        id: 6,
-        title: "Merit-Based Scholarship Announced for Technical & Computer Courses",
-        excerpt: "Financial fee concessions up to 35% announced for meritorious students, female learners, and economically weaker candidates.",
-        content: "In alignment with the Institute's mission to make professional education accessible, Aayush Institute introduces the 2026 Skill Scholarship Scheme. Eligible students can apply online through the admission gateway or visit the campus counsellor desks.",
-        category: "Announcements",
-        date: "February 28, 2026",
-        readTime: "3 min read",
-        author: "Management Desk",
-        featured: false,
-        image: "/university_library.jpg",
-        tags: ["Scholarship", "Fee Waiver", "Financial Aid", "Education"],
-        theme: {
-            badge: "bg-cyan-50 text-cyan-700 border-cyan-200",
-            border: "border-cyan-200 hover:border-cyan-400",
-            glow: "from-cyan-500/15"
-        }
-    },
-    {
-        id: 7,
-        title: "TallyPrime 4.0 with E-Way Bill & GST Return Filing Masterclass",
-        excerpt: "Accounting students completed specialized hands-on billing drills simulating real business balance sheets and tax audits.",
-        content: "Commerce graduates and accounting professionals successfully completed an intensive weekend certification module covering GST portal reconciliation, TDS calculations, and annual closing statements using TallyPrime.",
-        category: "Batches",
-        date: "February 22, 2026",
-        readTime: "2 min read",
-        author: "Accounting Faculty",
-        featured: false,
-        image: "/corporate_data.jpg",
-        tags: ["TallyPrime", "GST", "Accounting", "Commerce"],
-        theme: {
-            badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
-            border: "border-emerald-200 hover:border-emerald-400",
-            glow: "from-emerald-500/15"
-        }
-    },
-    {
-        id: 8,
-        title: "Alumni Spotlight: Senior Frontend Developer at Top Fintech Startup",
-        excerpt: "Read how former Aayush Institute graduate transformed from non-tech background to leading user experience design for 1M+ active users.",
-        content: "We celebrate our alumnus Rahul Verma who graduated from the Full Stack Development Diploma. Starting with zero coding experience in 2024, his journey highlights how structured mentorship, continuous practice, and portfolio building can transform careers.",
-        category: "Placements",
-        date: "February 15, 2026",
-        readTime: "5 min read",
-        author: "Alumni Relations",
-        featured: false,
-        image: "/university_mba.jpg",
-        tags: ["Alumni", "Success Story", "Career Switch", "Inspiration"],
-        theme: {
-            badge: "bg-purple-50 text-purple-700 border-purple-200",
-            border: "border-purple-200 hover:border-purple-400",
-            glow: "from-purple-500/15"
-        }
-    },
-    {
-        id: 101,
-        title: "Top IT Skills in 2025 That Can Boost Your Career",
-        excerpt: "Discover the most in-demand software skills — Full Stack development, Cloud services, and AI workflows — to fast-track your tech career.",
-        content: "The tech industry demands multi-skilled developers who understand modern web architectures, API design, and containerized deployment. Specializing in high-growth ecosystems like React, Node.js, and Python opens accelerated job opportunities across startups and multinational enterprises. At Aayush Institute, we combine theoretical foundations with live project sprints and interview preparation.",
-        category: "Blogs",
-        date: "12 Sep 2025",
-        readTime: "4 min read",
-        author: "Tech Training Cell",
-        featured: false,
-        image: "/blog_it_skills.jpg",
-        tags: ["IT Skills", "Full Stack", "React", "Node.js", "Career"],
-        theme: {
-            badge: "bg-blue-50 text-blue-700 border-blue-200",
-            border: "border-blue-200 hover:border-blue-400",
-            glow: "from-blue-500/15"
-        }
-    },
-    {
-        id: 102,
-        title: "Benefits of Distance Education for Working Professionals",
-        excerpt: "Learn how UGC-DEB entitled online degrees empower working adults to earn accredited qualifications without quitting their day jobs.",
-        content: "Balancing career growth with higher education is easier than ever with UGC-entitled distance and online learning. Professionals can pursue BCA, MCA, BBA, or MBA programs with flexible schedules, digital study materials, and proctored examinations. Recognized degrees unlock promotions, salary appraisals, and higher managerial appointments.",
-        category: "Blogs",
-        date: "10 Sep 2025",
-        readTime: "3 min read",
-        author: "Academic Advisory",
-        featured: false,
-        image: "/blog_distance_edu.jpg",
-        tags: ["Distance Education", "UGC Approved", "BCA", "MBA", "Online Degree"],
-        theme: {
-            badge: "bg-rose-50 text-rose-700 border-rose-200",
-            border: "border-rose-200 hover:border-rose-400",
-            glow: "from-rose-500/15"
-        }
-    },
-    {
-        id: 103,
-        title: "How Internships Help You Get Hired Faster",
-        excerpt: "Real-world project experience bridges the gap between classroom concepts and high-velocity corporate engineering standards.",
-        content: "Internships offer invaluable exposure to agile development workflows, sprint planning, pull request reviews, and production bug resolutions. Candidates with proven internship experience stand out significantly during campus placements and technical rounds, with many securing direct pre-placement offers (PPOs).",
-        category: "Blogs",
-        date: "08 Sep 2025",
-        readTime: "3 min read",
-        author: "Placement Cell",
-        featured: false,
-        image: "/blog_internships.jpg",
-        tags: ["Internship", "Placement", "Live Projects", "PPO"],
-        theme: {
-            badge: "bg-purple-50 text-purple-700 border-purple-200",
-            border: "border-purple-200 hover:border-purple-400",
-            glow: "from-purple-500/15"
-        }
-    },
-    {
-        id: 104,
-        title: "The Future of AI & How It's Changing the Job Market",
-        excerpt: "Artificial intelligence is reshaping everyday workflows. Learn how developers and creators can leverage AI to multiply their output.",
-        content: "AI tools are not here to replace developers, but developers who understand AI-assisted tooling will outperform those who don't. From automated coding assistants to intelligent chatbots and predictive data models, incorporating AI into your skillset equips you for modern, high-value tech positions.",
-        category: "Blogs",
-        date: "05 Sep 2025",
-        readTime: "4 min read",
-        author: "AI Innovation Lab",
-        featured: false,
-        image: "/blog_future_ai.jpg",
-        tags: ["AI & ML", "Generative AI", "Future Tech", "Automation"],
-        theme: {
-            badge: "bg-amber-50 text-amber-700 border-amber-200",
-            border: "border-amber-200 hover:border-amber-400",
-            glow: "from-amber-500/15"
-        }
-    },
-    {
-        id: 105,
-        title: "Campus Life & Smart Computer Lab Walkthrough Vlog",
-        excerpt: "Take an insider video tour of Aayush Institute: high-speed development labs, practical training sessions, and student project pods.",
-        content: "Explore our modern learning campus located in Delhi NCR. This vlog features hands-on student interviews, a walk-through of the high-spec computer laboratories equipped with dual-boot systems, dedicated high-speed fiber internet, audio-visual classrooms, and faculty support desks designed for collaborative live coding sprints.",
-        category: "Blogs",
-        date: "March 22, 2026",
-        readTime: "4 min watch",
-        author: "Campus Media Team",
-        featured: false,
-        isVideo: true,
-        image: "/corporate_ai.jpg",
-        tags: ["Campus Vlog", "Lab Facilities", "Student Life", "Tour"],
-        theme: {
-            badge: "bg-pink-50 text-pink-700 border-pink-200",
-            border: "border-pink-200 hover:border-pink-400",
-            glow: "from-pink-500/15"
-        }
-    },
-    {
-        id: 106,
-        title: "Complete 2026 Career Roadmap for Full Stack & AI Engineers (Video Masterclass)",
-        excerpt: "Expert faculty breakdown: which frameworks to master, portfolio project ideas, and interview strategies for 2026 hiring cycles.",
-        content: "In this comprehensive video guide and masterclass summary, our lead tech mentor outlines the step-by-step pathway from basic JavaScript to deploying production microservices with Next.js, FastAPI, and AI integration. Learn the exact resume portfolio criteria required by senior recruiters.",
-        category: "Blogs",
-        date: "March 15, 2026",
-        readTime: "6 min watch",
-        author: "Tech Innovations Lab",
-        featured: false,
-        isVideo: true,
-        image: "/laptop_live_projects.jpg",
-        tags: ["Video Vlog", "Roadmap 2026", "Full Stack", "Career Guide"],
-        theme: {
-            badge: "bg-rose-50 text-rose-700 border-rose-200",
-            border: "border-rose-200 hover:border-rose-400",
-            glow: "from-rose-500/15"
-        }
-    }
-];
+const newsArticles = [];
 
 const News = () => {
     const navigate = useNavigate();
@@ -410,79 +156,60 @@ const News = () => {
 
 
     // News Articles State backed by localStorage
-    const [dbArticles, setDbArticles] = useState(() => {
-        try {
-            const saved = localStorage.getItem('aayush_news_custom');
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                if (Array.isArray(parsed) && parsed.length > 0) {
-                    return parsed;
-                }
-            }
-        } catch (e) {
-            console.warn(e);
-        }
-        return newsArticles;
-    });
+    const [isBackendDown, setIsBackendDown] = useState(false);
+    const [dbArticles, setDbArticles] = useState([]);
 
     // Real-time synchronization with live MongoDB Atlas API, tabs, and sessions
     useEffect(() => {
         let isMounted = true;
         const fetchArticles = async () => {
             try {
-                const res = await fetch('/api/news');
-                if (res.ok) {
-                    const data = await res.json();
-                    if (isMounted && Array.isArray(data) && data.length > 0) {
-                        const formatted = data
-                            .filter(a => a.visible !== false)
-                            .map(a => {
-                                const defMatch = newsArticles.find(d => 
-                                    (d.title && a.title && d.title.toLowerCase() === a.title.toLowerCase()) ||
-                                    String(d.id) === String(a._id) || String(d.id) === String(a.id)
-                                ) || {};
-
-                                const imgUrl = a.image 
-                                    ? (a.image.startsWith('http') || a.image.startsWith('/') ? a.image : `/Uploads/${a.image}`)
-                                    : (defMatch.image || '/corporate_ai.jpg');
-
-                                return {
-                                    ...defMatch,
-                                    _id: a._id,
-                                    id: a._id || a.id || defMatch.id,
-                                    title: a.title || defMatch.title,
-                                    excerpt: a.excerpt || defMatch.excerpt,
-                                    content: a.content || defMatch.content,
-                                    category: a.category || defMatch.category || 'Announcements',
-                                    date: a.date ? (typeof a.date === 'string' && a.date.includes('T') ? new Date(a.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : a.date) : defMatch.date,
-                                    readTime: a.readTime || defMatch.readTime || '3 min read',
-                                    author: a.author || defMatch.author || 'Academic Cell',
-                                    featured: !!a.featured,
-                                    image: imgUrl,
-                                    tags: Array.isArray(a.tags) && a.tags.length > 0 ? a.tags : (defMatch.tags || [a.category || 'News', 'Aayush']),
-                                    theme: defMatch.theme || {
-                                        badge: "bg-blue-50 text-blue-700 border-blue-200",
-                                        border: "border-blue-200 hover:border-blue-400",
-                                        glow: "from-blue-500/15"
-                                    }
-                                };
-                            });
-                        if (formatted.length > 0) {
-                            setDbArticles(formatted);
-                        }
-                    }
+                const baseUrl = import.meta.env.VITE_ERP_API_BASE_URL || '';
+                const res = await fetch(`${baseUrl}/api/news`);
+                if (!res.ok) {
+                    setIsBackendDown(true);
+                    setDbArticles([]);
+                    return;
                 }
-            } catch (e) {
-                // local fallback
-                try {
-                    const saved = localStorage.getItem('aayush_news_custom');
-                    if (saved) {
-                        const parsed = JSON.parse(saved);
-                        if (isMounted && Array.isArray(parsed) && parsed.length > 0) {
-                            setDbArticles(parsed);
-                        }
-                    }
-                } catch {}
+                const data = await res.json();
+                if (isMounted && Array.isArray(data) && data.length > 0) {
+                    const formatted = data
+                        .filter(a => a.visible !== false)
+                        .map(a => {
+                            const imgUrl = a.image 
+                                ? (a.image.startsWith('http') || a.image.startsWith('/') ? a.image : `/Uploads/${a.image}`)
+                                : '/corporate_ai.jpg';
+
+                            return {
+                                _id: a._id,
+                                id: a._id || a.id,
+                                title: a.title,
+                                excerpt: a.excerpt || a.shortDescription || '',
+                                content: a.content || a.longDescription || '',
+                                category: a.category || 'Announcements',
+                                date: a.date ? (typeof a.date === 'string' && a.date.includes('T') ? new Date(a.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : a.date) : 'Recently',
+                                readTime: a.readTime || '3 min read',
+                                author: a.author || 'Academic Cell',
+                                featured: !!a.featured,
+                                image: imgUrl,
+                                tags: Array.isArray(a.tags) && a.tags.length > 0 ? a.tags : [a.category || 'News', 'Aayush'],
+                                theme: {
+                                    badge: "bg-blue-50 text-blue-700 border-blue-200",
+                                    border: "border-blue-200 hover:border-blue-400",
+                                    glow: "from-blue-500/15"
+                                }
+                            };
+                        });
+                    setIsBackendDown(false);
+                    setDbArticles(formatted);
+                } else {
+                    setIsBackendDown(true);
+                    setDbArticles([]);
+                }
+            } catch (err) {
+                console.warn('[News] Backend offline, standing by...', err.message);
+                setIsBackendDown(true);
+                setDbArticles([]);
             }
         };
 
@@ -935,7 +662,24 @@ const News = () => {
                 )}
 
                 {/* ── 4. NEWS & ARTICLES GRID (COLORFUL CARDS) ── */}
-                {filteredArticles.length === 0 ? (
+                {isBackendDown || (dbArticles.length === 0 && !searchTerm) ? (
+                    <div className="text-center py-12 bg-white rounded-2xl border border-amber-200 p-8 max-w-lg mx-auto shadow-xs">
+                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-50 text-amber-600 mb-3 border border-amber-200">
+                            <AlertCircle className="w-6 h-6 animate-pulse" />
+                        </div>
+                        <h3 className="text-base font-bold text-slate-800 mb-1">News & Articles Database Disconnected</h3>
+                        <p className="text-xs text-slate-500 mb-4">
+                            All institutional announcements, blogs, and campus notices are served live from MongoDB. The backend server is currently offline. Articles will load automatically within seconds of reconnection.
+                        </p>
+                        <button
+                            onClick={fetchArticles}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors"
+                        >
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            <span>Reload Articles</span>
+                        </button>
+                    </div>
+                ) : filteredArticles.length === 0 ? (
                     <div className="text-center py-14 bg-white rounded-2xl border border-slate-100 p-8 max-w-lg mx-auto shadow-xs">
                         <BookOpen className="w-10 h-10 text-slate-300 mx-auto mb-3" />
                         <h3 className="text-base font-bold text-slate-700 mb-1">No updates found matching "{searchTerm}"</h3>

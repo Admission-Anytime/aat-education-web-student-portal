@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     User,
     Mail,
@@ -78,6 +78,34 @@ function RegistrationForm() {
     const [submissionResult, setSubmissionResult] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
     const [photoStatus, setPhotoStatus] = useState({ student: '', father: '', mother: '' });
+    const [coursesList, setCoursesList] = useState([]);
+    const [isBackendDown, setIsBackendDown] = useState(false);
+
+    const fetchCoursesForForm = async () => {
+        try {
+            const baseUrl = import.meta.env.VITE_ERP_API_BASE_URL || '';
+            const res = await fetch(`${baseUrl}/api/courses`);
+            if (res.ok) {
+                const data = await res.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    setCoursesList(data.filter(c => c.visible !== false));
+                    setIsBackendDown(false);
+                } else {
+                    setIsBackendDown(true);
+                }
+            } else {
+                setIsBackendDown(true);
+            }
+        } catch {
+            setIsBackendDown(true);
+        }
+    };
+
+    useEffect(() => {
+        fetchCoursesForForm();
+        const poll = setInterval(fetchCoursesForForm, 3000);
+        return () => clearInterval(poll);
+    }, []);
 
     // Photo files & previews
     const [photos, setPhotos] = useState({
@@ -549,24 +577,18 @@ function RegistrationForm() {
                                             required
                                             className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm outline-none transition bg-white"
                                         >
-                                            <optgroup label="School Education">
-                                                <option value="9th">9th Standard</option>
-                                                <option value="10th">10th Standard (Matric)</option>
-                                                <option value="11th">11th Standard</option>
-                                                <option value="12th">12th Standard (Intermediate)</option>
-                                            </optgroup>
-                                            <optgroup label="Professional & University Programs">
-                                                <option value="Full Stack Development">Full Stack Development</option>
-                                                <option value="Python Development">Python Programming & AI</option>
-                                                <option value="Web Development">Web Development</option>
-                                                <option value="App Development">Mobile App Development</option>
-                                                <option value="UI/UX Design">UI/UX Design Master</option>
-                                                <option value="Digital Marketing">Digital Marketing Professional</option>
-                                                <option value="Tally Accounting">Tally Prime & GST Accounting</option>
-                                                <option value="BCA">BCA (Bachelor of Computer Applications)</option>
-                                                <option value="BBA">BBA (Bachelor of Business Admin)</option>
-                                                <option value="MCA / MBA">MCA / MBA Support</option>
-                                            </optgroup>
+                                            <option value="">-- Select Course / Program --</option>
+                                            {coursesList.length > 0 ? (
+                                                coursesList.map((c) => (
+                                                    <option key={c._id || c.id} value={c.name || c.title}>
+                                                        {c.name || c.title} {c.duration ? `(${c.duration})` : ''}
+                                                    </option>
+                                                ))
+                                            ) : (
+                                                <option value="" disabled>
+                                                    {isBackendDown ? "Waiting for backend courses..." : "Loading courses..."}
+                                                </option>
+                                            )}
                                         </select>
                                     </div>
 

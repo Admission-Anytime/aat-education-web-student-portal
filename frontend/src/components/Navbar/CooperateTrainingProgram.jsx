@@ -36,7 +36,8 @@ import {
     Trash2,
     BookOpen,
     RefreshCw,
-    KeyRound
+    KeyRound,
+    AlertCircle,
 } from 'lucide-react';
 
 // Safe dynamic icon resolver for corporate courses
@@ -121,352 +122,7 @@ const corporateCategories = [
     }
 ];
 
-const corporateCourses = {
-    ai: [
-        {
-            name: "Artificial Intelligence & Generative AI",
-            popular: true,
-            icon: <Sparkles className="w-5 h-5" />,
-            details: "Comprehensive introduction to core AI principles, Large Language Models (LLMs), transformer architecture, and practical enterprise workflows.",
-            features: ["Core AI & Machine Learning Concepts", "Large Language Models (LLMs) & GPTs", "Enterprise Workflow Modernization", "Generative vs Predictive AI Systems"],
-            duration: "2–4 Weeks (Custom)",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Generative AI for Business",
-            popular: true,
-            icon: <Cpu className="w-5 h-5" />,
-            details: "Practical adoption of GenAI tools to automate organizational processes, enhance customer service touchpoints, and improve business decision-making.",
-            features: ["Strategic AI Opportunity Mapping", "Process Automation with AI", "Tool Evaluation & Enterprise Rollout", "Measuring AI ROI & Business Impact"],
-            duration: "2–3 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "AI Tools & Workplace Productivity",
-            icon: <Laptop className="w-5 h-5" />,
-            details: "Hands-on mastery of modern generative tools including ChatGPT, Claude, Microsoft 365 Copilot, and Midjourney to accelerate daily work output.",
-            features: ["ChatGPT & Claude Pro Workflows", "Microsoft 365 Copilot in Word/Excel", "Document Summarization & Drafting", "Meeting Notes & Task Automation"],
-            duration: "1–2 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Prompt Engineering & AI Applications",
-            icon: <Code className="w-5 h-5" />,
-            details: "Master advanced prompt architecture, few-shot prompting, system role engineering, output formatting (JSON/tables), and chain-of-thought logic.",
-            features: ["System Instructions & Persona Setup", "Few-Shot & Multi-Turn Prompts", "Structured Output Formatting", "Chain-of-Thought & Reasoning"],
-            duration: "2 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "AI for Data Analysis",
-            popular: true,
-            icon: <LineChart className="w-5 h-5" />,
-            details: "Leverage AI assistants and Code Interpreter models to query datasets in plain English, cleanse data, extract hidden trends, and automate visual graphs.",
-            features: ["Natural Language Data Querying", "Automated Data Cleaning & Prep", "Trend Extraction & Anomaly Detection", "Instant Visual Chart Generation"],
-            duration: "2–3 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "AI for Digital Marketing",
-            icon: <Globe className="w-5 h-5" />,
-            details: "Supercharge marketing campaigns with AI-driven ad copy, high-converting angles, image asset generation, customer segmentation, and journey mapping.",
-            features: ["High-Converting AI Copywriting", "Multi-Variation Ad Creative Generation", "Audience Persona Segmentation", "Campaign Optimization Strategies"],
-            duration: "2 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "AI-Powered Business Automation",
-            icon: <Layers className="w-5 h-5" />,
-            details: "Connect AI capabilities with Zapier, Make, and internal systems to automate repetitive cross-department workflows, data entry, and team notifications.",
-            features: ["No-Code Automation with Zapier/Make", "AI Webhooks & Trigger Logic", "Email Parsing & Ticket Routing", "Cross-Department Synchronization"],
-            duration: "3–4 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Responsible AI Practices",
-            icon: <ShieldCheck className="w-5 h-5" />,
-            details: "Enterprise AI governance, corporate data privacy safeguards, compliance protocols, IP protection, and mitigating hallucinations and bias.",
-            features: ["Data Privacy & Enterprise Security", "Intellectual Property Safeguards", "Bias Mitigation & Hallucination Audits", "Responsible Deployment Frameworks"],
-            duration: "1–2 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        }
-    ],
-
-    excel: [
-        {
-            name: "Advanced Excel",
-            popular: true,
-            icon: <FileSpreadsheet className="w-5 h-5" />,
-            details: "Master enterprise spreadsheet operations, dynamic formula calculations, cross-sheet data linking, validation rules, and error auditing techniques.",
-            features: ["Data Validation & Custom Rules", "Formula Auditing & Trace Precedents", "Advanced Conditional Formatting", "Multi-Workbook Data Linking"],
-            duration: "2–4 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Excel Formulas & Functions",
-            popular: true,
-            icon: <BarChart3 className="w-5 h-5" />,
-            details: "Deep dive into enterprise lookup and array formulas: XLOOKUP, INDEX/MATCH, dynamic arrays (FILTER, UNIQUE, SORT), and complex nested logic.",
-            features: ["XLOOKUP & Modern Formula Suite", "Dynamic Array Functions (FILTER, UNIQUE)", "Nested IF, IFS, AND/OR Logical Stacks", "Date, Time & Financial Formulas"],
-            duration: "2 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Data Cleaning & Data Management",
-            icon: <Database className="w-5 h-5" />,
-            details: "Transform and standardize inconsistent corporate data: de-duplication, delimiter splitting, blank handling, text trims, and structured Excel tables.",
-            features: ["De-duplication & Hygiene Standards", "Text-to-Columns & Delimiters", "Fixing Dirty Dates & Inconsistent Formats", "Structured Table Nomenclature"],
-            duration: "1–2 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Pivot Tables & Pivot Charts",
-            popular: true,
-            icon: <LineChart className="w-5 h-5" />,
-            details: "Summarize thousands of operational records in seconds: calculated fields, date groupings, interactive slicers, timelines, and dynamic visual charts.",
-            features: ["Pivot Table Architecture & Layouts", "Calculated Items & Value Settings", "Interactive Timeline & Slicer Controls", "Dynamic Pivot Visualizations"],
-            duration: "2 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Excel Dashboards",
-            popular: true,
-            icon: <BarChart3 className="w-5 h-5" />,
-            details: "Build executive-grade interactive business dashboards with KPI cards, dynamic chart switchers, drill-down interactions, and professional aesthetics.",
-            features: ["Executive KPI Cards & Metrics", "Interactive Slicer-Connected Visuals", "Dynamic Chart Series Switchers", "Corporate Aesthetic Design Rules"],
-            duration: "2–3 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Data Analysis & Reporting",
-            icon: <FileSpreadsheet className="w-5 h-5" />,
-            details: "Statistical analysis, budget vs. actual variance reporting, automated monthly MIS preparation, what-if sensitivity modeling, and forecasting.",
-            features: ["Automated Monthly MIS Packs", "Variance & Financial Budget Tracking", "What-If Analysis & Goal Seek", "Linear Trend Forecasting"],
-            duration: "2–3 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Excel Automation & Productivity",
-            icon: <Laptop className="w-5 h-5" />,
-            details: "Eliminate repetitive manual spreadsheet tasks through recorded Excel Macros, custom keyboard shortcuts, and structured VBA automation routines.",
-            features: ["Macro Recording Best Practices", "VBA Syntax & Module Fundamentals", "One-Click Automated Workflows", "Custom Ribbon & Button Triggers"],
-            duration: "2–4 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Power Query",
-            popular: true,
-            icon: <Layers className="w-5 h-5" />,
-            details: "Extract, Transform, and Load (ETL) corporate data from multiple files and folders into automated self-refreshing analytical pipelines.",
-            features: ["Multi-File & Folder Consolidation", "Data Cleaning without Formulas", "Automated Daily Scheduled Refresh", "Merging & Appending Datasets"],
-            duration: "2 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Power BI & Data Visualization",
-            popular: true,
-            icon: <BarChart3 className="w-5 h-5" />,
-            details: "End-to-end business intelligence: Star schema data modeling, DAX measures and calculated columns, interactive reports, and cloud dashboard sharing.",
-            features: ["Data Modeling & Relationships", "Essential DAX Measures & Time Intelligence", "Interactive Visual Reports", "Power BI Service & Sharing"],
-            duration: "3–4 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        }
-    ],
-
-    software: [
-        {
-            name: "Python Programming",
-            popular: true,
-            icon: <Code className="w-5 h-5" />,
-            details: "Enterprise Python from foundational syntax to object-oriented programming (OOP), file automation, libraries, and RESTful API consumption.",
-            features: ["Python Syntax & Object-Oriented Design", "Standard Libraries & Utilities", "API Requests & JSON Parsing", "Automated Scripting & Testing"],
-            duration: "4–6 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Web Development",
-            icon: <Globe className="w-5 h-5" />,
-            details: "Modern frontend and responsive web standards: semantic HTML5, modern CSS3 layouts, ES6+ JavaScript, DOM events, and cross-browser quality.",
-            features: ["Modern Responsive Layouts", "JavaScript ES6+ Language Core", "Cross-Browser Compatibility", "Web Performance Standards"],
-            duration: "4–6 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "MERN Stack Development",
-            popular: true,
-            icon: <Layers className="w-5 h-5" />,
-            details: "Full stack web application development covering MongoDB database modeling, Express.js REST APIs, React single-page apps, and Node.js servers.",
-            features: ["MongoDB Schema & Aggregation", "Express & Node RESTful Services", "React State & Component Lifecycle", "Full Stack Production Architecture"],
-            duration: "6–8 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Java Programming",
-            icon: <Cpu className="w-5 h-5" />,
-            details: "Enterprise software development using Core Java, OOP design patterns, collections framework, exception handling, multithreading, and JDBC.",
-            features: ["Core Java & OOP Architecture", "Java Collections & Generics", "Exception Handling & Multithreading", "Database Connectivity (JDBC)"],
-            duration: "4–6 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "React JS Development",
-            popular: true,
-            icon: <Code className="w-5 h-5" />,
-            details: "Component architecture, React Hooks (useState, useEffect, useMemo), state management solutions, client-side routing, and clean API integration.",
-            features: ["Modern Functional Hooks", "State Management Patterns", "REST API Data Fetching", "Reusable UI Component Systems"],
-            duration: "3–4 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Node.js Development",
-            icon: <Database className="w-5 h-5" />,
-            details: "Scalable backend development using Node.js and Express: asynchronous event loops, JSON Web Token (JWT) authentication, and database connections.",
-            features: ["Async Event Loop & Streams", "JWT Authentication & Security", "Middleware Architecture", "SQL & NoSQL Database Operations"],
-            duration: "3–4 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Software Development Fundamentals",
-            icon: <FolderKanban className="w-5 h-5" />,
-            details: "Engineering best practices: Git version control, branching models, Agile/Scrum workflows, code review etiquette, and CI/CD basics.",
-            features: ["Git & GitHub Team Workflows", "Agile & Sprint Ceremonies", "Clean Code & Code Reviews", "Testing & Debugging Foundations"],
-            duration: "2–3 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        }
-    ],
-
-    digital: [
-        {
-            name: "Digital Marketing",
-            popular: true,
-            icon: <Globe className="w-5 h-5" />,
-            details: "Strategic digital marketing foundation covering customer acquisition funnels, multichannel campaigns, conversion optimization, and analytics.",
-            features: ["Full-Funnel Digital Strategy", "Channel Attribution & ROI", "Customer Journey Mapping", "Conversion Rate Optimization (CRO)"],
-            duration: "3–4 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "SEO – Search Engine Optimization",
-            icon: <Search className="w-5 h-5" />,
-            details: "Drive organic business rankings: keyword research, on-page optimization, content architecture, technical audits, and Search Console metrics.",
-            features: ["Commercial Keyword Research", "On-Page & Meta Tag Optimization", "Technical SEO & Core Web Vitals", "Google Search Console Monitoring"],
-            duration: "2–3 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Google Ads & PPC",
-            popular: true,
-            icon: <LineChart className="w-5 h-5" />,
-            details: "Paid search and display advertising: campaign structure, smart bidding strategies, keyword match types, negative keywords, and ROAS tracking.",
-            features: ["Search & Display Campaign Setup", "Quality Score Optimization", "Smart Bidding & Budget Management", "Conversion Tracking & Attribution"],
-            duration: "2–3 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Social Media Marketing",
-            icon: <Share2 className="w-5 h-5" />,
-            details: "B2B and B2C brand building across LinkedIn, Meta, and YouTube: organic content calendars, paid audience targeting, and community management.",
-            features: ["B2B LinkedIn Lead Generation", "Meta Ads & Lookalike Audiences", "Organic Calendar Planning", "Performance Reporting Metrics"],
-            duration: "2–3 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Content Marketing",
-            icon: <MessageSquare className="w-5 h-5" />,
-            details: "Storytelling and content assets that convert: corporate blogs, customer case studies, lead magnets, email newsletters, and editorial calendars.",
-            features: ["Content Strategy Frameworks", "High-Converting Case Studies", "Email Newsletter Sequences", "Editorial Pipeline Governance"],
-            duration: "2 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "E-Commerce & Digital Business",
-            icon: <Briefcase className="w-5 h-5" />,
-            details: "Online store operations, payment gateway setup, product catalog optimization, inventory handling, and customer retention strategies.",
-            features: ["Store Setup & Catalog Strategy", "Payment Gateways & Security", "Cart Abandonment Recovery", "Customer Lifetime Value Growth"],
-            duration: "3–4 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Marketing Analytics",
-            icon: <BarChart3 className="w-5 h-5" />,
-            details: "Google Analytics 4 (GA4) measurement: event setup, conversion funnels, custom exploration reports, and marketing spend efficiency.",
-            features: ["GA4 Configuration & Event Tracking", "Attribution & Channel Analysis", "Customer Acquisition Cost (CAC)", "Executive Marketing Dashboards"],
-            duration: "2–3 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "AI for Digital Marketing",
-            popular: true,
-            icon: <Sparkles className="w-5 h-5" />,
-            details: "Practical AI applications: automated ad copy variation testing, automated email drafting, visual creative generation, and predictive analytics.",
-            features: ["AI Copywriting & Angles", "Automated Visual Ad Generation", "Email Campaign Personalization", "Predictive Campaign Insights"],
-            duration: "2 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        }
-    ],
-
-    productivity: [
-        {
-            name: "MS Office",
-            popular: true,
-            icon: <Laptop className="w-5 h-5" />,
-            details: "Master the standard corporate productivity suite: professional Word documents, Excel calculations, and persuasive PowerPoint presentations.",
-            features: ["Executive Word Documentation", "Essential Excel Calculations", "High-Impact PowerPoint Decks", "Corporate Template Standards"],
-            duration: "2–3 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Tally & Computerized Accounting",
-            popular: true,
-            icon: <FileSpreadsheet className="w-5 h-5" />,
-            details: "Enterprise accounting and compliance: company creation, ledger vouchers, GST invoicing, bank reconciliation, and balance sheet preparation.",
-            features: ["Tally Prime Navigation", "Ledger & Voucher Entry", "GST Invoicing & Returns", "Balance Sheet & P&L Reporting"],
-            duration: "3–4 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Business Data & Reporting",
-            icon: <BarChart3 className="w-5 h-5" />,
-            details: "Turn daily operational metrics into clean, structured management reports, executive summaries, project trackers, and status updates.",
-            features: ["Structured Data Tracking", "Executive MIS Reporting", "Visual Chart Summaries", "Data Accuracy Auditing"],
-            duration: "2 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Digital Workplace Skills",
-            icon: <Globe className="w-5 h-5" />,
-            details: "Modern collaborative cloud platforms: Google Workspace, Microsoft 365, Teams, Slack, cloud storage sharing, and remote work protocols.",
-            features: ["Cloud Document Collaboration", "MS Teams & Slack Communication", "Calendar & Task Scheduling", "Digital File Organization"],
-            duration: "1–2 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Professional Email & Business Communication",
-            popular: true,
-            icon: <Mail className="w-5 h-5" />,
-            details: "Business communication etiquette: structured email writing, proposal drafting, stakeholder alignment, meeting minutes, and professional tone.",
-            features: ["Professional Email Structure", "Proposal & Brief Writing", "Cross-Functional Alignment", "Workplace Etiquette Standards"],
-            duration: "1–2 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Cyber Security Awareness",
-            icon: <Lock className="w-5 h-5" />,
-            details: "Protect corporate assets: identifying phishing attacks, credential hygiene, safe data handling, safe browsing, and incident reporting.",
-            features: ["Phishing & Social Engineering", "Password & 2FA Hygiene", "Sensitive Data Handling", "Incident Response Protocols"],
-            duration: "1 Week",
-            delivery: "On-Site / Online / Hybrid"
-        },
-        {
-            name: "Workplace Productivity Tools",
-            icon: <FolderKanban className="w-5 h-5" />,
-            details: "Project management and task management systems: Notion, Trello, Asana, structured time blocking, and meeting optimization frameworks.",
-            features: ["Kanban & Project Boards", "Time Management Systems", "Task Prioritization Frameworks", "Meeting Optimization Tools"],
-            duration: "1–2 Weeks",
-            delivery: "On-Site / Online / Hybrid"
-        }
-    ]
-};
+const corporateCourses = {};
 
 const corporateSolutions = [
     {
@@ -715,16 +371,21 @@ const CooperateTrainingProgram = () => {
 
 
     // Dynamic Corporate Courses State backed by MongoDB & real-time sync
-    const [dbCourses, setDbCourses] = useState(corporateCourses);
+    const [isBackendDown, setIsBackendDown] = useState(false);
+    const [dbCourses, setDbCourses] = useState({});
 
     // Fetch live corporate courses from MongoDB
     const fetchMongoCorporateCourses = async () => {
         try {
-            const res = await fetch('/api/courses?programType=corporate');
-            if (!res.ok) return;
+            const baseUrl = import.meta.env.VITE_ERP_API_BASE_URL || '';
+            const res = await fetch(`${baseUrl}/api/courses?programType=corporate`);
+            if (!res.ok) {
+                setIsBackendDown(true);
+                setDbCourses({});
+                return;
+            }
             const mongoList = await res.json();
             if (Array.isArray(mongoList) && mongoList.length > 0) {
-                // Group by categoryId and sort strictly by order ascending (#1 at top)
                 const grouped = {};
                 mongoList.forEach(item => {
                     const cat = item.categoryId || 'ai';
@@ -737,21 +398,26 @@ const CooperateTrainingProgram = () => {
                     });
                 });
 
-                // Sort each category by order ascending
                 for (const cat in grouped) {
                     grouped[cat].sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
                 }
 
-                setDbCourses(prev => ({ ...prev, ...grouped }));
+                setIsBackendDown(false);
+                setDbCourses(grouped);
+            } else {
+                setIsBackendDown(true);
+                setDbCourses({});
             }
         } catch (err) {
-            console.warn('MongoDB corporate fetch note:', err);
+            console.warn('[Corporate] Backend offline, standing by...', err.message);
+            setIsBackendDown(true);
+            setDbCourses({});
         }
     };
 
     useEffect(() => {
         fetchMongoCorporateCourses();
-        const interval = setInterval(fetchMongoCorporateCourses, 4000);
+        const interval = setInterval(fetchMongoCorporateCourses, 3000);
 
         const syncCourses = () => {
             fetchMongoCorporateCourses();
@@ -1280,11 +946,30 @@ const CooperateTrainingProgram = () => {
                 </div>
 
                 {/* Course Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-                    {currentCourses.map((course, idx) => (
-                        <CourseCard key={idx} course={course} index={idx} />
-                    ))}
-                </div>
+                {isBackendDown || currentCourses.length === 0 ? (
+                    <div className="text-center py-12 bg-white rounded-2xl border border-amber-200 p-8 max-w-lg mx-auto shadow-xs col-span-full">
+                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-50 text-amber-600 mb-3 border border-amber-200">
+                            <AlertCircle className="w-6 h-6 animate-pulse" />
+                        </div>
+                        <h3 className="text-base font-bold text-slate-800 mb-1">Corporate Training Database Disconnected</h3>
+                        <p className="text-xs text-slate-500 mb-4">
+                            All corporate programs and enterprise tracks are served directly from MongoDB. The backend is currently offline. Tracks will load automatically upon server reconnection.
+                        </p>
+                        <button
+                            onClick={fetchMongoCorporateCourses}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors"
+                        >
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            <span>Reload Corporate Programs</span>
+                        </button>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+                        {currentCourses.map((course, idx) => (
+                            <CourseCard key={idx} course={course} index={idx} />
+                        ))}
+                    </div>
+                )}
 
                 {/* ── Corporate Training Solutions (9 Modules) ── */}
                 <div className="mt-14 sm:mt-18 pt-10 border-t border-slate-200/80">

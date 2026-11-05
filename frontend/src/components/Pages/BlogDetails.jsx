@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate, useLocation, NavLink } from 'react-router-dom';
 import {
+  AlertCircle,
+  RefreshCw,
   Calendar,
   Clock,
   ArrowLeft,
@@ -21,185 +23,8 @@ import {
 } from 'lucide-react';
 
 // Static fallback blogs matching MainPage & Backend default seeds
-const FALLBACK_BLOGS = [
-  {
-    id: 101,
-    displayOrder: 1,
-    image: "/blog_it_skills.jpg",
-    coverImage: "/blog_it_skills.jpg",
-    tag: "Career Tips",
-    category: "Blogs",
-    title: "Top IT Skills in 2026 That Can Boost Your Career",
-    date: "12 Sep 2025",
-    readTime: "4 min read",
-    author: "Tech Training Cell",
-    excerpt: "Discover the most in-demand software skills — Full Stack development, Cloud services, and AI workflows — to fast-track your tech career.",
-    content: `The modern tech landscape is evolving at a breakneck speed. Organizations across the globe are no longer just hiring programmers—they are actively looking for problem solvers who can navigate full-cycle software product engineering, from responsive frontend interfaces to scalable backend APIs and cloud-ready architectures.
+const FALLBACK_BLOGS = [];
 
-### Why Full Stack & AI Skills Are In High Demand
-Full stack developers with familiarity in AI-augmented development (such as GitHub Copilot, Cursor, and LLM APIs) command premium salaries because they can deliver features twice as fast. Rather than maintaining separate teams for small iterations, high-growth startups and tech giants prefer engineers who understand:
-- **Component-Driven Frontend**: React 19, Next.js, and TypeScript for fluid user experiences.
-- **Robust API Architectures**: Express.js, FastAPI, and modular REST/GraphQL endpoints.
-- **Relational & NoSQL Databases**: PostgreSQL, MongoDB, and Redis caching.
-- **Containerization & CI/CD**: Docker, GitHub Actions, and cloud deployment pipelines.
-
-### Practical Learning vs. Passive Watching
-Passive video tutorials often give learners a false sense of mastery until they encounter real production bugs. At Aayush Institute of Professional Studies, every module is structured around daily live coding, peer pull-request reviews, and agile sprints simulating genuine software house environments.
-
-### Career Roadmap for 2026
-1. **Master Core Fundamentals**: Do not skip HTML5, CSS Grid/Flexbox, and Modern ES6+ JavaScript.
-2. **Build Non-Trivial Projects**: Avoid generic todo lists; build full multi-user SaaS platforms, ERP portals, or e-commerce engines.
-3. **Contribute to Open Source & GitHub**: Showcase your code publicly with clean commit histories and verified documentation.
-4. **Prepare for Technical Interviews**: Practice data structures, system design basics, and mock HR rounds.`,
-    highlights: [
-      "Master MERN (MongoDB, Express, React, Node.js) with production architectures",
-      "Hands-on Git/GitHub collaboration, branching strategies & CI/CD workflows",
-      "API integrations with AI models, cloud storage & secure authentication",
-      "100% placement assistance with mock technical & HR interview rounds"
-    ],
-    relatedLink: "/it-stack-development"
-  },
-  {
-    id: 102,
-    displayOrder: 2,
-    image: "/blog_distance_edu.jpg",
-    coverImage: "/blog_distance_edu.jpg",
-    tag: "Education",
-    category: "Blogs",
-    title: "Benefits of Distance Education for Working Professionals",
-    date: "10 Sep 2025",
-    readTime: "3 min read",
-    author: "Academic Advisory",
-    excerpt: "Learn how UGC-DEB entitled online degrees empower working adults to earn accredited qualifications without quitting their day jobs.",
-    content: `Balancing career growth with higher academic credentials has historically been a struggle for employed individuals. With the modern expansion of UGC-DEB entitled distance and online university programmes, working adults now have a verified, government-recognized pathway to upgrade their academic standing.
-
-### Why Pursue Online & Distance Degrees?
-1. **Flexibility Without Career Interruption**: Maintain your current job and regular income while attending weekend virtual lectures and self-paced modules.
-2. **Accredited Credentials**: Degrees from UGC-DEB recognized universities hold equal weight for government jobs, corporate appraisals, and overseas immigration.
-3. **Cost-Effective Higher Education**: Distance education significantly reduces tuition and eliminates campus accommodation and commute expenses.
-
-### Popular Programmes at Aayush Institute
-- **BCA & MCA**: Ideal for tech aspirants seeking accredited computer science credentials.
-- **BBA & MBA**: Tailored for working executives aiming for leadership and managerial positions.
-- **B.Com & M.Com**: Tailored for finance and accounting professionals.
-
-Our dedicated student advisory team provides end-to-end guidance from university admissions, study material distribution, and internal assignment tracking to semester examinations.`,
-    highlights: [
-      "UGC-DEB recognized degree credentials valid worldwide",
-      "Self-paced learning supported by weekend live faculty doubt classes",
-      "Cost-effective fee structures with convenient installment / EMI options",
-      "Eligible for corporate promotions, MNC eligibility & government exams"
-    ],
-    relatedLink: "/UniversityCourses"
-  },
-  {
-    id: 103,
-    displayOrder: 3,
-    image: "/blog_internships.jpg",
-    coverImage: "/blog_internships.jpg",
-    tag: "Internship",
-    category: "Blogs",
-    title: "How Internships Help You Get Hired Faster",
-    date: "08 Sep 2025",
-    readTime: "3 min read",
-    author: "Placement Cell",
-    excerpt: "Real-world project experience bridges the gap between classroom concepts and high-velocity corporate engineering standards.",
-    content: `A common hurdle faced by fresh graduates is the classic paradox: "You need experience to get a job, but you need a job to get experience." Internships and live client projects are the single most effective way to eliminate this roadblock.
-
-### The Real Impact of Live Project Exposure
-When recruiters evaluate hundreds of candidate resumes, theoretical knowledge on a sheet of paper looks identical across applicants. What immediately stands out is concrete evidence of real-world contribution:
-- Real commits on shared repositories.
-- Understanding agile standups, bug tracking, and sprint deadlines.
-- Deploying working applications to accessible live URLs.
-
-### From Internship to Pre-Placement Offer (PPO)
-At Aayush Institute, live project internships connect students directly with industry mentors. Students solve actual business briefs, receive weekly architectural feedback, and build a verified portfolio. Over 65% of students demonstrating consistent performance during our live projects receive pre-placement offers before completing their diplomas.`,
-    highlights: [
-      "Work directly on live client deliverables, prototypes & scalable databases",
-      "Mentorship from experienced senior tech leads with 1-on-1 code reviews",
-      "Build a verified GitHub repository & live portfolio website",
-      "Official certificate of completion, letter of recommendation & placement drives"
-    ],
-    relatedLink: "/LiveProject"
-  },
-  {
-    id: 104,
-    displayOrder: 4,
-    image: "/blog_future_ai.jpg",
-    coverImage: "/blog_future_ai.jpg",
-    tag: "Technology",
-    category: "Blogs",
-    title: "The Future of AI & How It's Changing the Job Market",
-    date: "05 Sep 2025",
-    readTime: "4 min read",
-    author: "AI Innovation Lab",
-    excerpt: "Artificial intelligence is reshaping everyday workflows. Learn how developers and creators can leverage AI to multiply their output.",
-    content: `Artificial intelligence is fundamentally revolutionizing every sector of the global economy. However, the common narrative that "AI will replace all developers" misses the essential reality: developers and creators who master AI tools will replace those who do not.
-
-### How AI Is Transforming Daily Workflows
-- **Autonomous Code Generation**: Leveraging LLM APIs to scaffold boilerplate logic, unit tests, and regex expressions in seconds.
-- **Intelligent Customer Interfaces**: Embedding customized knowledge-base chatbots and conversational agents into business portals.
-- **Automated Data Processing**: Analyzing customer behavior, predictive metrics, and reporting without complex manual scripts.
-
-### Staying Ahead in 2026
-To remain indispensable, professionals must move beyond simple surface-level prompts. Understanding model integration, vector embeddings, prompt engineering, and ethical AI deployment ensures you remain at the top tier of technical leadership.`,
-    highlights: [
-      "Integrating LLM APIs & automated generative AI workflows into production apps",
-      "Copilot-assisted rapid application development and automated testing",
-      "Data analysis, visualization & business intelligence using modern AI models",
-      "Future-proofing technical career skills for high-paying next-generation roles"
-    ],
-    relatedLink: "/Courses"
-  },
-  {
-    id: 105,
-    displayOrder: 5,
-    image: "/blog_it_skills.jpg",
-    coverImage: "/blog_it_skills.jpg",
-    tag: "Web Development",
-    category: "Blogs",
-    title: "Full Stack Roadmap 2026: Frontend, Backend & System Design",
-    date: "01 Oct 2025",
-    readTime: "5 min read",
-    author: "Full Stack Department",
-    excerpt: "Everything you need to know about mastering React 19, Node.js, databases, and modern cloud deployment in 2026.",
-    content: `Full stack development continues to be the foundation of digital innovation. In 2026, the expectations from full stack developers have expanded to include server components, edge rendering, containerization, and system design fundamentals.
-
-Whether you are starting from zero or transitioning from another domain, having a structured step-by-step roadmap will save you months of directionless learning. Join our guided mentorship at Aayush Institute to master every phase with hands-on labs and direct mentor assistance.`,
-    highlights: [
-      "Modern React 19, Next.js & TypeScript architectures",
-      "PostgreSQL, MongoDB, and Redis caching layers",
-      "Dockerizing applications & scalable cloud deployments",
-      "100% placement track with top tech firms and IT service consultancies"
-    ],
-    relatedLink: "/it-stack-development"
-  },
-  {
-    id: 106,
-    displayOrder: 6,
-    image: "/blog_distance_edu.jpg",
-    coverImage: "/blog_distance_edu.jpg",
-    tag: "Design & UX",
-    category: "Blogs",
-    title: "Mastering UI/UX: From User Research to High-Converting Interfaces",
-    date: "28 Sep 2025",
-    readTime: "4 min read",
-    author: "Design Studio Lead",
-    excerpt: "Explore the core fundamentals of UX research, Figma design systems, and rapid prototyping that employers look for.",
-    content: `A stunning website with poor usability will fail to convert, while an intuitive, human-centered product creates lasting customer loyalty. Great UI/UX design is not merely decoration—it is the strategic bridge between business goals and human psychology.
-
-Learn how to master Figma, user research, wireframing, interactive prototyping, and design systems in our comprehensive UI/UX Design course at Aayush Institute.`,
-    highlights: [
-      "Figma components, variants, auto-layout & token design systems",
-      "User research, empathy maps, journey flows & usability testing methods",
-      "Building production-ready responsive mobile and web interfaces",
-      "Live client design reviews & industry-ready portfolio creation"
-    ],
-    relatedLink: "/ui-ux-design"
-  }
-];
-
-// WhatsApp Icon SVG Component
 const WhatsAppIcon = ({ className = "w-5 h-5" }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor">
     <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
@@ -382,7 +207,8 @@ export default function BlogDetails() {
     return found || null;
   });
 
-  const [allBlogs, setAllBlogs] = useState(FALLBACK_BLOGS);
+  const [isBackendDown, setIsBackendDown] = useState(false);
+  const [allBlogs, setAllBlogs] = useState([]);
   const [loading, setLoading] = useState(!blog);
   const [copied, setCopied] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -537,21 +363,22 @@ export default function BlogDetails() {
         }
       }
 
-      // Final fallback to matching static list
+      // Strict Database Verification
       if (isMounted) {
-        const fallbackMatch = FALLBACK_BLOGS.find(
-          (b) => String(b.id) === String(id) || String(b.displayOrder) === String(id)
-        );
-        if (fallbackMatch) {
-          setBlog(fallbackMatch);
+        if (!blog) {
+          setIsBackendDown(true);
+        } else {
+          setIsBackendDown(false);
         }
         setLoading(false);
       }
     };
 
     fetchAllBlogsAndCurrent();
+    const interval = setInterval(fetchAllBlogsAndCurrent, 3000);
 
     return () => {
+      clearInterval(interval);
       isMounted = false;
     };
   }, [id]);

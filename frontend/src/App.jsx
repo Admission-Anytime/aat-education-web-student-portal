@@ -55,6 +55,10 @@ const App = () => {
             <Route path='Courses/ui-ux-design' element={<UIUXDesign />} />
             <Route path='Courses/digital-marketing' element={<DigitalMarketing />} />
             <Route path='Courses/tally-accounting' element={<TallyAccounting />} />
+            <Route path='Courses/:courseSlug' element={<Courses />} />
+            <Route path='courses/:courseSlug' element={<Courses />} />
+            <Route path='course/:courseSlug' element={<Courses />} />
+            <Route path='Course/:courseSlug' element={<Courses />} />
             <Route path='Courses/*' element={<Courses />} />
             <Route path='courses/*' element={<Courses />} />
             <Route path='Courses/Courses' element={<Courses />} />

@@ -17,6 +17,8 @@ import {
     Send,
     X,
     GraduationCap,
+    AlertCircle,
+    RefreshCw,
     TrendingUp,
     Calendar,
     ChevronRight,
@@ -35,8 +37,7 @@ import {
     Trash2,
     ShieldCheck,
     Lock,
-    KeyRound,
-    RefreshCw
+    KeyRound
 } from 'lucide-react';
 
 // Safe dynamic icon resolver for placement roles
@@ -126,324 +127,7 @@ const careerCategories = [
     }
 ];
 
-const placementRolesData = {
-    it: [
-        {
-            name: "Software Development",
-            subgroup: "Core Development",
-            icon: <Code className="w-5 h-5" />,
-            popular: true,
-            details: "Prepare for entry-level and junior Software Development Engineer (SDE) roles with strong data structures, algorithms, OOP fundamentals, and modular problem-solving.",
-            features: ["Data Structures & Algorithms", "OOP Design Principles", "Problem-Solving & Clean Code", "Technical Coding Assessments"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "Junior Software Engineer / SDE-1"
-        },
-        {
-            name: "Web Development",
-            subgroup: "Web & Frontend",
-            icon: <Globe className="w-5 h-5" />,
-            popular: true,
-            details: "Client-facing web engineering focusing on responsive design, modern JavaScript (ES6+), semantic HTML5, CSS frameworks, and cross-browser compliance.",
-            features: ["Modern JavaScript & CSS3", "Responsive Web Architecture", "REST API Consumption", "Portfolio Website Demonstration"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "Web Developer / Frontend Associate"
-        },
-        {
-            name: "Full Stack Development",
-            subgroup: "Full Stack Engineering",
-            icon: <Laptop className="w-5 h-5" />,
-            popular: true,
-            details: "End-to-end full stack developer training connecting frontends, robust backend REST APIs, authentication security, database modeling, and cloud deployments.",
-            features: ["End-to-End System Design", "Database Schemas & ORM", "API Security & Token Auth", "Live Production Project Defense"],
-            duration: "Full-Time / On-Site",
-            targetRole: "Full Stack Engineer"
-        },
-        {
-            name: "Python Development",
-            subgroup: "Backend Engineering",
-            icon: <Code className="w-5 h-5" />,
-            popular: true,
-            details: "Backend engineering roles utilizing Python, Django, Flask, database queries, web scraping, and microservice APIs with comprehensive unit testing.",
-            features: ["Django / Flask REST Framework", "SQL & NoSQL Integration", "Scripting & Automation", "Backend Architecture Viva Prep"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "Python Developer / Backend Engineer"
-        },
-        {
-            name: "Java Development",
-            subgroup: "Backend Engineering",
-            icon: <Laptop className="w-5 h-5" />,
-            popular: true,
-            details: "Enterprise corporate software roles using Core Java, Spring Boot, Hibernate ORM, microservices architecture, and enterprise design patterns.",
-            features: ["Core Java & Multithreading", "Spring Boot & Microservices", "Hibernate JPA Relational Mapping", "Enterprise Coding Interviews"],
-            duration: "Full-Time / On-Site",
-            targetRole: "Java Developer / Spring Boot Engineer"
-        },
-        {
-            name: "React JS",
-            subgroup: "Web & Frontend",
-            icon: <Code className="w-5 h-5" />,
-            popular: true,
-            details: "High-demand frontend positions for modern Single Page Applications (SPAs) built with React Hooks, Redux Toolkit, client-side routing, and API integration.",
-            features: ["Component Lifecycle & Hooks", "State Management (Redux/Zustand)", "Performance Optimization", "Live Frontend Coding Rounds"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "React Developer / Frontend Engineer"
-        },
-        {
-            name: "Node.js",
-            subgroup: "Backend Engineering",
-            icon: <Code className="w-5 h-5" />,
-            details: "Scalable server-side backend development roles emphasizing asynchronous event loops, Express frameworks, WebSocket integrations, and API performance.",
-            features: ["Asynchronous Event Loops", "REST API Development", "JWT Security & Rate Limiting", "Backend Microservice Scenarios"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "Node.js Backend Developer"
-        },
-        {
-            name: "MERN Stack",
-            subgroup: "Full Stack Engineering",
-            icon: <Laptop className="w-5 h-5" />,
-            popular: true,
-            details: "Comprehensive MERN engineer placement preparation: MongoDB Atlas, Express.js backend, React frontend, and Node.js servers with Git workflows.",
-            features: ["Full MERN Stack Proficiency", "Cloud Hosting (Vercel/Render)", "Full Stack Portfolio Codebase", "System Design Fundamentals"],
-            duration: "Full-Time / On-Site",
-            targetRole: "MERN Stack Developer"
-        }
-    ],
-
-    data: [
-        {
-            name: "Artificial Intelligence",
-            subgroup: "AI & Machine Learning",
-            icon: <Cpu className="w-5 h-5" />,
-            popular: true,
-            details: "Specialized roles in applied AI: foundational computer vision, natural language processing (NLP), neural network evaluation, and AI solution integration.",
-            features: ["AI & Neural Network Fundamentals", "Python AI Libraries", "Model Validation & Metrics", "Applied AI Case Studies"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "AI Specialist / Applied AI Associate"
-        },
-        {
-            name: "Generative AI",
-            subgroup: "AI & Machine Learning",
-            icon: <Sparkles className="w-5 h-5" />,
-            popular: true,
-            details: "Next-gen GenAI roles focusing on LangChain, Large Language Models (LLMs), RAG vector search implementations, prompt engineering, and enterprise AI automation.",
-            features: ["LangChain & LLM APIs", "RAG Vector Architecture", "Enterprise Prompt Engineering", "AI Automation Workflows"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "Generative AI Engineer / AI Consultant"
-        },
-        {
-            name: "Data Analytics",
-            subgroup: "Analytics & Intelligence",
-            icon: <TrendingUp className="w-5 h-5" />,
-            popular: true,
-            details: "Practical data analyst placements: data extraction with SQL, cleaning and statistical exploration with Pandas, and executive reporting presentations.",
-            features: ["Advanced SQL Analytical Queries", "Pandas & Python Data Wrangling", "Statistical Trend Extraction", "Business Metric Formulations"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "Data Analyst / Business Intelligence Associate"
-        },
-        {
-            name: "Machine Learning",
-            subgroup: "AI & Machine Learning",
-            icon: <Cpu className="w-5 h-5" />,
-            popular: true,
-            details: "Supervised and unsupervised predictive modeling, feature engineering, Scikit-Learn pipelines, model accuracy scoring, and Flask API deployment.",
-            features: ["Feature Engineering & Scaling", "Scikit-Learn ML Pipelines", "Model Accuracy & Confusion Matrix", "ML Project Portfolio Reviews"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "Machine Learning Engineer / Trainee"
-        },
-        {
-            name: "Power BI",
-            subgroup: "Analytics & Intelligence",
-            icon: <TrendingUp className="w-5 h-5" />,
-            popular: true,
-            details: "Business Intelligence roles focusing on enterprise Power BI dashboards, DAX formulas, Power Query data transformation, and data storytelling.",
-            features: ["Power Query ETL Transformation", "Complex DAX Measures & KPIs", "Star Schema Relationship Modeling", "Executive Dashboard Defense"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "Power BI Developer / BI Analyst"
-        },
-        {
-            name: "Cloud Computing",
-            subgroup: "Cloud & DevOps",
-            icon: <Cpu className="w-5 h-5" />,
-            popular: true,
-            details: "Cloud infrastructure associate positions: managing AWS/Azure compute instances, virtual private clouds, IAM permissions, storage, and load balancing.",
-            features: ["AWS / Azure Core Infrastructure", "IAM Policies & Cloud Security", "VPC & Storage Management", "Cloud Architecture Interviews"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "Cloud Engineer / Cloud Support Associate"
-        },
-        {
-            name: "DevOps",
-            subgroup: "Cloud & DevOps",
-            icon: <Settings className="w-5 h-5" />,
-            popular: true,
-            details: "Automated deployment, continuous integration (CI/CD) pipelines, Docker containerization, GitHub Actions, and Linux production server maintenance.",
-            features: ["CI/CD Pipeline Construction", "Docker Containerization", "Linux Administration & Bash", "Deployment Automation Scenarios"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "DevOps Engineer / Automation Associate"
-        }
-    ],
-
-    digital: [
-        {
-            name: "Digital Marketing",
-            subgroup: "Marketing & Growth",
-            icon: <Globe className="w-5 h-5" />,
-            popular: true,
-            details: "Full-funnel digital marketing careers: multi-channel campaign planning, conversion rate optimization, Google Ads, lead acquisition, and ROI tracking.",
-            features: ["Multi-Channel Campaign Strategy", "Google Ads & Meta Ads Management", "Conversion Funnel Optimization", "Marketing Analytics & Reporting"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "Digital Marketing Executive / Specialist"
-        },
-        {
-            name: "SEO",
-            subgroup: "Marketing & Growth",
-            icon: <Search className="w-5 h-5" />,
-            popular: true,
-            details: "Search Engine Optimization careers: keyword research, technical SEO audits, on-page content optimization, link profile building, and ranking metrics.",
-            features: ["Keyword Research & Content Maps", "Technical SEO Audits & Schemas", "Google Search Console & Analytics", "Backlink Strategy Development"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "SEO Specialist / Search Strategist"
-        },
-        {
-            name: "Social Media Marketing",
-            subgroup: "Marketing & Growth",
-            icon: <MessageSquare className="w-5 h-5" />,
-            details: "Brand audience growth on Instagram, LinkedIn, YouTube, and Facebook with creative calendar planning, engagement tactics, and influencer outreach.",
-            features: ["Social Content Calendars", "Engagement & Community Growth", "Meta Business Suite Mastery", "Brand Performance Metrics"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "Social Media Manager / Executive"
-        },
-        {
-            name: "E-Commerce",
-            subgroup: "E-Commerce & Business Operations",
-            icon: <Globe className="w-5 h-5" />,
-            popular: true,
-            details: "Online store management across Amazon, Flipkart, and Shopify: product listing optimization, inventory coordination, order fulfillment, and marketplace ads.",
-            features: ["Marketplace Listing & Cataloging", "Shopify Store Management", "Order & Inventory Operations", "E-Commerce Advertising Basics"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "E-Commerce Executive / Catalog Specialist"
-        },
-        {
-            name: "Business Analytics",
-            subgroup: "E-Commerce & Business Operations",
-            icon: <TrendingUp className="w-5 h-5" />,
-            details: "Bridging business goals and technical operations: KPI tracking, customer churn evaluation, process modeling, and presentation to leadership.",
-            features: ["Business KPI Formulations", "Process Workflow Mapping", "Data-Driven Strategy Formulation", "Stakeholder Presentation Prep"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "Business Analyst / Operations Strategist"
-        },
-        {
-            name: "Customer Support",
-            subgroup: "E-Commerce & Business Operations",
-            icon: <PhoneCall className="w-5 h-5" />,
-            details: "Client communication, ticket resolution with Zendesk/Freshdesk, professional email etiquette, issue escalation protocols, and customer retention.",
-            features: ["CRM & Ticketing Systems", "Conflict Resolution & Empathy", "Professional Communication", "Customer Success KPIs"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "Customer Support Specialist / Executive"
-        },
-        {
-            name: "Business Operations",
-            subgroup: "E-Commerce & Business Operations",
-            icon: <Briefcase className="w-5 h-5" />,
-            details: "Operational management in corporate workplaces: scheduling, procurement coordination, vendor communication, team reporting, and productivity workflows.",
-            features: ["Office Productivity Workflows", "Vendor & Resource Management", "Documentation & Reporting", "Operational Problem Solving"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "Operations Executive / Business Coordinator"
-        }
-    ],
-
-    design: [
-        {
-            name: "UI/UX Design",
-            subgroup: "Product Design",
-            icon: <Palette className="w-5 h-5" />,
-            popular: true,
-            details: "High-paying product design careers: user interviews, empathy maps, UX architecture, wireframing, UI kits, interactive prototyping, and usability testing.",
-            features: ["User Empathy & Problem Statements", "Wireframing & Information Architecture", "High-Fidelity Interactive Flows", "Behance / Dribbble Portfolio Defense"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "UI/UX Designer / Product Designer"
-        },
-        {
-            name: "Graphic Design",
-            subgroup: "Visual Design",
-            icon: <Palette className="w-5 h-5" />,
-            popular: true,
-            details: "Commercial graphic design roles using Photoshop, Illustrator, and CorelDRAW: brand identity logos, marketing banners, brochures, and vector artworks.",
-            features: ["Brand Identity & Logo Systems", "Marketing Creative Collateral", "Typography & Color Theory", "Print & Digital Media Production"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "Graphic Designer / Visual Artist"
-        },
-        {
-            name: "Web Design",
-            subgroup: "Visual Design",
-            icon: <Laptop className="w-5 h-5" />,
-            details: "Digital web layout design: creating responsive landing pages, conversion-optimized marketing pages, interactive hero sections, and design systems.",
-            features: ["Responsive Web Grid Systems", "Landing Page CRO Layouts", "Modern UI Micro-Interactions", "Figma to Web Developer Specs"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "Web Designer / Creative Layout Artist"
-        },
-        {
-            name: "Digital Design",
-            subgroup: "Product Design",
-            icon: <Palette className="w-5 h-5" />,
-            popular: true,
-            details: "Multi-platform digital creatives: app icons, social media carousels, motion graphics fundamentals, email templates, and corporate digital decks.",
-            features: ["Cross-Platform Digital Creatives", "Motion Graphics Basics", "Email Template Layouts", "Portfolio Presentation Coaching"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "Digital Designer / Creative Specialist"
-        }
-    ],
-
-    support: [
-        {
-            name: "Computer Hardware & Networking",
-            subgroup: "Hardware & Infrastructure",
-            icon: <Settings className="w-5 h-5" />,
-            popular: true,
-            details: "PC assembly, diagnostics, motherboard troubleshooting, LAN/WAN setup, crimping, switches, routers, and client workstation deployment.",
-            features: ["Hardware Diagnostics & Assembly", "LAN/WAN Configuration & Cabling", "OS & Driver Installations", "Peripheral & Printer Maintenance"],
-            duration: "Full-Time / On-Site",
-            targetRole: "Hardware & Network Engineer"
-        },
-        {
-            name: "IT Support",
-            subgroup: "Technical Services",
-            icon: <Laptop className="w-5 h-5" />,
-            popular: true,
-            details: "Internal corporate IT support: user account setup, Active Directory basics, antivirus deployment, remote support tools, and software troubleshooting.",
-            features: ["Active Directory User Management", "Remote Desktop Support Tools", "Antivirus & Firewall Rules", "IT Ticket Resolution Etiquette"],
-            duration: "Full-Time / On-Site",
-            targetRole: "IT Support Engineer / Desktop Engineer"
-        },
-        {
-            name: "Technical Support",
-            subgroup: "Technical Services",
-            icon: <PhoneCall className="w-5 h-5" />,
-            popular: true,
-            details: "Client and customer technical support: diagnosing software glitches, handling phone/chat escalations, documentation, and SLA compliance.",
-            features: ["SLA & Escalation Protocols", "Voice & Chat Tech Assistance", "Troubleshooting Trees & Guides", "Client Relationship Etiquette"],
-            duration: "Full-Time / Hybrid",
-            targetRole: "Technical Support Specialist"
-        },
-        {
-            name: "Network Support",
-            subgroup: "Hardware & Infrastructure",
-            icon: <Settings className="w-5 h-5" />,
-            details: "Monitoring network uptime, configuring routers and access points, IP addressing (IPv4/IPv6), subnetting, and resolving connectivity drops.",
-            features: ["IP Addressing & Subnetting", "Router & AP Configurations", "Network Monitoring Tools", "Bandwidth & Packet Diagnostics"],
-            duration: "Full-Time / On-Site",
-            targetRole: "Network Support Associate / NOC Tech"
-        },
-        {
-            name: "System Support",
-            subgroup: "Technical Services",
-            icon: <Settings className="w-5 h-5" />,
-            details: "System administrative support: Windows and Linux workstation maintenance, backup schedules, patch management, and hardware upgrades.",
-            features: ["Windows & Linux Administration", "Data Backup & Recovery Routines", "System Patch Management", "Hardware Upgrade Procedures"],
-            duration: "Full-Time / On-Site",
-            targetRole: "System Support Associate"
-        }
-    ]
-};
+const placementRolesData = {};
 
 const whoCanJoinStreams = [
     'ITI',
@@ -689,55 +373,57 @@ const Placement = () => {
 
 
     // Placement Roles State backed by localStorage
-    const [dbRoles, setDbRoles] = useState(() => {
+    const [isBackendDown, setIsBackendDown] = useState(false);
+    const [dbRoles, setDbRoles] = useState({});
+
+    const fetchMongoRoles = async () => {
         try {
-            const saved = localStorage.getItem('aayush_placement_roles_custom');
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                const clean = {};
-                for (const [k, list] of Object.entries(parsed)) {
-                    if (Array.isArray(list)) {
-                        clean[k] = list.map(r => {
-                            const { icon, ...rest } = r;
-                            return rest;
-                        });
-                    }
-                }
-                return { ...placementRolesData, ...clean };
+            const baseUrl = import.meta.env.VITE_ERP_API_BASE_URL || "";
+            const res = await fetch(`${baseUrl}/api/courses`);
+            if (!res.ok) {
+                setIsBackendDown(true);
+                setDbRoles({});
+                return;
             }
-        } catch (e) {
-            console.warn(e);
+            const mongoList = await res.json();
+            if (Array.isArray(mongoList) && mongoList.length > 0) {
+                const grouped = {};
+                mongoList.forEach(item => {
+                    if (item.visible === false) return;
+                    const cat = item.categoryId || (item.type && item.type.toLowerCase()) || "software";
+                    if (!grouped[cat]) grouped[cat] = [];
+                    grouped[cat].push({
+                        id: item._id || item.id,
+                        _id: item._id,
+                        name: item.name || item.title,
+                        subgroup: item.subgroup || "Job Role Track",
+                        salary: item.salary || "₹ 3.5 – 8.5 LPA",
+                        growth: "+28% YoY",
+                        popular: !!item.popular,
+                        details: item.details || item.oneLiner || item.description || "",
+                        skills: Array.isArray(item.skills) && item.skills.length > 0 ? item.skills : (item.skills ? String(item.skills).split(",").map(s => s.trim()) : ["Industry Relevant Skills"]),
+                        recruiters: Array.isArray(item.career) && item.career.length > 0 ? item.career.slice(0, 4) : ["TCS", "Infosys", "Wipro", "HCL"],
+                        duration: item.duration || "3–6 Months",
+                        rating: item.rating || 4.8
+                    });
+                });
+                setIsBackendDown(false);
+                setDbRoles(grouped);
+            } else {
+                setIsBackendDown(true);
+                setDbRoles({});
+            }
+        } catch (err) {
+            console.warn("[Placement] Backend offline, standing by...", err.message);
+            setIsBackendDown(true);
+            setDbRoles({});
         }
-        return placementRolesData;
-    });
+    };
 
     useEffect(() => {
-        const syncRoles = () => {
-            try {
-                const saved = localStorage.getItem('aayush_placement_roles_custom');
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    const clean = {};
-                    for (const [k, list] of Object.entries(parsed)) {
-                        if (Array.isArray(list)) {
-                            clean[k] = list.map(r => {
-                                const { icon, ...rest } = r;
-                                return rest;
-                            });
-                        }
-                    }
-                    setDbRoles({ ...placementRolesData, ...clean });
-                }
-            } catch (e) {
-                console.warn(e);
-            }
-        };
-        window.addEventListener('placementRolesUpdated', syncRoles);
-        window.addEventListener('storage', syncRoles);
-        return () => {
-            window.removeEventListener('placementRolesUpdated', syncRoles);
-            window.removeEventListener('storage', syncRoles);
-        };
+        fetchMongoRoles();
+        const interval = setInterval(fetchMongoRoles, 3000);
+        return () => clearInterval(interval);
     }, []);
 
     const handleResetToDefaults = () => {
@@ -1527,11 +1213,30 @@ const Placement = () => {
                 </div>
 
                 {/* Role Grid - All courses/roles of this page kept together in a unified continuous grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-                    {currentRoles.map((role, idx) => (
-                        <RoleCard key={idx} role={role} index={idx} />
-                    ))}
-                </div>
+                {isBackendDown || currentRoles.length === 0 ? (
+                    <div className="text-center py-12 bg-white rounded-2xl border border-amber-200 p-8 max-w-lg mx-auto shadow-xs col-span-full">
+                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-50 text-amber-600 mb-3 border border-amber-200">
+                            <AlertCircle className="w-6 h-6 animate-pulse" />
+                        </div>
+                        <h3 className="text-base font-bold text-slate-800 mb-1">Placement Records Database Disconnected</h3>
+                        <p className="text-xs text-slate-500 mb-4">
+                            All career pathways, placement records, and hiring partner roles are pulled directly from MongoDB. The backend is currently offline. Content will render automatically upon database reconnection.
+                        </p>
+                        <button
+                            onClick={fetchMongoRoles}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors"
+                        >
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            <span>Reload Placement Records</span>
+                        </button>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+                        {currentRoles.map((role, idx) => (
+                            <RoleCard key={idx} role={role} index={idx} />
+                        ))}
+                    </div>
+                )}
 
                 {/* WHO CAN JOIN? SECTION */}
                 <div className="mt-14 sm:mt-16 bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/20 rounded-2xl p-6 sm:p-8 border-2 border-blue-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] relative overflow-hidden">

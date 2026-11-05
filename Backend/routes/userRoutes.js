@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs";
 import { Router } from "express";
 import User from "../models/User.js";
 import multer from "multer";
@@ -130,7 +131,7 @@ router.post("/", async (req, res) => {
       bio,
       image,
       status: status || "active",
-      password: password || "password123",
+      password: password ? await bcrypt.hash(password, 10) : await bcrypt.hash("User@" + Math.floor(1000 + Math.random() * 9000), 10),
       isApproved: status === "active" || role === "staff",
     });
 
@@ -239,7 +240,7 @@ router.post("/seed-faculty", async (req, res) => {
         await User.create({
           ...fac,
           memberId: `STF-${Math.floor(100 + Math.random() * 900)}`,
-          password: "password123",
+          password: await bcrypt.hash(process.env.INITIAL_FACULTY_PASSWORD || "AayushFaculty@2026", 10),
           isApproved: true
         });
         inserted++;

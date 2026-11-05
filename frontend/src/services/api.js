@@ -42,179 +42,67 @@ async function request(endpoint, options = {}) {
     }
 }
 
-// Offline user store helper for development / offline demonstration
-const getOfflineUsers = () => {
-    try {
-        return JSON.parse(localStorage.getItem('aayush_offline_users') || '[]');
-    } catch {
-        return [];
-    }
-};
-
-const saveOfflineUser = (user) => {
-    const users = getOfflineUsers();
-    users.push(user);
-    localStorage.setItem('aayush_offline_users', JSON.stringify(users));
-};
-
-// Authentication API
+// Authentication API (Real API integration with Backend)
 export const authApi = {
     register: async (userData) => {
-        try {
-            return await request('/auth/register', {
-                method: 'POST',
-                body: JSON.stringify(userData)
-            });
-        } catch (error) {
-            // Offline fallback when backend is offline
-            const isStaffRole = userData.role === 'staff' || userData.role === 'admin';
-            const user = {
-                id: 'usr_' + Date.now(),
-                name: userData.name || (isStaffRole ? 'Staff Member' : 'Student Member'),
-                email: (userData.email || (isStaffRole ? 'staff@aayush.com' : 'student@aayush.com')).toLowerCase(),
-                phone: userData.phone || '',
-                role: userData.role || 'student',
-                course: userData.course || '',
-                department: userData.department || (isStaffRole ? 'Faculty / Instructor' : undefined),
-                studentId: !isStaffRole ? ('AAY-' + Math.floor(1000 + Math.random() * 9000)) : undefined,
-                staffId: isStaffRole ? (userData.staffId || ('STF-' + Math.floor(100 + Math.random() * 900))) : undefined
-            };
-            saveOfflineUser(user);
-            const token = 'demo_jwt_' + btoa(JSON.stringify({ id: user.id, role: user.role }));
-            localStorage.setItem('aayush_token', token);
-            localStorage.setItem('aayush_user', JSON.stringify(user));
-            return {
-                success: true,
-                message: 'Account created successfully! Welcome to Aayush Institute.',
-                token,
-                user
-            };
+        const payload = {
+            name: userData.name,
+            email: userData.email,
+            phone: userData.phone,
+            password: userData.password,
+            role: userData.role || 'student',
+            course: userData.course || '',
+            department: userData.department || ''
+        };
+        const res = await request('/auth/register-request', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        if (res && res.token) {
+            localStorage.setItem('aayush_token', res.token);
+            localStorage.setItem('aayush_user', JSON.stringify(res.user));
         }
+        return res;
     },
 
     login: async (credentials) => {
-        try {
-            return await request('/auth/login', {
-                method: 'POST',
-                body: JSON.stringify(credentials)
-            });
-        } catch (error) {
-            // Offline fallback when backend is offline
-            const { identifier, email, loginType } = credentials;
-            const target = (email || identifier || '').trim().toLowerCase();
-
-            const offlineUsers = getOfflineUsers();
-            const found = offlineUsers.find(u =>
-                u.email.toLowerCase() === target ||
-                (identifier && (u.studentId === identifier || u.staffId === identifier || u.alumniId === identifier))
-            );
-
-            let role = loginType || 'student';
-            if (target.includes('admin')) role = 'admin';
-            else if (target.includes('staff') || (identifier && identifier.toUpperCase().startsWith('STF'))) role = 'staff';
-            else if (target.includes('alumni') || (identifier && identifier.toUpperCase().startsWith('ALM'))) role = 'alumni';
-
-            const isDemoAccount = target === 'student@aayush.com' || target === 'staff@aayush.com' || target === 'admin@aayush.com' || target === 'alumni@aayush.com';
-            
-            const extractNameFromEmail = (mail) => {
-                if (!mail) return 'Student';
-                const prefix = mail.split('@')[0];
-                const clean = prefix.replace(/[0-9]/g, '').replace(/[._-]/g, ' ').trim();
-                if (!clean) return 'Student';
-                return clean.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-            };
-
-            const user = found || {
-                id: (isDemoAccount ? 'demo_' : 'usr_') + role + '_' + Date.now(),
-                name: isDemoAccount
-                    ? (role === 'admin' ? 'Administrator' : role === 'staff' ? 'Faculty Member' : role === 'alumni' ? 'Alumni Graduate' : 'Aayush Student')
-                    : extractNameFromEmail(target),
-                email: email || target,
-                role: role,
-                isProfileComplete: isDemoAccount ? true : false,
-                isEnrolled: isDemoAccount ? true : false,
-                studentId: identifier || (isDemoAccount ? 'AAY-2024-1082' : 'Pending Enrollment'),
-                staffId: role === 'staff' ? (identifier || 'STF-001') : '',
-                alumniId: role === 'alumni' ? (identifier || 'ALM-2022') : '',
-                enrolledCourse: isDemoAccount ? 'Software & Full Stack Development' : '',
-                phone: ''
-            };
-
-            const token = 'demo_jwt_' + btoa(JSON.stringify({ 
-                id: user.id, 
-                role: user.role, 
-                email: user.email, 
-                name: user.name, 
-                isProfileComplete: user.isProfileComplete, 
-                isEnrolled: user.isEnrolled 
-            }));
-            localStorage.setItem('aayush_token', token);
-            localStorage.setItem('aayush_user', JSON.stringify(user));
-
-            return {
-                success: true,
-                message: `Login successful! Welcome back, ${user.name}.`,
-                token,
-                user
-            };
+        const res = await request('/auth/login', {
+            method: 'POST',
+            body: JSON.stringify(credentials)
+        });
+        if (res && res.token) {
+            localStorage.setItem('aayush_token', res.token);
+            localStorage.setItem('aayush_user', JSON.stringify(res.user || res.admin));
         }
+        return res;
     },
 
     forgotPassword: async (email) => {
-        try {
-            return await request('/auth/forgot-password', {
-                method: 'POST',
-                body: JSON.stringify({ email })
-            });
-        } catch (error) {
-            // Offline fallback: provide instant reset code
-            return {
-                success: true,
-                message: 'Password reset code generated.',
-                resetCode: '123456'
-            };
-        }
+        return await request('/auth/forgot-password', {
+            method: 'POST',
+            body: JSON.stringify({ email })
+        });
     },
 
     resetPassword: async (payload) => {
-        try {
-            return await request('/auth/reset-password', {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            });
-        } catch (error) {
-            return {
-                success: true,
-                message: 'Password reset successfully! You can now log in.'
-            };
-        }
+        const token = payload.resetToken || payload.resetCode || payload.token;
+        return await request(`/auth/reset-password/${token}`, {
+            method: 'POST',
+            body: JSON.stringify({ password: payload.newPassword || payload.password })
+        });
     },
 
     getProfile: () => request('/auth/me'),
 
     updateProfile: async (profileData) => {
-        try {
-            return await request('/auth/profile', {
-                method: 'PUT',
-                body: JSON.stringify(profileData)
-            });
-        } catch (error) {
-            // Local fallback
-            const existing = JSON.parse(localStorage.getItem('aayush_user') || '{}');
-            const updated = { ...existing, ...profileData };
-            localStorage.setItem('aayush_user', JSON.stringify(updated));
-            window.dispatchEvent(new Event('authChange'));
-            return {
-                success: true,
-                message: 'Profile updated successfully',
-                user: updated
-            };
+        const res = await request('/auth/profile', {
+            method: 'PUT',
+            body: JSON.stringify(profileData)
+        });
+        if (res && res.user) {
+            localStorage.setItem('aayush_user', JSON.stringify(res.user));
         }
-    },
-
-    logout: () => {
-        localStorage.removeItem('aayush_token');
-        localStorage.removeItem('aayush_user');
+        return res;
     }
 };
 
@@ -524,7 +412,6 @@ export const healthApi = {
     check: () => request('/health')
 };
 
-// Dynamic Student Profile & Dashboard API
 export const studentApi = {
     getProfile: async () => {
         try {

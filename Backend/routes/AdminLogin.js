@@ -12,17 +12,7 @@ const router = express.Router();
 // 🔹 GET ALL ADMINS
 router.get("/admins", async (req, res) => {
   try {
-    let admins = await Admin.find().select("-password").sort({ createdAt: -1 });
-    if (admins.length === 0) {
-      // Seed default admin
-      const hashed = await bcrypt.hash("admin123", 10);
-      const defaultAdmin = new Admin({
-        email: "admin@aayushinstitute.com",
-        password: hashed
-      });
-      await defaultAdmin.save();
-      admins = [defaultAdmin];
-    }
+    const admins = await Admin.find().select("-password").sort({ createdAt: -1 });
     res.json({ success: true, data: admins });
   } catch (err) {
     res.status(500).json({ success: false, message: "Error fetching admins" });
@@ -132,7 +122,7 @@ router.delete("/admins/:id", async (req, res) => {
   }
 });
 
-// 🔹 DASHBOARD STATS (100% Real-Time from Database)
+// 🔹 DASHBOARD STATS (Real-Time from Database)
 router.get("/stats", async (req, res) => {
   try {
     const [
@@ -148,11 +138,11 @@ router.get("/stats", async (req, res) => {
     ] = await Promise.all([
       Course.countDocuments({
         $or: [{ programType: "course" }, { programType: { $exists: false } }, { programType: null }],
-      }).catch(() => 22),
+      }).catch(() => 0),
       Course.countDocuments({
         $or: [{ programType: "course" }, { programType: { $exists: false } }, { programType: null }],
         visible: { $ne: false },
-      }).catch(() => 22),
+      }).catch(() => 0),
       Inquiry.countDocuments().catch(() => 0),
       Admin.countDocuments().catch(() => 0),
       User.countDocuments().catch(() => 0),
@@ -165,8 +155,8 @@ router.get("/stats", async (req, res) => {
     res.json({
       success: true,
       data: {
-        totalCourses: coursesCount || 22,
-        liveCourses: liveCourses || 22,
+        totalCourses: coursesCount,
+        liveCourses: liveCourses,
         totalLeads: inquiriesCount,
         totalStudents: inquiriesCount,
         totalStaff: staffCount,
@@ -182,14 +172,28 @@ router.get("/stats", async (req, res) => {
   }
 });
 
-// 🔹 REGISTER ADMIN (optional)
+// 🔹 REGISTER ADMIN
 router.post("/register", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, name, role } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: "Email and password are required" });
+    }
+    const cleanEmail = email.trim().toLowerCase();
+    const existing = await Admin.findOne({ email: cleanEmail });
+    if (existing) {
+      return res.status(400).json({ success: false, message: "Admin with this email already exists" });
+    }
     const hashed = await bcrypt.hash(password, 10);
-    const newAdmin = new Admin({ email, password: hashed });
+    const newAdmin = new Admin({
+      name: name || cleanEmail.split("@")[0] || "Admin",
+      email: cleanEmail,
+      password: hashed,
+      role: role || "Admin",
+      status: "active"
+    });
     await newAdmin.save();
-    res.json({ success: true, message: "Admin registered" });
+    res.json({ success: true, message: "Admin registered successfully" });
   } catch (err) {
     res.status(500).json({ success: false, message: "Error registering admin" });
   }
@@ -208,25 +212,20 @@ router.post("/register-request", async (req, res) => {
       return res.status(400).json({ success: false, message: "An account with this email already exists" });
     }
 
-    if (role === "student") {
-      return res.status(403).json({
-        success: false,
-        message: "Students cannot register from this portal. Please use the Student Portal on the main website."
-      });
-    }
-
-    const targetRole = role === "alumni" ? "alumni" : "staff";
-    const targetStatus = "pending";
-    const isApproved = false;
+    const targetRole = role === "alumni" ? "alumni" : role === "student" ? "student" : "staff";
+    const targetStatus = targetRole === "student" ? "active" : "pending";
+    const isApproved = targetRole === "student";
 
     const genId = targetRole === "staff" ? `STF-${Math.floor(100 + Math.random() * 900)}` :
       targetRole === "alumni" ? `ALM-${new Date().getFullYear()}-${Math.floor(10 + Math.random() * 90)}` :
-      `STU-${Math.floor(1000 + Math.random() * 9000)}`;
+      `AAY-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
       name,
       email: cleanEmail,
-      password, // Plain or hashed
+      password: hashedPassword,
       role: targetRole,
       phone: phone || "",
       department: department || (targetRole === "staff" ? "Academic Faculty" : ""),
@@ -239,14 +238,29 @@ router.post("/register-request", async (req, res) => {
     });
     await newUser.save();
 
+    const token = jwt.sign(
+      { id: newUser._id, email: newUser.email, role: targetRole },
+      process.env.JWT_SECRET_KEY || "myscretkey",
+      { expiresIn: targetRole === "student" ? "7d" : "24h" }
+    );
+
     res.status(201).json({
       success: true,
       message: targetRole === "student"
-        ? "Student account created successfully! You can now log in."
+        ? "Student account created successfully! You can now access your learning profile."
         : `Your ${targetRole} application was submitted successfully! It is currently pending Administrator approval before you can access the portal.`,
       role: targetRole,
       status: targetStatus,
-      user: { _id: newUser._id, name: newUser.name, email: newUser.email, role: targetRole, status: targetStatus }
+      token: targetRole === "student" ? token : undefined,
+      user: {
+        _id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        role: targetRole,
+        memberId: newUser.memberId,
+        studentId: targetRole === "student" ? newUser.memberId : undefined,
+        status: targetStatus
+      }
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -288,118 +302,107 @@ router.put("/approve-user/:id", async (req, res) => {
   }
 });
 
-// 🔹 LOGIN (Admin, Staff, Alumni, Student with Strict Approval and Navigation Enforcement)
+// 🔹 LOGIN (Admin, Staff, Alumni, Student with Strict Approval and Security)
 router.post("/login", async (req, res) => {
   try {
-    const { email, password, roleHint } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ success: false, message: "Email and password are required" });
+    const { email, password, identifier, roleHint } = req.body;
+    const rawIdentifier = (email || identifier || "").trim();
+    if (!rawIdentifier || !password) {
+      return res.status(400).json({ success: false, message: "Email / ID and password are required" });
     }
 
-    const cleanEmail = email.trim().toLowerCase();
+    const cleanEmail = rawIdentifier.toLowerCase();
+    const cleanId = rawIdentifier;
 
-    // 1️⃣ Role-based authentication segregation: Block student logins from Admin Portal
-    if (roleHint === "student") {
-      return res.status(403).json({
-        success: false,
-        message: "Access Denied: Students cannot log in from the Admin Portal. Please use the Student Portal on the main website."
-      });
-    }
-
-    // 2️⃣ Check Admin Collection (Admin & Management Staff Only)
-    let admin = await Admin.findOne({
+    // 1️⃣ Check Admin Collection (Admin & Management Staff)
+    const admin = await Admin.findOne({
       email: { $regex: new RegExp(`^${cleanEmail}$`, "i") }
     });
 
-    if (!admin) {
-      // Auto-create initial super-admin if credentials match official admin email
-      if (cleanEmail === "aastechit@admin.com" || cleanEmail === "admin@aayushinstitute.com") {
-        const hashed = await bcrypt.hash(password, 10);
-        admin = new Admin({ email: cleanEmail, password: hashed });
-        await admin.save();
-      }
-    }
-
     if (admin) {
-      let isMatch = await bcrypt.compare(password, admin.password);
-      if (!isMatch && cleanEmail === "aastechit@admin.com") {
-        const hashed = await bcrypt.hash(password, 10);
-        admin.password = hashed;
-        await admin.save();
-        isMatch = true;
+      const isMatch = await bcrypt.compare(password, admin.password);
+      if (!isMatch) {
+        return res.status(400).json({ success: false, message: "Invalid email or password" });
       }
 
-      if (isMatch) {
-        if (admin.status === "pending" && cleanEmail !== "aastechit@admin.com" && cleanEmail !== "admin@aayushinstitute.com") {
-          return res.status(403).json({
-            success: false,
-            message: "Your admin account is pending approval by the Super Administrator."
-          });
-        }
-        if (admin.status === "suspended" && cleanEmail !== "aastechit@admin.com" && cleanEmail !== "admin@aayushinstitute.com") {
-          return res.status(403).json({
-            success: false,
-            message: "Your admin account has been suspended. Please contact the Super Administrator."
-          });
-        }
-
-        const token = jwt.sign(
-          { id: admin._id, email: admin.email, role: admin.role || "admin" },
-          process.env.JWT_SECRET_KEY || "myscretkey",
-          { expiresIn: "24h" }
-        );
-        return res.json({
-          success: true,
-          message: "Admin login successful",
-          token,
-          role: "admin",
-          admin: {
-            _id: admin._id,
-            email: admin.email,
-            name: admin.name || "Super Admin",
-            role: "admin",
-            status: admin.status || "active",
-            isApproved: true
-          },
-          user: {
-            _id: admin._id,
-            email: admin.email,
-            name: admin.name || "Super Admin",
-            role: "admin",
-            status: admin.status || "active",
-            isApproved: true
-          },
-          redirectTo: "/panel"
+      if (admin.status === "pending") {
+        return res.status(403).json({
+          success: false,
+          message: "Your admin account is pending approval by the Super Administrator."
         });
       }
+      if (admin.status === "suspended") {
+        return res.status(403).json({
+          success: false,
+          message: "Your admin account has been suspended. Please contact the Super Administrator."
+        });
+      }
+
+      const token = jwt.sign(
+        { id: admin._id, email: admin.email, role: admin.role || "admin" },
+        process.env.JWT_SECRET_KEY || "myscretkey",
+        { expiresIn: "24h" }
+      );
+
+      return res.json({
+        success: true,
+        message: "Admin login successful",
+        token,
+        role: "admin",
+        admin: {
+          _id: admin._id,
+          email: admin.email,
+          name: admin.name || "Administrator",
+          role: "admin",
+          status: admin.status || "active",
+          isApproved: true
+        },
+        user: {
+          _id: admin._id,
+          email: admin.email,
+          name: admin.name || "Administrator",
+          role: "admin",
+          status: admin.status || "active",
+          isApproved: true
+        },
+        redirectTo: "/panel"
+      });
     }
 
-    // 2️⃣ Check User Collection (Staff, Alumni, Student)
+    // 2️⃣ Check User Collection (Staff, Alumni, Student) by email or memberId
     const user = await User.findOne({
-      email: { $regex: new RegExp(`^${cleanEmail}$`, "i") }
+      $or: [
+        { email: { $regex: new RegExp(`^${cleanEmail}$`, "i") } },
+        { memberId: cleanId }
+      ]
     });
 
     if (!user) {
       return res.status(400).json({ success: false, message: "Invalid email or password" });
     }
 
-    // Check user password (support both bcrypt hashed & plain text fallback)
+    // Check user password (support both bcrypt hashed & plain text upgrade)
     let passwordMatch = false;
     if (user.password && (user.password.startsWith("$2a$") || user.password.startsWith("$2b$"))) {
       passwordMatch = await bcrypt.compare(password, user.password);
-    } else {
+    } else if (user.password) {
       passwordMatch = (user.password === password);
+      // If matched legacy plain text, auto-upgrade to secure bcrypt hash
+      if (passwordMatch) {
+        user.password = await bcrypt.hash(password, 10);
+        await user.save();
+      }
     }
 
     if (!passwordMatch) {
       return res.status(400).json({ success: false, message: "Invalid email or password" });
     }
 
-    // ⛔ STRICT RESTRICTION: Students are not allowed on this portal
-    if (user.role === "student") {
+    // Block Students from logging into the Admin Management Panel
+    if (user.role === "student" && (roleHint === "staff" || roleHint === "admin")) {
       return res.status(403).json({
         success: false,
-        message: "Access Denied: Students cannot log in from this portal. Please use the Student Portal on the main website.",
+        message: "Access Denied: Students cannot log in from the Admin Portal. Please use the Student Portal on the main website.",
       });
     }
 
@@ -413,10 +416,13 @@ router.post("/login", async (req, res) => {
           message: `Admin Approval Required: Your ${user.role.toUpperCase()} account is pending Administrator approval. You cannot log in until verified.`,
         });
       }
-    } else {
+    }
+
+    // If Student account is inactive
+    if (user.role === "student" && user.status === "inactive") {
       return res.status(403).json({
         success: false,
-        message: "Access Denied: Only Staff and Alumni members can access this portal.",
+        message: "Your student account is currently inactive. Please contact the institute admission desk.",
       });
     }
 
@@ -424,14 +430,14 @@ router.post("/login", async (req, res) => {
     const token = jwt.sign(
       { id: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET_KEY || "myscretkey",
-      { expiresIn: "24h" }
+      { expiresIn: user.role === "student" ? "7d" : "24h" }
     );
 
-    const redirectTo = user.role === "alumni" ? "/student" : "/panel";
+    const redirectTo = user.role === "student" ? "/profile" : user.role === "alumni" ? "/student" : "/panel";
 
     return res.json({
       success: true,
-      message: `${user.role === "alumni" ? "Alumni" : "Staff"} login successful!`,
+      message: `${user.role.charAt(0).toUpperCase() + user.role.slice(1)} login successful!`,
       token,
       role: user.role,
       user: {
@@ -443,6 +449,9 @@ router.post("/login", async (req, res) => {
         company: user.company || "",
         batch: user.batch || "",
         memberId: user.memberId,
+        studentId: user.role === "student" ? user.memberId : undefined,
+        course: user.course || "",
+        phone: user.phone || "",
         status: user.status,
         isApproved: user.isApproved !== false
       },
@@ -458,10 +467,23 @@ router.post("/login", async (req, res) => {
 router.post("/forgot-password", async (req, res) => {
   try {
     const { email } = req.body;
-    const admin = await Admin.findOne({ email });
-    if (!admin) return res.status(404).json({ success: false, message: "Admin not found" });
+    if (!email) return res.status(400).json({ success: false, message: "Email is required" });
+    const cleanEmail = email.trim().toLowerCase();
 
-    const resetToken = jwt.sign({ id: admin._id }, process.env.JWT_SECRET || "myscretkey", { expiresIn: "15m" });
+    const admin = await Admin.findOne({ email: { $regex: new RegExp(`^${cleanEmail}$`, "i") } });
+    const user = !admin ? await User.findOne({ email: { $regex: new RegExp(`^${cleanEmail}$`, "i") } }) : null;
+
+    if (!admin && !user) {
+      return res.status(404).json({ success: false, message: "Account with this email does not exist" });
+    }
+
+    const targetId = admin ? admin._id : user._id;
+    const accountType = admin ? "admin" : "user";
+    const resetToken = jwt.sign(
+      { id: targetId, accountType },
+      process.env.JWT_SECRET_KEY || process.env.JWT_SECRET || "myscretkey",
+      { expiresIn: "15m" }
+    );
 
     res.json({ success: true, message: "Password reset link generated", resetToken });
   } catch (err) {
@@ -474,11 +496,17 @@ router.post("/reset-password/:token", async (req, res) => {
   try {
     const { token } = req.params;
     const { password } = req.body;
+    if (!password) return res.status(400).json({ success: false, message: "New password is required" });
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "myscretkey");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY || process.env.JWT_SECRET || "myscretkey");
     const hashed = await bcrypt.hash(password, 10);
 
-    await Admin.findByIdAndUpdate(decoded.id, { password: hashed });
+    if (decoded.accountType === "user") {
+      await User.findByIdAndUpdate(decoded.id, { password: hashed });
+    } else {
+      await Admin.findByIdAndUpdate(decoded.id, { password: hashed });
+    }
+
     res.json({ success: true, message: "Password reset successful" });
   } catch (err) {
     res.status(500).json({ success: false, message: "Invalid or expired token" });
