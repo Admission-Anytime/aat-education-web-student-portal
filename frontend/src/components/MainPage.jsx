@@ -664,7 +664,7 @@ export default function MainPage() {
       {/* ── Top Scroll Reading Progress Indicator ── */}
       <div className="scroll-progress-line" style={{ width: `${scrollProgress}%` }} />
 
-      {/* ── Backend Standby Mode Banner (Auto-Reconnect Enabled) ── */}
+      {/* ── Live Sync Banner (Auto-Reconnect Enabled) ── */}
       {!isDbConnected && (
         <div className="bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-amber-500/15 border-b border-amber-300/40 px-3.5 sm:px-6 py-2 text-amber-900 text-xs sm:text-[13px] flex flex-wrap items-center justify-between gap-3 sticky top-[56px] z-40 backdrop-blur-md shadow-xs">
           <div className="flex items-center gap-2.5">
@@ -672,16 +672,16 @@ export default function MainPage() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
             </span>
-            <span className="font-bold text-amber-950">Backend Server Offline:</span>
-            <span className="text-amber-800 hidden sm:inline">Sections standby mode me hain. Jaise hi Backend start hoga, sabhi data automatic reload ho jayega.</span>
-            <span className="text-amber-800 sm:hidden">Auto-reconnecting...</span>
+            <span className="font-bold text-amber-950">Connecting to Server:</span>
+            <span className="text-amber-800 hidden sm:inline">Showing preview content while we sync live updates.</span>
+            <span className="text-amber-800 sm:hidden">Syncing live updates...</span>
           </div>
           <button
             onClick={fetchAllFromDb}
             className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-semibold text-xs shadow-xs transition hover:scale-105 active:scale-95 cursor-pointer ml-auto sm:ml-0"
           >
             <RefreshCw className="w-3.5 h-3.5" />
-            <span>Reload Data</span>
+            <span>Retry</span>
           </button>
         </div>
       )}

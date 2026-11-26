@@ -154,23 +154,19 @@ const WhatsAppFloatingBtn = () => {
         </div>
       )}
 
-      {/* ── Circular WhatsApp Trigger Button (Exact Image 3 match) ── */}
+      {/* ── Circular WhatsApp Trigger Button ── */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-[#25D366] hover:bg-[#20ba59] text-white shadow-[0_10px_25px_rgba(37,211,102,0.45)] hover:shadow-[0_14px_30px_rgba(37,211,102,0.65)] flex items-center justify-center transition-all duration-300 transform hover:scale-110 active:scale-95 cursor-pointer group"
+        className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#25D366] hover:bg-[#20ba59] text-white shadow-[0_6px_20px_rgba(37,211,102,0.4)] hover:shadow-[0_10px_28px_rgba(37,211,102,0.55)] flex items-center justify-center transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer group"
         title="Chat on WhatsApp"
         aria-label="WhatsApp Chat & Support"
       >
-        {/* Subtle Outer Ping Wave */}
-        <span className="absolute inset-0 rounded-full bg-[#25D366] opacity-35 animate-ping pointer-events-none" />
-
         {/* Centered White WhatsApp SVG Icon */}
-        <WhatsAppIcon className="w-7 h-7 sm:w-7.5 sm:h-7.5 relative z-10 text-white drop-shadow-xs" />
+        <WhatsAppIcon className="w-6 h-6 sm:w-7 sm:h-7 relative z-10 text-white" />
 
-        {/* Online Notification Beacon Dot on Top-Right (matching Image 3) */}
-        <span className="absolute top-1 right-1 sm:top-1.5 sm:right-1.5 flex h-3.5 w-3.5 z-20 pointer-events-none">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-200 opacity-80" />
-          <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#6ee7b7] border-2 border-white shadow-xs" />
+        {/* Clean Online Notification Dot on Outer Corner */}
+        <span className="absolute top-0 right-0 flex h-3 w-3 z-20 pointer-events-none">
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-400 border-2 border-white shadow-xs" />
         </span>
       </button>
     </div>

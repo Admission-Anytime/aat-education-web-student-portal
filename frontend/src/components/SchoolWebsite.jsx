@@ -5,7 +5,7 @@ import CooperateTrainingProgram from './Navbar/CooperateTrainingProgram'
 import News from './Navbar/News'
 import Courses from './Navbar/Courses'
 import logo_image from '../assets/img/Logo.jpg'
-import { Facebook, Instagram, Linkedin, MapPin, Youtube, Twitter, MessageCircle } from 'lucide-react'
+import { Facebook, Instagram, Linkedin, Youtube, Twitter, MessageCircle } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
 import Header from './Navbar/Header'
 import MobileTabBar from './Navbar/MobileTabBar'
@@ -108,12 +108,12 @@ const SchoolWebsite = () => {
                     <div className="grid grid-cols-2 md:grid-cols-12 gap-y-7 gap-x-5 lg:gap-x-8 items-start">
 
                         {/* Left Brand Column */}
-                        <div className="col-span-2 md:col-span-4 flex flex-col items-center md:items-start text-center md:text-left pr-0 md:pr-4">
-                            <div className="relative group md:ml-3">
+                        <div className="col-span-2 md:col-span-4 flex flex-col items-center text-center pr-0 md:pr-4">
+                            <div className="relative group">
                                 <img
                                     src="/ayush_circle_logo.png"
                                     alt="Aayush Institute"
-                                    className="w-14 h-14 sm:w-16 sm:h-16 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)] transition-transform duration-200 group-hover:scale-105"
+                                    className="w-10 h-10 sm:w-11 sm:h-11 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)] transition-transform duration-200 group-hover:scale-105"
                                 />
                             </div>
 
@@ -123,24 +123,13 @@ const SchoolWebsite = () => {
                             </h3>
 
                             {/* Crisp Tagline */}
-                            <div className="text-xs sm:text-[12.5px] font-semibold tracking-wide mt-1.5 flex items-center justify-center md:justify-start gap-1.5 flex-wrap">
+                            <div className="text-xs sm:text-[12.5px] font-semibold tracking-wide mt-1.5 flex items-center justify-center gap-1.5 flex-wrap">
                                 <span className="text-[#fed000]">Learn</span>
                                 <span className="text-slate-400">•</span>
                                 <span className="text-emerald-400">Grow</span>
                                 <span className="text-slate-400">•</span>
                                 <span className="text-sky-300">Build Your Future</span>
                             </div>
-
-                            <a
-                                href="https://www.google.com/search?q=aayush+institute+of+professional+studies"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-start gap-1.5 text-xs text-slate-400 mt-3 pt-2.5 border-t border-white/10 w-full justify-center md:justify-start hover:text-[#fed000] transition-colors group"
-                                title="View on Google Maps / Search"
-                            >
-                                <MapPin className="w-3.5 h-3.5 text-[#fed000] flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
-                                <span className="leading-snug">S-14, DLF Dilshad Extention II, Bhopura, Sahibabad, Ghaziabad, Uttar Pradesh 201006</span>
-                            </a>
                         </div>
 
                         {/* Dynamic Columns from MongoDB footerData.sections */}
