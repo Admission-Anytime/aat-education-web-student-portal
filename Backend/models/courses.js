@@ -29,6 +29,29 @@ const CourseSchema = new Schema({
   prerequisites: [{ type: String }],
   structure: [String],
   visible: { type: Boolean, default: true },
+  detailedOverview: { type: String, default: "" },
+  syllabusModules: [
+    {
+      title: { type: String, default: "" },
+      subtitle: { type: String, default: "" },
+      duration: { type: String, default: "" },
+      badge: { type: String, default: "" },
+      topics: [{ type: String }]
+    }
+  ],
+  projectsList: [
+    {
+      title: { type: String, default: "" },
+      category: { type: String, default: "" },
+      description: { type: String, default: "" }
+    }
+  ],
+  courseFaqs: [
+    {
+      q: { type: String, default: "" },
+      a: { type: String, default: "" }
+    }
+  ],
 
   // School-Web Portal specific fields
   name: { type: String },

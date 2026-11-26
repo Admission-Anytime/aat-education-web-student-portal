@@ -178,6 +178,11 @@ export default function CoursesAdmin({
     degrees: "",
     suitableFor: "",
     delivery: "On-Site / Online / Hybrid",
+    detailedOverview: "",
+    prerequisites: "",
+    syllabusModules: [],
+    projectsList: [],
+    courseFaqs: [],
   };
   const [courseForm, setCourseForm] = useState(defaultForm);
 
@@ -549,6 +554,24 @@ export default function CoursesAdmin({
       degrees: course.degrees || "",
       suitableFor: course.suitableFor || "",
       delivery: course.delivery || "On-Site / Online / Hybrid",
+      detailedOverview: course.detailedOverview || "",
+      prerequisites: Array.isArray(course.prerequisites) ? course.prerequisites.join(", ") : (course.prerequisites || ""),
+      syllabusModules: Array.isArray(course.syllabusModules) ? course.syllabusModules.map((m) => ({
+        title: m.title || "",
+        subtitle: m.subtitle || "",
+        duration: m.duration || "",
+        badge: m.badge || "",
+        topics: Array.isArray(m.topics) ? m.topics.join("\n") : (m.topics || ""),
+      })) : [],
+      projectsList: Array.isArray(course.projectsList) ? course.projectsList.map((p) => ({
+        title: p.title || "",
+        category: p.category || "",
+        description: p.description || "",
+      })) : [],
+      courseFaqs: Array.isArray(course.courseFaqs) ? course.courseFaqs.map((f) => ({
+        q: f.q || "",
+        a: f.a || "",
+      })) : [],
     });
     setModalTab("basic");
     setShowCourseModal(true);
@@ -617,6 +640,34 @@ export default function CoursesAdmin({
         degrees: courseForm.degrees || "",
         suitableFor: courseForm.suitableFor || "",
         delivery: courseForm.delivery || "On-Site / Online / Hybrid",
+        detailedOverview: courseForm.detailedOverview || "",
+        prerequisites: courseForm.prerequisites
+          ? String(courseForm.prerequisites).split(",").map((s) => s.trim()).filter(Boolean)
+          : [],
+        syllabusModules: (courseForm.syllabusModules || [])
+          .filter((m) => m.title && m.title.trim())
+          .map((m) => ({
+            title: m.title.trim(),
+            subtitle: (m.subtitle || "").trim(),
+            duration: (m.duration || "").trim(),
+            badge: (m.badge || "").trim(),
+            topics: Array.isArray(m.topics)
+              ? m.topics
+              : String(m.topics || "").split("\n").map((t) => t.trim()).filter(Boolean),
+          })),
+        projectsList: (courseForm.projectsList || [])
+          .filter((p) => p.title && p.title.trim())
+          .map((p) => ({
+            title: p.title.trim(),
+            category: (p.category || "").trim(),
+            description: (p.description || "").trim(),
+          })),
+        courseFaqs: (courseForm.courseFaqs || [])
+          .filter((f) => f.q && f.q.trim())
+          .map((f) => ({
+            q: f.q.trim(),
+            a: (f.a || "").trim(),
+          })),
       };
 
       if (editingCourse) {
@@ -2108,6 +2159,267 @@ export default function CoursesAdmin({
                   <label htmlFor="popularCheckbox" className="text-xs font-bold text-amber-950 cursor-pointer">
                     Display with "★ POPULAR" featured ribbon on main website homepage
                   </label>
+                </div>
+
+                {/* Detailed Overview & Prerequisites (for Full Course Detail Page) */}
+                <div className="p-4 rounded-2xl bg-indigo-50/50 border border-indigo-200/80 space-y-3">
+                  <h4 className="text-xs font-bold text-indigo-950 flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-indigo-600" />
+                    <span>Full Course Detail Page Content (Live Sync)</span>
+                  </h4>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Detailed Course Overview (Optional — overrides static overview on dedicated page)
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={courseForm.detailedOverview}
+                      onChange={(e) => setCourseForm({ ...courseForm, detailedOverview: e.target.value })}
+                      placeholder="Comprehensive overview shown on the dedicated course page..."
+                      className="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Prerequisites (comma-separated)
+                    </label>
+                    <input
+                      type="text"
+                      value={courseForm.prerequisites}
+                      onChange={(e) => setCourseForm({ ...courseForm, prerequisites: e.target.value })}
+                      placeholder="e.g. Basic Computer Knowledge, 10th/12th Pass"
+                      className="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800"
+                    />
+                  </div>
+                </div>
+
+                {/* Syllabus Modules Editor */}
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-800">Syllabus Modules ({(courseForm.syllabusModules || []).length})</h4>
+                      <p className="text-[10.5px] text-slate-500">Add or edit live modules shown on the dedicated course page.</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCourseForm((prev) => ({
+                          ...prev,
+                          syllabusModules: [
+                            ...(prev.syllabusModules || []),
+                            { title: "", subtitle: "", duration: "", badge: "", topics: "" },
+                          ],
+                        }))
+                      }
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Add Module
+                    </button>
+                  </div>
+                  {(courseForm.syllabusModules || []).map((mod, mIdx) => (
+                    <div key={mIdx} className="p-3 rounded-xl bg-white border border-slate-200 space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[11px] font-bold text-indigo-600">Module #{mIdx + 1}</span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCourseForm((prev) => ({
+                              ...prev,
+                              syllabusModules: prev.syllabusModules.filter((_, i) => i !== mIdx),
+                            }))
+                          }
+                          className="text-rose-500 hover:text-rose-700 text-[11px] font-semibold cursor-pointer"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <input
+                          type="text"
+                          value={mod.title}
+                          onChange={(e) => {
+                            const updated = [...courseForm.syllabusModules];
+                            updated[mIdx] = { ...updated[mIdx], title: e.target.value };
+                            setCourseForm({ ...courseForm, syllabusModules: updated });
+                          }}
+                          placeholder="Module Title"
+                          className="px-3 py-1.5 text-xs border border-slate-200 rounded-lg"
+                        />
+                        <input
+                          type="text"
+                          value={mod.duration}
+                          onChange={(e) => {
+                            const updated = [...courseForm.syllabusModules];
+                            updated[mIdx] = { ...updated[mIdx], duration: e.target.value };
+                            setCourseForm({ ...courseForm, syllabusModules: updated });
+                          }}
+                          placeholder="Duration (e.g. 2 Weeks)"
+                          className="px-3 py-1.5 text-xs border border-slate-200 rounded-lg"
+                        />
+                        <input
+                          type="text"
+                          value={mod.badge}
+                          onChange={(e) => {
+                            const updated = [...courseForm.syllabusModules];
+                            updated[mIdx] = { ...updated[mIdx], badge: e.target.value };
+                            setCourseForm({ ...courseForm, syllabusModules: updated });
+                          }}
+                          placeholder="Badge (e.g. Core)"
+                          className="px-3 py-1.5 text-xs border border-slate-200 rounded-lg"
+                        />
+                      </div>
+                      <textarea
+                        rows={2}
+                        value={Array.isArray(mod.topics) ? mod.topics.join("\n") : mod.topics}
+                        onChange={(e) => {
+                          const updated = [...courseForm.syllabusModules];
+                          updated[mIdx] = { ...updated[mIdx], topics: e.target.value };
+                          setCourseForm({ ...courseForm, syllabusModules: updated });
+                        }}
+                        placeholder="Topics (1 per line)"
+                        className="w-full px-3 py-1.5 text-xs font-mono border border-slate-200 rounded-lg"
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Live Projects Editor */}
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-800">Capstone / Live Projects ({(courseForm.projectsList || []).length})</h4>
+                      <p className="text-[10.5px] text-slate-500">Hands-on projects included in this course.</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCourseForm((prev) => ({
+                          ...prev,
+                          projectsList: [...(prev.projectsList || []), { title: "", category: "", description: "" }],
+                        }))
+                      }
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Add Project
+                    </button>
+                  </div>
+                  {(courseForm.projectsList || []).map((proj, pIdx) => (
+                    <div key={pIdx} className="p-3 rounded-xl bg-white border border-slate-200 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-emerald-600">Project #{pIdx + 1}</span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCourseForm((prev) => ({
+                              ...prev,
+                              projectsList: prev.projectsList.filter((_, i) => i !== pIdx),
+                            }))
+                          }
+                          className="text-rose-500 hover:text-rose-700 text-[11px] font-semibold cursor-pointer"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <input
+                          type="text"
+                          value={proj.title}
+                          onChange={(e) => {
+                            const updated = [...courseForm.projectsList];
+                            updated[pIdx] = { ...updated[pIdx], title: e.target.value };
+                            setCourseForm({ ...courseForm, projectsList: updated });
+                          }}
+                          placeholder="Project Title"
+                          className="px-3 py-1.5 text-xs border border-slate-200 rounded-lg"
+                        />
+                        <input
+                          type="text"
+                          value={proj.category}
+                          onChange={(e) => {
+                            const updated = [...courseForm.projectsList];
+                            updated[pIdx] = { ...updated[pIdx], category: e.target.value };
+                            setCourseForm({ ...courseForm, projectsList: updated });
+                          }}
+                          placeholder="Category / Tech Stack"
+                          className="px-3 py-1.5 text-xs border border-slate-200 rounded-lg"
+                        />
+                      </div>
+                      <input
+                        type="text"
+                        value={proj.description}
+                        onChange={(e) => {
+                          const updated = [...courseForm.projectsList];
+                          updated[pIdx] = { ...updated[pIdx], description: e.target.value };
+                          setCourseForm({ ...courseForm, projectsList: updated });
+                        }}
+                        placeholder="Short project description"
+                        className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg"
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Course FAQs Editor */}
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-800">Course FAQs ({(courseForm.courseFaqs || []).length})</h4>
+                      <p className="text-[10.5px] text-slate-500">Custom Q&amp;A shown on the course detail page.</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCourseForm((prev) => ({
+                          ...prev,
+                          courseFaqs: [...(prev.courseFaqs || []), { q: "", a: "" }],
+                        }))
+                      }
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white text-[11px] font-bold cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Add FAQ
+                    </button>
+                  </div>
+                  {(courseForm.courseFaqs || []).map((faq, fIdx) => (
+                    <div key={fIdx} className="p-3 rounded-xl bg-white border border-slate-200 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600">FAQ #{fIdx + 1}</span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCourseForm((prev) => ({
+                              ...prev,
+                              courseFaqs: prev.courseFaqs.filter((_, i) => i !== fIdx),
+                            }))
+                          }
+                          className="text-rose-500 hover:text-rose-700 text-[11px] font-semibold cursor-pointer"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={faq.q}
+                        onChange={(e) => {
+                          const updated = [...courseForm.courseFaqs];
+                          updated[fIdx] = { ...updated[fIdx], q: e.target.value };
+                          setCourseForm({ ...courseForm, courseFaqs: updated });
+                        }}
+                        placeholder="Question"
+                        className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg"
+                      />
+                      <textarea
+                        rows={2}
+                        value={faq.a}
+                        onChange={(e) => {
+                          const updated = [...courseForm.courseFaqs];
+                          updated[fIdx] = { ...updated[fIdx], a: e.target.value };
+                          setCourseForm({ ...courseForm, courseFaqs: updated });
+                        }}
+                        placeholder="Answer"
+                        className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg"
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
 

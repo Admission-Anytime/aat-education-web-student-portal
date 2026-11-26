@@ -56,10 +56,11 @@ router.get("/seed", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const totalCount = await Course.countDocuments();
-    const hasAllOfferings = totalCount >= 45;
 
-    if (!hasAllOfferings || req.query.reset === "true") {
-      await Course.deleteMany({});
+    if (totalCount === 0 || req.query.reset === "true") {
+      if (req.query.reset === "true") {
+        await Course.deleteMany({});
+      }
       await Course.insertMany(initialCourses);
     }
 

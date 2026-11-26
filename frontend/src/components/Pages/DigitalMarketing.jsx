@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
+import LiveCourseSummaryStrip from '../Common/LiveCourseSummaryStrip';
 import {
     TrendingUp,
     Search,
@@ -753,7 +754,7 @@ export default function DigitalMarketing() {
                     <div className="flex items-center gap-2">
                         <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 animate-pulse" />
                         <span>
-                            <strong>Backend Offline:</strong> Course curriculum and live enrollment data are in standby mode. Auto-reconnecting every 3 seconds...
+                            <strong>Connecting to Server:</strong> Showing preview curriculum while syncing live updates.
                         </span>
                     </div>
                     <button
@@ -761,7 +762,7 @@ export default function DigitalMarketing() {
                         className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded text-xs font-medium transition cursor-pointer"
                     >
                         <RefreshCw className="w-3 h-3" />
-                        <span>Reload Data</span>
+                        <span>Retry</span>
                     </button>
                 </div>
             )}
@@ -846,6 +847,8 @@ export default function DigitalMarketing() {
                     </div>
                 </div>
             </div>
+
+            <LiveCourseSummaryStrip courseData={courseData} />
 
             {/* ── 2. ARCHITECTURE & OVERVIEW MATRIX (Ultra-Colorful 4 Cards) ── */}
             <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
